@@ -31,7 +31,9 @@ import 'reading_plan_detail_v2_screen.dart';
 import 'your_space_screen.dart';
 import '../../data/curated_plans.dart';
 import '../../l10n/l10n.dart';
+import '../../state/home_provider.dart';
 import '../../theme/design_tokens.dart';
+import '../widgets/dictionary_entry_sheet.dart';
 
 /// Redesigned Study hub (V2): Large by default, every card the same
 /// size.
@@ -61,6 +63,7 @@ const _v2CardIds = [
   'dictionary',
   'concordance',
   'commentary',
+  'wotd',
   'votd_archive',
   'streak',
 ];
@@ -130,8 +133,7 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
   /// Long-press card sheet: size (Large, Extra Large, Half) + reorder.
   /// The only customization UI — no persistent handles, no edit mode.
   void _showCardSize(StudyCardConfig card, List<StudyCardConfig> cards) {
-    final isLarge = card.span == CardSpan.full && !card.expanded;
-    final isXLarge = card.span == CardSpan.full && card.expanded;
+    final isFull = card.span == CardSpan.full;
     final isHalf = card.span == CardSpan.half;
     final index = cards.indexWhere((c) => c.id == card.id);
     final canUp = index > 0;
@@ -195,22 +197,13 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                 child: V2Eyebrow(context.l10n.studyCardSize),
               ),
               option(
-                label: context.l10n.studySizeLarge,
-                hint: context.l10n.studySizeLargeHint,
+                label: context.l10n.studySizeFull,
+                hint: context.l10n.studySizeFullHint,
                 icon: Icons.crop_landscape_rounded,
-                selected: isLarge,
+                selected: isFull,
                 onPick: () => ref
                     .read(studyLayoutProvider.notifier)
                     .setCardSize(card.id, span: CardSpan.full, expanded: false),
-              ),
-              option(
-                label: context.l10n.studySizeExtraLarge,
-                hint: context.l10n.studySizeExtraLargeHint,
-                icon: Icons.aspect_ratio_rounded,
-                selected: isXLarge,
-                onPick: () => ref
-                    .read(studyLayoutProvider.notifier)
-                    .setCardSize(card.id, span: CardSpan.full, expanded: true),
               ),
               option(
                 label: context.l10n.studySizeHalf,
@@ -220,6 +213,28 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                 onPick: () => ref
                     .read(studyLayoutProvider.notifier)
                     .setCardSize(card.id, span: CardSpan.half, expanded: false),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                child: V2Eyebrow(context.l10n.studyPresetLayout),
+              ),
+              option(
+                label: context.l10n.studyPresetFull,
+                hint: context.l10n.studySizeFullHint,
+                icon: Icons.view_agenda_rounded,
+                selected: false,
+                onPick: () => ref
+                    .read(studyLayoutProvider.notifier)
+                    .applyPreset(CardSpan.full),
+              ),
+              option(
+                label: context.l10n.studyPresetHalf,
+                hint: context.l10n.studySizeHalfHint,
+                icon: Icons.view_column_rounded,
+                selected: false,
+                onPick: () => ref
+                    .read(studyLayoutProvider.notifier)
+                    .applyPreset(CardSpan.half),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
@@ -328,6 +343,50 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                   ],
                 ),
                 const SizedBox(height: 14),
+                // Layout presets: Full and Half
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Row(
+                    children: [
+                      Text(
+                        context.l10n.studyPresetLayout,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.65),
+                          fontWeight: FontWeight.w600,
+                          fontSize: TypeScale.micro,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const Spacer(),
+                      _PresetPill(
+                        icon: Icons.view_agenda_rounded,
+                        label: context.l10n.studySizeFull,
+                        selected: cards.every((c) => c.span == CardSpan.full),
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          ref
+                              .read(studyLayoutProvider.notifier)
+                              .applyPreset(CardSpan.full);
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      _PresetPill(
+                        icon: Icons.view_column_rounded,
+                        label: context.l10n.studySizeHalf,
+                        selected: cards
+                            .where((c) => c.id != 'your_space')
+                            .every((c) => c.span == CardSpan.half),
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          ref
+                              .read(studyLayoutProvider.notifier)
+                              .applyPreset(CardSpan.half);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
                 // Cards (Large default; halves pair up).
                 LayoutBuilder(
                   builder: (context, constraints) {
@@ -492,18 +551,11 @@ class _CardBody extends ConsumerWidget {
           onTap: () => onOpen(const BibleStoriesScreen()),
         );
       case 'concordance':
-        return _ToolCard(
-          span: span,
-          expanded: expanded,
-          icon: Icons.find_in_page_rounded,
-          eyebrow: l10n.studyConcordanceEyebrow,
-          title: l10n.studyConcordanceTitle,
-          snippet: l10n.studyConcordanceSnippet,
-          cta: l10n.studyConcordanceCta,
-          onTap: () => onOpen(const ConcordanceScreen()),
-        );
+        return _ConcordanceCard(span: span, expanded: expanded, onOpen: onOpen);
+      case 'wotd':
+        return _WotdCard(span: span, expanded: expanded, onOpen: onOpen);
       case 'votd_archive':
-        return _VotdArchiveCard(span: span, expanded: expanded, onOpen: onOpen);
+        return _VotdCard(span: span, expanded: expanded, onOpen: onOpen);
       case 'streak':
         return _StreakCard(span: span, expanded: expanded, onOpen: onOpen);
       default:
@@ -1145,13 +1197,12 @@ class _ToolCard extends StatelessWidget {
   }
 }
 
-/// Word-of-the-day card: today's word with an archive entry point.
-/// Mirrors the _ToolCard half/full structure for row symmetry.
-class _VotdArchiveCard extends ConsumerWidget {
+/// Word-of-the-day card: today's word with definition and dictionary entry point.
+class _WotdCard extends ConsumerWidget {
   final CardSpan span;
   final bool expanded;
   final void Function(Widget page) onOpen;
-  const _VotdArchiveCard({
+  const _WotdCard({
     required this.span,
     this.expanded = false,
     required this.onOpen,
@@ -1160,11 +1211,20 @@ class _VotdArchiveCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final wotdAsync = ref.watch(wordOfTheDayProvider);
-    void open() => onOpen(const VotdArchiveScreen());
+    final iconBox = expanded ? 52.0 : 34.0;
 
-    Widget body(String title, String? snippet, {bool showSnippet = true}) {
-      final iconBox = expanded ? 52.0 : 34.0;
+    void openDefinition(String normalized) {
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (_) => DictionaryEntrySheet(normalizedWord: normalized),
+      );
+    }
+
+    Widget content(String word, String? snippet, String? normalized) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -1183,9 +1243,9 @@ class _VotdArchiveCard extends ConsumerWidget {
                 size: expanded ? 24 : 18, color: theme.primaryColor),
           ),
           const SizedBox(height: 8),
-          V2Eyebrow(context.l10n.studyWordOfTheDay),
+          V2Eyebrow(l10n.studyWordOfTheDay),
           const SizedBox(height: 2),
-          Text(title,
+          Text(word,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: (expanded
@@ -1194,7 +1254,9 @@ class _VotdArchiveCard extends ConsumerWidget {
                   ?.copyWith(
                 fontWeight: FontWeight.bold,
               )),
-          if (showSnippet && snippet != null && snippet.isNotEmpty) ...[
+          if ((span == CardSpan.full || expanded) &&
+              snippet != null &&
+              snippet.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(snippet,
                 maxLines: 2,
@@ -1205,7 +1267,7 @@ class _VotdArchiveCard extends ConsumerWidget {
                 )),
           ],
           const SizedBox(height: 6),
-          Text(context.l10n.studyArchiveLink,
+          Text(context.l10n.studyCtaArrow(l10n.studyWordLookUp),
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w800,
                 color: theme.primaryColor,
@@ -1220,26 +1282,24 @@ class _VotdArchiveCard extends ConsumerWidget {
           return V2Card(
             textured: true,
             featured: span == CardSpan.full,
-            onTap: open,
+            onTap: () => onOpen(const DictionaryV2Screen()),
             padding: EdgeInsets.all(expanded ? 20 : 15),
-            child:
-                body(context.l10n.studyWordOfTheDay, null, showSnippet: false),
+            child: content(l10n.studyWordOfTheDay, null, null),
           );
         }
         return V2Card(
           textured: true,
           featured: span == CardSpan.full,
-          onTap: open,
+          onTap: () => openDefinition(wotd.normalized),
           padding: EdgeInsets.all(expanded ? 20 : 15),
-          child: body(wotd.word, wotd.snippet,
-              showSnippet: span == CardSpan.full || expanded),
+          child: content(wotd.word, wotd.snippet, wotd.normalized),
         );
       },
       loading: () => V2Card(
         textured: true,
         featured: span == CardSpan.full,
         padding: const EdgeInsets.all(15),
-        child: Text(context.l10n.studyLoading,
+        child: Text(l10n.studyLoading,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             )),
@@ -1247,11 +1307,271 @@ class _VotdArchiveCard extends ConsumerWidget {
       error: (_, __) => V2Card(
         textured: true,
         featured: span == CardSpan.full,
-        onTap: open,
+        onTap: () => onOpen(const DictionaryV2Screen()),
         padding: const EdgeInsets.all(15),
-        child: body(
-            context.l10n.studyWordOfTheDay, context.l10n.studyUnavailableNow,
-            showSnippet: false),
+        child: content(l10n.studyWordOfTheDay, l10n.studyUnavailableNow, null),
+      ),
+    );
+  }
+}
+
+/// Verse-of-the-day card: today's scripture anchor with recent VOTDs archive entry.
+class _VotdCard extends ConsumerWidget {
+  final CardSpan span;
+  final bool expanded;
+  final void Function(Widget page) onOpen;
+  const _VotdCard({
+    required this.span,
+    this.expanded = false,
+    required this.onOpen,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final pool = ref.watch(votdPoolProvider);
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final epoch = DateTime(2026, 1, 1);
+    final dayIndex =
+        pool.isEmpty ? 0 : today.difference(epoch).inDays % pool.length;
+    final validIndex = dayIndex < 0 ? dayIndex + pool.length : dayIndex;
+    final votdEntry = pool.isEmpty ? null : pool[validIndex];
+    final iconBox = expanded ? 52.0 : 34.0;
+
+    void openArchive() => onOpen(const VotdArchiveScreen());
+
+    return V2Card(
+      textured: true,
+      featured: span == CardSpan.full,
+      onTap: openArchive,
+      padding: EdgeInsets.all(expanded ? 20 : 15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: iconBox,
+            height: iconBox,
+            decoration: BoxDecoration(
+              color: theme.primaryColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(Radii.md),
+              border: Border.all(
+                color: theme.primaryColor.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Icon(Icons.format_quote_rounded,
+                size: expanded ? 24 : 18, color: theme.primaryColor),
+          ),
+          const SizedBox(height: 8),
+          V2Eyebrow(l10n.studyVerseOfTheDay),
+          const SizedBox(height: 2),
+          Text(votdEntry?.reference ?? l10n.studyVerseOfTheDay,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: (expanded
+                      ? theme.textTheme.titleMedium
+                      : theme.textTheme.titleSmall)
+                  ?.copyWith(
+                fontWeight: FontWeight.bold,
+              )),
+          if ((span == CardSpan.full || expanded) && votdEntry != null) ...[
+            const SizedBox(height: 4),
+            Text(votdEntry.text,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontStyle: FontStyle.italic,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                )),
+          ],
+          const SizedBox(height: 6),
+          Text(context.l10n.studyCtaArrow(l10n.studyRecentVerses),
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: theme.primaryColor,
+              )),
+        ],
+      ),
+    );
+  }
+}
+
+/// Concordance card with interactive quick-search keyword chips.
+class _ConcordanceCard extends StatelessWidget {
+  final CardSpan span;
+  final bool expanded;
+  final void Function(Widget page) onOpen;
+  const _ConcordanceCard({
+    required this.span,
+    this.expanded = false,
+    required this.onOpen,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final iconBox = expanded ? 52.0 : 34.0;
+    const quickWords = ['grace', 'faith', 'love', 'peace'];
+
+    return V2Card(
+      textured: true,
+      featured: span == CardSpan.full,
+      onTap: () => onOpen(const ConcordanceScreen()),
+      padding: EdgeInsets.all(expanded ? 20 : 15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: iconBox,
+                height: iconBox,
+                decoration: BoxDecoration(
+                  color: theme.primaryColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(Radii.md),
+                  border: Border.all(
+                    color: theme.primaryColor.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Icon(Icons.find_in_page_rounded,
+                    size: expanded ? 24 : 18, color: theme.primaryColor),
+              ),
+              const Spacer(),
+              Icon(Icons.chevron_right_rounded,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          V2Eyebrow(l10n.studyConcordanceEyebrow),
+          const SizedBox(height: 2),
+          Text(l10n.studyConcordanceTitle,
+              style: (expanded
+                      ? theme.textTheme.titleMedium
+                      : theme.textTheme.titleSmall)
+                  ?.copyWith(
+                fontWeight: FontWeight.bold,
+              )),
+          if (span == CardSpan.full || expanded) ...[
+            const SizedBox(height: 4),
+            Text(l10n.studyConcordanceSnippet,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontStyle: FontStyle.italic,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                )),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                for (final w in quickWords)
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => onOpen(ConcordanceScreen(initialWord: w)),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: theme.primaryColor.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(Radii.sm),
+                        border: Border.all(
+                          color: theme.primaryColor.withValues(alpha: 0.2),
+                        ),
+                      ),
+                      child: Text(
+                        '${w[0].toUpperCase()}${w.substring(1)}',
+                        style: TextStyle(
+                          fontSize: TypeScale.micro,
+                          fontWeight: FontWeight.w600,
+                          color: theme.primaryColor,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ],
+          const SizedBox(height: 8),
+          Text(context.l10n.studyCtaArrow(l10n.studyConcordanceCta),
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: theme.primaryColor,
+              )),
+        ],
+      ),
+    );
+  }
+}
+
+/// Pill toggle button for switching between layout presets (Full / Half).
+class _PresetPill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _PresetPill({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      child: Material(
+        color: selected
+            ? theme.primaryColor.withValues(alpha: 0.14)
+            : theme.colorScheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(Radii.pill),
+          side: BorderSide(
+            color: selected
+                ? theme.primaryColor
+                : theme.dividerColor.withValues(alpha: 0.5),
+            width: selected ? 1.5 : 1,
+          ),
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(Radii.pill),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon,
+                  size: 14,
+                  color: selected
+                      ? theme.primaryColor
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: TypeScale.micro,
+                    fontWeight: selected ? FontWeight.bold : FontWeight.w600,
+                    color: selected
+                        ? theme.primaryColor
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -239,11 +239,34 @@ class AppLocalizationsSw extends AppLocalizations {
   }
 
   @override
+  String get onboardingPrimaryVersion => 'Tafsiri kuu';
+
+  @override
+  String get onboardingSecondaryVersion => 'Tafsiri ya pili';
+
+  @override
+  String get onboardingSecondaryDesc =>
+      'Inaonyeshwa kando ya Biblia yako kuu katika mwonekano sambamba';
+
+  @override
   String get onboardingLookTitle => 'Soma kwa starehe';
 
   @override
   String get onboardingLookBody =>
-      'Chagua rangi ya ukurasa na ukubwa wa maandishi. Kila kitu kinaweza kurekebishwa baadaye.';
+      'Chagua rangi ya ukurasa, mtindo wa maandishi na ukubwa. Kila kitu kinaweza kurekebishwa baadaye.';
+
+  @override
+  String get onboardingThemeDaily => 'Mzunguko wa kila siku';
+
+  @override
+  String get onboardingThemeDailyDesc =>
+      'Hubadilika kila siku kuakisi mandhari tele ya Maandiko';
+
+  @override
+  String get onboardingFontFamily => 'Mtindo wa herufi';
+
+  @override
+  String get onboardingShuffleHint => 'Gusa ili kuchanganya';
 
   @override
   String get onboardingThemeLight => 'Mwanga';
@@ -2746,6 +2769,48 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get studySizeHalfHint => 'Ndogo, mbili kwa safu';
+
+  @override
+  String get studySizeFull => 'Kamili';
+
+  @override
+  String get studySizeFullHint => 'Upana kamili, moja kwa safu';
+
+  @override
+  String get studyPresetLayout => 'Mipangilio iliyowekwa';
+
+  @override
+  String get studyPresetFull => 'Zote kamili';
+
+  @override
+  String get studyPresetHalf => 'Zote nusu';
+
+  @override
+  String get studyVerseOfTheDay => 'Aya ya siku';
+
+  @override
+  String get studyRecentVerses => 'Aya za hivi karibuni';
+
+  @override
+  String get studyWordLookUp => 'Tafuta';
+
+  @override
+  String get studyConcordanceClear => 'Futa';
+
+  @override
+  String get studyConcordanceBrowseAll => 'Vinjari maneno yote';
+
+  @override
+  String get studyConcordanceFeatured => 'Maneno makuu ya kibiblia';
+
+  @override
+  String get studyConcordanceFilterAll => 'Zote';
+
+  @override
+  String get studyConcordanceFilterOT => 'Agano la Kale';
+
+  @override
+  String get studyConcordanceFilterNT => 'Agano Jipya';
 
   @override
   String get studyMoveUp => 'Sogeza juu';

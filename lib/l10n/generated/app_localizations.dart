@@ -466,6 +466,24 @@ abstract class AppLocalizations {
   /// **'Also show {name} alongside'**
   String onboardingParallel(String name);
 
+  /// No description provided for @onboardingPrimaryVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Main translation'**
+  String get onboardingPrimaryVersion;
+
+  /// No description provided for @onboardingSecondaryVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Second translation'**
+  String get onboardingSecondaryVersion;
+
+  /// No description provided for @onboardingSecondaryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown alongside your main Bible in parallel view'**
+  String get onboardingSecondaryDesc;
+
   /// No description provided for @onboardingLookTitle.
   ///
   /// In en, this message translates to:
@@ -475,8 +493,32 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingLookBody.
   ///
   /// In en, this message translates to:
-  /// **'Choose a page color and text size. Everything can be fine-tuned later.'**
+  /// **'Choose a page color, font and text size. Everything can be fine-tuned later.'**
   String get onboardingLookBody;
+
+  /// No description provided for @onboardingThemeDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily rotation'**
+  String get onboardingThemeDaily;
+
+  /// No description provided for @onboardingThemeDailyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes daily to reflect the rich themes of Scripture'**
+  String get onboardingThemeDailyDesc;
+
+  /// No description provided for @onboardingFontFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Font style'**
+  String get onboardingFontFamily;
+
+  /// No description provided for @onboardingShuffleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to shuffle'**
+  String get onboardingShuffleHint;
 
   /// No description provided for @onboardingThemeLight.
   ///
@@ -4743,6 +4785,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Compact, two per row'**
   String get studySizeHalfHint;
+
+  /// No description provided for @studySizeFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Full'**
+  String get studySizeFull;
+
+  /// No description provided for @studySizeFullHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Full width, one per row'**
+  String get studySizeFullHint;
+
+  /// No description provided for @studyPresetLayout.
+  ///
+  /// In en, this message translates to:
+  /// **'Layout presets'**
+  String get studyPresetLayout;
+
+  /// No description provided for @studyPresetFull.
+  ///
+  /// In en, this message translates to:
+  /// **'All full'**
+  String get studyPresetFull;
+
+  /// No description provided for @studyPresetHalf.
+  ///
+  /// In en, this message translates to:
+  /// **'All half'**
+  String get studyPresetHalf;
+
+  /// No description provided for @studyVerseOfTheDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Verse of the day'**
+  String get studyVerseOfTheDay;
+
+  /// No description provided for @studyRecentVerses.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent verses'**
+  String get studyRecentVerses;
+
+  /// No description provided for @studyWordLookUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Look up'**
+  String get studyWordLookUp;
+
+  /// No description provided for @studyConcordanceClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get studyConcordanceClear;
+
+  /// No description provided for @studyConcordanceBrowseAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse all terms'**
+  String get studyConcordanceBrowseAll;
+
+  /// No description provided for @studyConcordanceFeatured.
+  ///
+  /// In en, this message translates to:
+  /// **'Featured biblical terms'**
+  String get studyConcordanceFeatured;
+
+  /// No description provided for @studyConcordanceFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get studyConcordanceFilterAll;
+
+  /// No description provided for @studyConcordanceFilterOT.
+  ///
+  /// In en, this message translates to:
+  /// **'Old Testament'**
+  String get studyConcordanceFilterOT;
+
+  /// No description provided for @studyConcordanceFilterNT.
+  ///
+  /// In en, this message translates to:
+  /// **'New Testament'**
+  String get studyConcordanceFilterNT;
 
   /// No description provided for @studyMoveUp.
   ///

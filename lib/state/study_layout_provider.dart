@@ -222,10 +222,27 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
     _save();
   }
 
+  /// Layout presets: [CardSpan.full] (all cards full width, like Your Space)
+  /// or [CardSpan.half] (compact two-per-row, like Dictionary and Stories).
+  void applyPreset(CardSpan span) {
+    final targetSpan = span == CardSpan.quarter ? CardSpan.full : span;
+    state = state.map((card) {
+      final safeSpan = (targetSpan == CardSpan.half && card.id == 'your_space')
+          ? CardSpan.full
+          : targetSpan;
+      return StudyCardConfig(
+        id: card.id,
+        size: safeSpan == CardSpan.full ? CardSize.large : CardSize.medium,
+        span: safeSpan,
+        expanded: false,
+      );
+    }).toList();
+    _save();
+  }
+
   /// Layout-v2 default order and sizes: full-width banners up top,
-  /// stories + dictionary share a row, commentary full, then the VOTD
-  /// archive + streak pair. Users can pick Extra Large or Half per card
-  /// via long-press and reorder via the same sheet.
+  /// stories + dictionary share a row, commentary full, then the
+  /// word of the day + verse of the day pair, followed by streak.
   static List<StudyCardConfig> defaultLayoutV2() => [
         StudyCardConfig(
             id: 'your_space', size: CardSize.large, span: CardSpan.full),
@@ -239,6 +256,7 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
             id: 'concordance', size: CardSize.large, span: CardSpan.full),
         StudyCardConfig(
             id: 'commentary', size: CardSize.large, span: CardSpan.full),
+        StudyCardConfig(id: 'wotd', size: CardSize.medium, span: CardSpan.half),
         StudyCardConfig(
             id: 'votd_archive', size: CardSize.medium, span: CardSpan.half),
         StudyCardConfig(

@@ -54,6 +54,30 @@
       }
     }
   },
+  "onboardingPrimaryVersion": {
+    "en": "Main translation",
+    "fr": "Traduction principale",
+    "it": "Traduzione principale",
+    "ro": "Traducerea principală",
+    "sw": "Tafsiri kuu",
+    "tl": "Pangunahing salin"
+  },
+  "onboardingSecondaryVersion": {
+    "en": "Second translation",
+    "fr": "Deuxième traduction",
+    "it": "Seconda traduzione",
+    "ro": "A doua traducere",
+    "sw": "Tafsiri ya pili",
+    "tl": "Pangalawang salin"
+  },
+  "onboardingSecondaryDesc": {
+    "en": "Shown alongside your main Bible in parallel view",
+    "fr": "Affichée à côté de votre Bible principale en vue parallèle",
+    "it": "Mostrata a fianco della tua Bibbia principale nella vista parallela",
+    "ro": "Afișată alături de Biblia principală în vizualizarea paralelă",
+    "sw": "Inaonyeshwa kando ya Biblia yako kuu katika mwonekano sambamba",
+    "tl": "Ipinapakita sa tabi ng iyong Bibliya sa parallel view"
+  },
   "onboardingLookTitle": {
     "en": "Make it comfortable",
     "fr": "Lisez à votre aise",
@@ -63,12 +87,44 @@
     "tl": "Gawing komportable"
   },
   "onboardingLookBody": {
-    "en": "Choose a page color and text size. Everything can be fine-tuned later.",
-    "fr": "Choisissez une couleur de page et une taille de texte. Tout reste ajustable ensuite.",
-    "it": "Scegli il colore della pagina e la dimensione del testo. Potrai regolare tutto in seguito.",
-    "ro": "Alege culoarea paginii și mărimea textului. Totul se poate ajusta ulterior.",
-    "sw": "Chagua rangi ya ukurasa na ukubwa wa maandishi. Kila kitu kinaweza kurekebishwa baadaye.",
-    "tl": "Pumili ng kulay ng pahina at laki ng teksto. Maaaring ayusin ang lahat mamaya."
+    "en": "Choose a page color, font and text size. Everything can be fine-tuned later.",
+    "fr": "Choisissez une couleur de page, une police et une taille de texte. Tout reste ajustable ensuite.",
+    "it": "Scegli il colore della pagina, il carattere e la dimensione del testo. Potrai regolare tutto in seguito.",
+    "ro": "Alege culoarea paginii, fontul și mărimea textului. Totul se poate ajusta ulterior.",
+    "sw": "Chagua rangi ya ukurasa, mtindo wa maandishi na ukubwa. Kila kitu kinaweza kurekebishwa baadaye.",
+    "tl": "Pumili ng kulay ng pahina, font at laki ng teksto. Maaaring ayusin ang lahat mamaya."
+  },
+  "onboardingThemeDaily": {
+    "en": "Daily rotation",
+    "fr": "Rotation quotidienne",
+    "it": "Rotazione giornaliera",
+    "ro": "Rotație zilnică",
+    "sw": "Mzunguko wa kila siku",
+    "tl": "Araw-araw na pagpapalit"
+  },
+  "onboardingThemeDailyDesc": {
+    "en": "Changes daily to reflect the rich themes of Scripture",
+    "fr": "Change chaque jour pour refléter les riches thèmes des Écritures",
+    "it": "Cambia ogni giorno per riflettere i ricchi temi delle Scritture",
+    "ro": "Se schimbă zilnic pentru a reflecta temele bogate ale Scripturii",
+    "sw": "Hubadilika kila siku kuakisi mandhari tele ya Maandiko",
+    "tl": "Nagbabago araw-araw upang ipakita ang mayayamang tema ng Kasulatan"
+  },
+  "onboardingFontFamily": {
+    "en": "Font style",
+    "fr": "Style de police",
+    "it": "Stile del carattere",
+    "ro": "Stil font",
+    "sw": "Mtindo wa herufi",
+    "tl": "Estilo ng font"
+  },
+  "onboardingShuffleHint": {
+    "en": "Tap to shuffle",
+    "fr": "Appuyez pour mélanger",
+    "it": "Tocca per mescolare",
+    "ro": "Apasă pentru amestecare",
+    "sw": "Gusa ili kuchanganya",
+    "tl": "Pindutin para i-shuffle"
   },
   "onboardingThemeLight": {
     "en": "Light",
