@@ -2,7 +2,7 @@ name: the_blessed_bible
 description: "An offline-first Flutter Bible study app with historicist commentaries, multi-language scripture, rich concordance, and dynamic themes."
 publish_to: 'none'
 
-version: 1.0.3+10
+version: 1.0.4+11
 
 environment:
   sdk: '>=3.2.0 <4.0.0'

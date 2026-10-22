@@ -4,6 +4,14 @@ All notable changes to The Blessed Bible. Newest first.
 
 ## [Unreleased]
 
+## [0.0.5] - 2026-10-22
+
+### Home Screen & Daily Content
+- **Story of the Day:** Added daily Bible story section at the bottom of the Home screen, featuring headline title, scripture reference, summary retelling snippet, Gustave Doré engraving plate previews, direct passage reading in `BibleStoryReaderScreen`, and daily calendar rotation across 500 devotional stories.
+- **Cleaner Commentary View:** Removed the `COMMENTARY · [Author]` text header and icon from the Home screen commentary card for an uncluttered, modern text-first aesthetic.
+- **Enhanced Sharing System:** Added `ShareService.formatStory` for formatted clipboard and WhatsApp sharing, plus custom rendered `ShareCard.story` visual cards supporting multiple backdrop styles and Doré artwork plates.
+- **Multi-language Support:** Added localization for Story of the Day in English, French, Italian, Romanian, Swahili, and Tagalog.
+
 ## [0.0.4] - 2026-10-22
 
 ### Study & Concordance
