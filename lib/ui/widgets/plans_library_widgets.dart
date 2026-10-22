@@ -30,9 +30,8 @@ String libraryWeekday(DateTime day, [String? locale]) {
 }
 
 /// Plans hero header: a small weekday eyebrow over a large left-aligned
-/// date, with a quiet year-progress line underneath (tap opens Let's Read)
-/// and an optional streak chip on the right. The chip is hidden at 0 so an
-/// empty streak never reads as a failure.
+/// date, with the year-progress link on the right of the same row (tap
+/// opens Let's Read). The streak lives in the app bar ([StreakChip]).
 class LibraryHeroHeader extends StatelessWidget {
   final String weekday;
   final String date;
@@ -40,16 +39,12 @@ class LibraryHeroHeader extends StatelessWidget {
   /// Day-of-year progress, e.g. "Day 277 of 365".
   final String progressLabel;
 
-  /// Consecutive reading days; the chip is hidden when this is 0.
-  final int streakCount;
-
   final VoidCallback onProgressPressed;
   const LibraryHeroHeader({
     super.key,
     required this.weekday,
     required this.date,
     required this.progressLabel,
-    required this.streakCount,
     required this.onProgressPressed,
   });
 
@@ -58,7 +53,7 @@ class LibraryHeroHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final palette = context.palette;
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Expanded(
           child: Column(
@@ -84,72 +79,83 @@ class LibraryHeroHeader extends StatelessWidget {
                   height: 1.1,
                 ),
               ),
-              // Quiet text link: no box, so it doesn't compete with the
-              // Today card below. 48dp tall for the touch target.
-              Semantics(
-                button: true,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(Radii.sm),
-                  onTap: onProgressPressed,
-                  child: ConstrainedBox(
-                    constraints:
-                        const BoxConstraints(minHeight: kMinTouchTarget),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            progressLabel,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: palette.textMuted,
-                            ),
-                          ),
-                          Icon(Icons.chevron_right_rounded,
-                              size: 18, color: palette.textMuted),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
         ),
-        if (streakCount > 0) ...[
-          const SizedBox(width: 12),
-          Padding(
-            padding: const EdgeInsets.only(top: 4),
-            child: Semantics(
-              label: context.l10n.studyStreakDays(streakCount),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: palette.warning.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(Radii.pill),
-                ),
+        const SizedBox(width: 12),
+        // Quiet text link: no box, so it doesn't compete with the Today
+        // card below. 48dp tall for the touch target.
+        Semantics(
+          button: true,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(Radii.sm),
+            onTap: onProgressPressed,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                  minHeight: kMinTouchTarget, minWidth: kMinTouchTarget),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 4),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.local_fire_department_rounded,
-                        size: 18, color: palette.warning),
-                    const SizedBox(width: 4),
                     Text(
-                      '$streakCount',
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: palette.warning,
+                      progressLabel,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: palette.textMuted,
                       ),
                     ),
+                    Icon(Icons.chevron_right_rounded,
+                        size: 18, color: palette.textMuted),
                   ],
                 ),
               ),
             ),
           ),
-        ],
+        ),
       ],
+    );
+  }
+}
+
+/// Reading-streak chip (flame + count) for the app bar. Renders nothing at
+/// 0 so an empty streak never reads as a failure.
+class StreakChip extends StatelessWidget {
+  final int count;
+  const StreakChip({super.key, required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    if (count <= 0) return const SizedBox.shrink();
+    final theme = Theme.of(context);
+    final palette = context.palette;
+    return Center(
+      child: Semantics(
+        label: context.l10n.studyStreakDays(count),
+        excludeSemantics: true,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: palette.warning.withValues(alpha: 0.14),
+            borderRadius: BorderRadius.circular(Radii.pill),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.local_fire_department_rounded,
+                  size: 18, color: palette.warning),
+              const SizedBox(width: 4),
+              Text(
+                '$count',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: palette.warning,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

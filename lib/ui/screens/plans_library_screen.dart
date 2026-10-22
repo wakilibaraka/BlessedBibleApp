@@ -269,7 +269,15 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
       appThemeMode: appThemeMode,
       page: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: SharedAppBar(title: Text(context.l10n.plansTitle)),
+        appBar: SharedAppBar(
+          title: Text(context.l10n.plansTitle),
+          // Streak sits on the title row, freeing the hero's right side
+          // for the year-progress link.
+          actions: [
+            StreakChip(count: streak.count),
+            const SizedBox(width: 16),
+          ],
+        ),
         body: SafeArea(
           bottom: false,
           child: Center(
@@ -283,7 +291,6 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
                       weekday: libraryWeekday(now, locale),
                       date: libraryMonthDay(now, locale),
                       progressLabel: YearProgress.label(now, context.l10n),
-                      streakCount: streak.count,
                       onProgressPressed: _openLetRead,
                     ),
                     const SizedBox(height: 16),
