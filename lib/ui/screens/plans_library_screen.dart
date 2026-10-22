@@ -252,7 +252,6 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final appThemeMode = ref.watch(themeProvider);
     final now = DateTime.now();
     final locale = Localizations.localeOf(context).toString();
