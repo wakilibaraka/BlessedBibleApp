@@ -4,6 +4,13 @@ All notable changes to The Blessed Bible. Newest first.
 
 ## [Unreleased]
 
+### Reading plans
+- **Study widget:** no more swipe pages. With a plan active it shows progress and today's reading with a **Read** button that opens the passage directly; with none it suggests three plans. Several active plans each get their own row.
+- **Plans page:** the Bible-story banner is gone. A small "Today" card for your main plan sits above the tabs. Plans you haven't started show their length and a **Start** button.
+- **Plan page:** the separate "Begin plan" screen is merged in. Before you start: day 1, **Start & read day 1**, and the start date on one screen, with every day listed below. After: a card that always holds the next thing to read (today, a missed day, or read ahead) and a compact day list opened at that day. Pace and reminder moved to the ⋯ menu.
+- **Reader:** uses your theme's accent colour, shows passage progress as a segmented bar, and ends each plan day with **Mark day complete**.
+- Fixed: a plan started from the old Begin screen didn't appear on the Study widget.
+
 ### Repository
 - Consolidated `OVERNIGHT_CHANGELOG.md` and `RELEASE_NOTES_prerelease-1.md` into this file; `PROJECT_RULES.md` is now `CONTRIBUTING.md`.
 - Merged `tools/` and `scripts/` into `tool/`; moved `evaluate_headings.jq` there.
