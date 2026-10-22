@@ -4,12 +4,31 @@ All notable changes to The Blessed Bible. Newest first.
 
 ## [Unreleased]
 
-### Reading plans
-- **Study widget:** no more swipe pages. With a plan active it shows progress and today's reading with a **Read** button that opens the passage directly; with none it suggests three plans. Several active plans each get their own row.
-- **Plans page:** the Bible-story banner is gone. A small "Today" card for your main plan sits above the tabs. Plans you haven't started show their length and a **Start** button.
-- **Plan page:** the separate "Begin plan" screen is merged in. Before you start: day 1, **Start & read day 1**, and the start date on one screen, with every day listed below. After: a card that always holds the next thing to read (today, a missed day, or read ahead) and a compact day list opened at that day. Pace and reminder moved to the ⋯ menu.
-- **Reader:** uses your theme's accent colour, shows passage progress as a segmented bar, and ends each plan day with **Mark day complete**.
-- Fixed: a plan started from the old Begin screen didn't appear on the Study widget.
+## [0.0.4] - 2026-10-22
+
+### Study & Concordance
+- **Biblical Concordance:** Complete built-in searchable concordance with 32+ prominent theological terms (Grace, Faith, Love, Peace, Hope, Mercy, Salvation, Righteousness, Holy, Truth, Covenant, Spirit, etc.) with exact verified occurrence counts from the KJV database, curated definitions, category filter chips, Old/New Testament filtering, and in-text keyword highlighting.
+- **Study Page Presets:** Simplified card sizing into two explicit presets: **Full** (spans entire width) and **Half** (compact, 2 per row). Added a top preset pill toggle (`[ Full | Half ]`) and an easy customization sheet to switch card layouts individually or in batch.
+- **Distinct Daily Cards:** Separated Word of the Day (`wotd`) and Verse of the Day (`votd_archive`) into dedicated half-width cards with interactive entry sheets and archive history.
+
+### Reading Plans Flow
+- **Study widget:** No more swipe pages. With an active plan it shows progress and today's reading with a **Read** button that opens the passage directly; with none it suggests curated plans. Multiple active plans each get their own row.
+- **Plans page:** Redesigned hero with weekday, date, streak counter, and direct reading button. Removed old calendar rail in favor of clean date-first layout. Unstarted plans show their length and a **Start** button.
+- **Plan page:** Merged the separate "Begin plan" screen into one seamless view. Before starting: preview all days, start date picker, and **Start & read day 1**. After: a card that always holds the next reading (today, missed day, or read ahead) with lazy-loaded day rows. Pace and reminder settings moved to the ⋯ menu.
+- **Reader:** Accent-based theming, segmented passage progress tracker with tap navigation, "Up next" previews, and inline **Mark day complete** completion card.
+
+### Onboarding & Themes
+- **Typography & Theme Shuffle:** Added an interactive comfort setup step during onboarding. Users can select reading typefaces and choose whether themes shuffle automatically on a daily basis or remain fixed.
+- **Multi-Translation Selection:** Added dual-translation view selection directly during the initial setup flow.
+
+### Accounts & Cloud Sync
+- **Shared Account Integration:** Integrated `blessed_account` supporting Google Sign-In and Apple Sign-In with persistent profile support.
+- **Cross-Device Sync:** Automatic sync for bookmarks, folders, highlights, study notes, reading plans, and reading streaks via Firebase Firestore.
+- **Welcome-Back Prompt:** Smart one-time prompt offering sign-in restoration after device transfer or fresh install with Android Auto Backup.
+
+### Infrastructure & Hygiene
+- **Hardened CI/CD:** Automated GitHub Actions pipeline validating strict analyzer rules (`--fatal-infos`), code formatting, unit tests, golden screenshot tests, Firestore security rules tests, and shrunk signed release bundle builds.
+- **Dependency & SDK Pinned:** Locked dependencies matching pinned Flutter 3.44.9 environment for reliable reproducibility.
 
 ### Repository
 - Consolidated `OVERNIGHT_CHANGELOG.md` and `RELEASE_NOTES_prerelease-1.md` into this file; `PROJECT_RULES.md` is now `CONTRIBUTING.md`.

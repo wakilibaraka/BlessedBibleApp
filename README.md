@@ -1,57 +1,110 @@
-# 📖 Bible (The Blessed Bible)
+# 📖 Blessed Bible (The Blessed Bible)
 
-A clean, fast, offline-first Bible study app built with Flutter — designed for distraction-free reading, multi-language study, and verse-by-verse historicist commentary. Listed on-device as **Bible**.
+[![Release](https://img.shields.io/github/v/release/wakilibaraka/BlessedBibleApp?include_prereleases&style=flat-square&color=blue)](https://github.com/wakilibaraka/BlessedBibleApp/releases)
+[![CI Status](https://img.shields.io/github/actions/workflow/status/wakilibaraka/BlessedBibleApp/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/wakilibaraka/BlessedBibleApp/actions)
+[![Flutter](https://img.shields.io/badge/Flutter-3.44.9%2B-02569B?style=flat-square&logo=flutter)](https://flutter.dev)
+[![License](https://img.shields.io/badge/License-Proprietary-red?style=flat-square)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20(in%20progress)-green?style=flat-square)](https://github.com/wakilibaraka/BlessedBibleApp)
 
-> ⬇️ Get the latest APK from [Releases](https://github.com/wakilibaraka/BlessedBibleApp/releases).
+A fast, offline-first, distraction-free Bible study app crafted with Flutter. Built for deep scripture immersion, multi-language study, verse-by-verse historicist commentary, and interactive reading plans. Listed on devices as **Bible**.
 
-The Blessed Bible focuses on the reading experience: legible typography, a wide range of themes, side-by-side translations, and study tools that stay out of your way until you need them.
+---
 
-## ✨ Features
+## ⬇️ Download & Installation
 
-### Reading
+Get the latest release APKs directly from [GitHub Releases](https://github.com/wakilibaraka/BlessedBibleApp/releases/latest).
 
-- **King James Version** with clean, native-feeling scrolling and swipe-to-change-chapter navigation.
-- **Multi-language translations** — read in your primary language with an optional secondary translation shown alongside, and quick per-verse translation chips.
-- **14 themes** across light, dark, sepia, and OLED modes, with live recoloring, surface styles, and shuffle.
-- **Custom typography** — multiple reading fonts (Lora, Literata, EB Garamond, Bitter, Source Sans 3, and more), adjustable size, and layout options.
+| Package | Recommended For | Description |
+| :--- | :--- | :--- |
+| **`BlessedBible-*-arm64-v8a.apk`** | **Most Modern Phones & Tablets** *(Recommended)* | Optimized 64-bit ARM build with the smallest download size (~133 MB) and fastest startup. |
+| **`BlessedBible-*-universal.apk`** | **Any Android Device** | Complete bundle containing all CPU architectures (~170 MB). Choose this if you're unsure of your processor type. |
+| **`BlessedBible-*-armeabi-v7a.apk`** | **Older 32-bit Phones** | Optimized build for older 32-bit ARM Android devices (~131 MB). |
+| **`BlessedBible-*-x86_64.apk`** | **Emulators & Chromebooks** | Optimized for Intel/AMD-based Android emulators and Chromebook devices (~135 MB). |
 
-### Study
+> **How to install:** Download the APK matching your device, tap the downloaded file on your Android device, and allow installation from your browser or file manager when prompted.
 
-- **Historicist commentary** — verse- and chapter-level insights for Genesis, Daniel, Hebrews, and Revelation, drawn from classic sources (Ellen G. White, Uriah Smith).
-- **Fast local search** across scripture, commentary, and your own notes, with filters and recent searches.
-- **Reading plans** — calendar-based daily reading with a dedicated plan reader.
+---
 
-### Personal
+## ✨ Flagship Features
 
-- **Bookmarks with folders** — organize saved verses into custom or preset collections, with smart auto-groups by date and book.
-- **Highlights & notes** — editable notes with quick verse insertion, all shown in your chosen translation.
-- **Today hub** — a daily verse, reading streak, and quick access to your study.
+### 📖 Distraction-Free Scripture Reading
+- **King James Version (KJV)** with smooth, native scrolling, gesture navigation, and rapid chapter/verse selection.
+- **Multi-Language Support**: Read scripture with comparative secondary translations side-by-side or per-verse (Spanish, French, Swahili, Italian, Romanian, Tagalog).
+- **Audio & Offline Bible**: High-performance local SQLite database — read anywhere without an internet connection or cellular data.
 
-## 🛠️ Tech Stack
+### 🔍 Built-In Biblical Concordance
+- **Curated Theological Index**: Explore 32+ foundational biblical keywords (Grace, Faith, Love, Peace, Hope, Mercy, Salvation, Righteousness, Covenant, Spirit, etc.) with exact verified KJV occurrence counts and concise definitions.
+- **Smart Filtering & Highlighting**: Filter results by Old Testament, New Testament, or thematic categories (*Salvation*, *Spiritual Life*, *Christian Walk*, *God & Spirit*). Matches are highlighted directly in the scripture text.
 
-- **Framework:** Flutter (Dart)
-- **State management:** Riverpod
-- **Storage:** Local SQLite (bundled Bible database) + SharedPreferences — fully offline, no account required. Optional sign-in (Google/Apple) unlocks cloud backup.
-- **Cloud (optional):** Firebase Auth + cloud backup of personal data.
-- **Platforms:** Android (iOS in progress). Desktop and web are not supported.
+### 📜 Historicist Commentary
+- **Classic Theological Insights**: Verse-by-verse and chapter-level commentary for Genesis, Daniel, Hebrews, and Revelation, drawn from classic historicist sources (Uriah Smith, Ellen G. White).
+- **Inline Cross-References**: Tap directly into commentaries without losing your place in scripture.
 
-## 🚀 Getting Started
+### 📅 Redesigned Reading Plans & Plan Reader
+- **Streamlined Dashboard**: Date and reading streak hero at the top of your plans, keeping your daily goal front and center.
+- **1-Tap Direct Reading**: Open today's assigned chapters with a single tap from the Study Page or Plans Library.
+- **Segmented Reader**: Visual segmented progress bar for multi-passage days, "Up next" previews, and inline completion cards that mark your day done right in the reader.
+- **Custom Plan Builder**: Create your own custom reading journeys tailored to your personal pace and schedule.
 
+### 🎨 Dynamic Themes & Custom Typography
+- **14 Hand-Crafted Visual Themes**: Light, Dark, Sepia, OLED black, Earth, Paperlike, and Claymorphic styles with live recoloring.
+- **Daily Theme Shuffle**: Enjoy fresh aesthetics every day automatically, or lock in your favorite theme permanently.
+- **Refined Reading Typography**: Premium typefaces designed for sustained reading comfort, including *Lora*, *Literata*, *EB Garamond*, *Bitter*, *Lexend*, and *Source Sans 3*, with adjustable sizing and spacing.
+
+### 🏷️ Personal Study Space ("Your Space")
+- **Organized Bookmarks**: Group saved verses into customized folders or automatic smart collections by book and date.
+- **Notes & Highlights**: Annotate scriptures, attach personal reflections, and export or share verses as beautifully rendered quote cards.
+- **Daily Inspiration**: Dedicated half-width cards for **Word of the Day** (with instant dictionary lookup) and **Verse of the Day** (with archive browsing).
+
+### ☁️ Privacy-First & Cloud Sync
+- **No Account Required**: The entire app functions completely offline without collecting personal data.
+- **Optional Cloud Sync**: Sign in securely with Google or Apple via `blessed_account` to seamlessly sync your bookmarks, notes, reading plans, and streaks across multiple devices.
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+- **Framework**: [Flutter](https://flutter.dev) (Dart 3.x)
+- **State Management**: [Riverpod](https://riverpod.dev) with Notifier architecture
+- **Local Storage**: Bundled SQLite database (`sqflite`), Git LFS data packs, and `shared_preferences`
+- **Cloud & Sync**: Firebase Auth, Cloud Firestore (with strict security rules), Firebase App Check, and Crashlytics
+- **Design Tokens**: Centralized token architecture (`AppPalette`, `TypeScale`, `Radii`, `Elevation`) ensuring consistent styling without raw magic values
+- **CI/CD Pipeline**: GitHub Actions running automated formatting, static analysis (`--fatal-infos`), 240+ unit/widget tests, golden snapshots, and R8/keystore release validation
+
+---
+
+## 🚀 Developer Setup
+
+### Prerequisites
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) (pinned to **3.44.9** via `.fvmrc`)
+- Android Studio / Android SDK (Platform 34+)
+- Xcode 15+ (for iOS development)
+- Git LFS (`git lfs install`)
+
+### Clone and Run
 ```bash
+# Clone repository with Git LFS
 git clone https://github.com/wakilibaraka/BlessedBibleApp.git
 cd BlessedBibleApp
-flutter pub get
+git lfs pull
+
+# Install dependencies with locked versions
+flutter pub get --enforce-lockfile
+
+# Run local code analysis and test suite
+flutter analyze --fatal-infos
+flutter test
+
+# Run app on connected device or emulator
 flutter run
 ```
 
-**Requirements:** Flutter SDK (stable), Android Studio (Android) or Xcode (iOS). Bundled databases are stored with Git LFS, so run `git lfs install` before cloning.
+### Content Build Scripts
+Database conversion and data processing tools reside in [`tool/`](tool/README.md).
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for architectural guidelines and code standards, and [`CHANGELOG.md`](CHANGELOG.md) for version history.
 
-Content build scripts live in [`tool/`](tool/README.md). See [`CONTRIBUTING.md`](CONTRIBUTING.md) for project rules and [`CHANGELOG.md`](CHANGELOG.md) for release history.
-
-## 📌 Status
-
-Early beta. Actively developed — expect ongoing changes.
+---
 
 ## 🔒 License
 
-Proprietary. The source is public for reference only; all rights reserved. See [`LICENSE`](LICENSE).
+Proprietary. The source code is made public for reference and personal study only; all rights reserved. See [`LICENSE`](LICENSE) for details.
