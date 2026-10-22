@@ -1,5 +1,5 @@
 // Hub card sizes: v5 default view (Stories+Dictionary and VOTD+Streak
-// pairs, Commentary full), the Large / Extra Large / Half picker
+// pairs, Commentary full), the Full / Half picker
 // persistence, and Move up/down reorder.
 
 import 'dart:convert';
@@ -46,7 +46,6 @@ void main() {
       'commentary'
     ]) {
       expect(byId[id]!.span, CardSpan.full, reason: id);
-      expect(byId[id]!.expanded, isFalse, reason: id);
     }
     for (final id in [
       'bible_stories',
@@ -168,47 +167,27 @@ void main() {
     expect(byId['concordance']!.span, CardSpan.full);
   });
 
-  test('applyPreset switches cards to full or half', () async {
-    final container = await makeContainer();
-    addTearDown(container.dispose);
-
-    container.read(studyLayoutProvider);
-    // Apply full preset
-    container.read(studyLayoutProvider.notifier).applyPreset(CardSpan.full);
-    var layout = container.read(studyLayoutProvider);
-    expect(layout.every((c) => c.span == CardSpan.full), isTrue);
-
-    // Apply half preset (your_space stays full banner)
-    container.read(studyLayoutProvider.notifier).applyPreset(CardSpan.half);
-    layout = container.read(studyLayoutProvider);
-    final byId = {for (final c in layout) c.id: c};
-    expect(byId['your_space']!.span, CardSpan.full);
-    expect(byId['dictionary']!.span, CardSpan.half);
-    expect(byId['concordance']!.span, CardSpan.half);
-    expect(byId['commentary']!.span, CardSpan.half);
-  });
-
-  test('setCardSize persists span + expanded at version 5', () async {
+  test('setCardSize persists span at version 5', () async {
     final container = await makeContainer();
     addTearDown(container.dispose);
 
     container.read(studyLayoutProvider);
     container
         .read(studyLayoutProvider.notifier)
-        .setCardSize('dictionary', span: CardSpan.half, expanded: false);
+        .setCardSize('dictionary', span: CardSpan.half);
     container
         .read(studyLayoutProvider.notifier)
-        .setCardSize('commentary', span: CardSpan.full, expanded: true);
+        .setCardSize('commentary', span: CardSpan.half);
 
     var layout = container.read(studyLayoutProvider);
     var byId = {for (final c in layout) c.id: c};
     expect(byId['dictionary']!.span, CardSpan.half);
-    expect(byId['commentary']!.expanded, isTrue);
+    expect(byId['commentary']!.span, CardSpan.half);
 
     // Quarter is rejected back to full.
     container
         .read(studyLayoutProvider.notifier)
-        .setCardSize('commentary', span: CardSpan.quarter, expanded: false);
+        .setCardSize('commentary', span: CardSpan.quarter);
     layout = container.read(studyLayoutProvider);
     byId = {for (final c in layout) c.id: c};
     expect(byId['commentary']!.span, CardSpan.full);

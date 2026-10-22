@@ -6,10 +6,10 @@ enum CardSize { small, medium, large }
 
 /// Layout-v2 span: how many grid columns a Study hub card occupies.
 /// full = full-width row, half = 2-across. Quarter tiles were retired:
-/// every card defaults to Large (full). [expanded] marks Extra Large
-/// (full width + roomier content). V1 keeps reading [CardSize]; V2 reads
-/// [span] + [expanded] + list order from the persisted JSON
-/// (version 4 resets all cards to Large once).
+/// every card defaults to Large (full). Extra Large and the layout
+/// presets were retired: Full and Half are the only two sizes. V1 keeps
+/// reading [CardSize]; V2 reads [span] + list order from the persisted
+/// JSON (version 4 resets all cards to Large once).
 enum CardSpan { quarter, half, full }
 
 CardSpan _spanFromSize(CardSize size) {
@@ -28,22 +28,13 @@ class StudyCardConfig {
   final CardSize size;
   final CardSpan span;
 
-  /// Extra Large: full width with expanded content. Only meaningful
-  /// with [span] == full (the size sheet enforces this).
-  final bool expanded;
-
-  StudyCardConfig(
-      {required this.id,
-      required this.size,
-      CardSpan? span,
-      this.expanded = false})
+  StudyCardConfig({required this.id, required this.size, CardSpan? span})
       : span = span ?? _spanFromSize(size);
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'size': size.name,
         'span': span.name,
-        'expanded': expanded,
         'version': 5,
       };
 
@@ -104,7 +95,6 @@ class StudyCardConfig {
       id: json['id'] as String,
       size: size,
       span: span,
-      expanded: json['expanded'] as bool? ?? false,
     );
   }
 }
@@ -131,11 +121,10 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
           final defaults = {for (final d in defaultLayoutV2()) d.id: d};
           final ordered = <StudyCardConfig>[];
           for (final def in defaultLayoutV2()) {
-            ordered.add(byId.containsKey(def.id) &&
-                    (byId[def.id]!.span != CardSpan.full ||
-                        byId[def.id]!.expanded)
-                ? byId.remove(def.id)!
-                : def);
+            ordered.add(
+                byId.containsKey(def.id) && byId[def.id]!.span != CardSpan.full
+                    ? byId.remove(def.id)!
+                    : def);
           }
           // Unknown future ids go last, untouched.
           for (final c in byId.values) {
@@ -201,41 +190,20 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
     _save();
   }
 
-  /// Layout-v2 resize (Large / Extra Large / Half). Keeps the V1 [size]
-  /// in sync (large for full, medium otherwise) so the fallback hub
-  /// keeps rendering sanely. Extra Large is full width + expanded.
-  void setCardSize(String id,
-      {required CardSpan span, required bool expanded}) {
+  /// Layout-v2 resize (Full / Half). Keeps the V1 [size] in sync
+  /// (large for full, medium otherwise) so the fallback hub keeps
+  /// rendering sanely.
+  void setCardSize(String id, {required CardSpan span}) {
     final safeSpan = span == CardSpan.quarter ? CardSpan.full : span;
-    final safeExpanded = expanded && safeSpan == CardSpan.full;
     state = state.map((card) {
       if (card.id == id) {
         return StudyCardConfig(
           id: card.id,
           size: safeSpan == CardSpan.full ? CardSize.large : CardSize.medium,
           span: safeSpan,
-          expanded: safeExpanded,
         );
       }
       return card;
-    }).toList();
-    _save();
-  }
-
-  /// Layout presets: [CardSpan.full] (all cards full width, like Your Space)
-  /// or [CardSpan.half] (compact two-per-row, like Dictionary and Stories).
-  void applyPreset(CardSpan span) {
-    final targetSpan = span == CardSpan.quarter ? CardSpan.full : span;
-    state = state.map((card) {
-      final safeSpan = (targetSpan == CardSpan.half && card.id == 'your_space')
-          ? CardSpan.full
-          : targetSpan;
-      return StudyCardConfig(
-        id: card.id,
-        size: safeSpan == CardSpan.full ? CardSize.large : CardSize.medium,
-        span: safeSpan,
-        expanded: false,
-      );
     }).toList();
     _save();
   }
