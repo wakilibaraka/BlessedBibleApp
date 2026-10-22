@@ -193,6 +193,27 @@ class ShareCard extends StatelessWidget {
     );
   }
 
+  /// Story card: eyebrow, title, narrative summary, reference footer.
+  factory ShareCard.story({
+    required String eyebrow,
+    required String title,
+    required String summary,
+    required String reference,
+    ShareCardBackdrop backdrop = ShareCardBackdrop.gradient,
+    ShareCardStyle style = ShareCardStyle.defaults,
+    String? artworkPath,
+  }) {
+    return ShareCard._(
+      backdrop: backdrop,
+      eyebrow: eyebrow,
+      title: title.trim().toUpperCase(),
+      body: summary,
+      footer: reference,
+      artworkPath: artworkPath,
+      style: style,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -203,7 +224,11 @@ class ShareCard extends StatelessWidget {
                 : title.length <= 320
                     ? 52.0
                     : 44.0)
-            : 92.0) *
+            : (title.length <= 24
+                ? 92.0
+                : title.length <= 60
+                    ? 68.0
+                    : 52.0)) *
         s.scale;
 
     // Exported image: fixed white-on-dark styling, independent of app theme.

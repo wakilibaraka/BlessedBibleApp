@@ -1365,6 +1365,18 @@ class AppLocalizationsIt extends AppLocalizations {
       'Nessuna parola scelta per oggi — riprova più tardi.';
 
   @override
+  String get homeStoryOfTheDayHeading => 'STORIA DEL GIORNO';
+
+  @override
+  String get homeStoryOfTheDay => 'Storia del giorno';
+
+  @override
+  String get homeReadStory => 'Leggi la storia';
+
+  @override
+  String get homeStoryEmpty => 'Nessuna storia disponibile per oggi.';
+
+  @override
   String get navHome => 'Home';
 
   @override

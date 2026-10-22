@@ -1381,6 +1381,18 @@ class AppLocalizationsRo extends AppLocalizations {
       'Niciun cuvânt ales pentru azi — încearcă mai târziu.';
 
   @override
+  String get homeStoryOfTheDayHeading => 'POVESTEA ZILEI';
+
+  @override
+  String get homeStoryOfTheDay => 'Povestea zilei';
+
+  @override
+  String get homeReadStory => 'Citește povestea';
+
+  @override
+  String get homeStoryEmpty => 'Nicio poveste disponibilă pentru azi.';
+
+  @override
   String get navHome => 'Acasă';
 
   @override

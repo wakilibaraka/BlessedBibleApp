@@ -1367,6 +1367,18 @@ class AppLocalizationsTl extends AppLocalizations {
       'Wala pang salitang napili ngayon — subukan mamaya.';
 
   @override
+  String get homeStoryOfTheDayHeading => 'KWENTO NG ARAW';
+
+  @override
+  String get homeStoryOfTheDay => 'Kwento ng araw';
+
+  @override
+  String get homeReadStory => 'Basahin ang kwento';
+
+  @override
+  String get homeStoryEmpty => 'Walang kwentong magagamit para sa araw na ito.';
+
+  @override
   String get navHome => 'Home';
 
   @override

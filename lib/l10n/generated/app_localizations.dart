@@ -2212,6 +2212,30 @@ abstract class AppLocalizations {
   /// **'No word picked for today yet — try again later.'**
   String get homeWotdEmpty;
 
+  /// No description provided for @homeStoryOfTheDayHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'STORY OF THE DAY'**
+  String get homeStoryOfTheDayHeading;
+
+  /// No description provided for @homeStoryOfTheDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Story of the day'**
+  String get homeStoryOfTheDay;
+
+  /// No description provided for @homeReadStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Read story'**
+  String get homeReadStory;
+
+  /// No description provided for @homeStoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No story available for today.'**
+  String get homeStoryEmpty;
+
   /// No description provided for @navHome.
   ///
   /// In en, this message translates to:

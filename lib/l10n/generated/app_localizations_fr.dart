@@ -1370,6 +1370,18 @@ class AppLocalizationsFr extends AppLocalizations {
       'Aucun mot choisi pour aujourd’hui — réessayez plus tard.';
 
   @override
+  String get homeStoryOfTheDayHeading => 'HISTOIRE DU JOUR';
+
+  @override
+  String get homeStoryOfTheDay => 'Histoire du jour';
+
+  @override
+  String get homeReadStory => 'Lire l\'histoire';
+
+  @override
+  String get homeStoryEmpty => 'Aucune histoire disponible aujourd\'hui.';
+
+  @override
   String get navHome => 'Accueil';
 
   @override

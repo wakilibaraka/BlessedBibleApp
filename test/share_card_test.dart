@@ -68,6 +68,22 @@ void main() {
     expect(find.text("EASTON'S BIBLE DICTIONARY"), findsOneWidget);
   });
 
+  testWidgets('story card renders eyebrow, title, summary, and reference',
+      (tester) async {
+    await tester.pumpWidget(host(ShareCard.story(
+      eyebrow: 'Story of the day',
+      title: 'The Creation of the World',
+      summary: 'In the beginning God created the heaven and the earth.',
+      reference: 'Genesis 1:1-2:3',
+    )));
+    expect(tester.takeException(), isNull);
+    expect(find.text('STORY OF THE DAY'), findsOneWidget);
+    expect(find.text('THE CREATION OF THE WORLD'), findsOneWidget);
+    expect(find.text('In the beginning God created the heaven and the earth.'),
+        findsOneWidget);
+    expect(find.text('Genesis 1:1-2:3'), findsOneWidget);
+  });
+
   testWidgets('artwork backdrop renders with a plate path', (tester) async {
     await tester.pumpWidget(host(ShareCard.verse(
       reference: 'John 3:16',

@@ -117,6 +117,24 @@ class ShareService {
     return '${word.trim().toUpperCase()}\n"$def"\n\n— ${sourceName.trim().toUpperCase()}';
   }
 
+  /// Formats a Bible story for copy/share:
+  ///   THE CREATION OF THE WORLD
+  ///   "In the beginning..."
+  ///
+  ///   — Genesis 1:1-2:3
+  static String formatStory({
+    required String title,
+    required String summary,
+    required String reference,
+    int maxSummaryLength = 600,
+  }) {
+    var s = summary.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (s.length > maxSummaryLength) {
+      s = '${s.substring(0, maxSummaryLength).trimRight()}…';
+    }
+    return '${title.trim().toUpperCase()}\n"$s"\n\n— $reference';
+  }
+
   /// Reference string for a verse selection: `John 3:16`,
   /// `John 3:16-18`, or `John 3:16, 18`.
   static String referenceFor(

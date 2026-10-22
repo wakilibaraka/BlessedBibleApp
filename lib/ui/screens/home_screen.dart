@@ -26,6 +26,9 @@ import '../../state/devotional_provider.dart';
 import '../widgets/share_card.dart';
 import '../../utils/log.dart';
 import 'package:intl/intl.dart';
+import '../../data/models/devotional_story.dart';
+import '../../state/story_of_the_day_provider.dart';
+import 'bible_story_reader_screen.dart';
 
 class StrictHorizontalDragGestureRecognizer
     extends HorizontalDragGestureRecognizer {
@@ -385,40 +388,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Commentary / Devotional text excerpt (fallback to omitted if none exists)
+                  // Commentary / Devotional text excerpt (clean view: content text only)
                   if (excerpt != null) ...[
-                    Row(
-                      children: [
-                        Icon(
-                          data.verseOfTheDay.isDevotional
-                              ? Icons.favorite_rounded
-                              : Icons.library_books_rounded,
-                          size: 13,
-                          color: theme.primaryColor,
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            (data.verseOfTheDay.isDevotional
-                                    ? context.l10n.homeDevotional
-                                    : context.l10n.homeCommentary) +
-                                (data.verseOfTheDay.author != null
-                                    ? ' · ${data.verseOfTheDay.author}'
-                                    : (data.verseOfTheDay.sourceTitle != null
-                                        ? ' · ${data.verseOfTheDay.sourceTitle}'
-                                        : '')),
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.8,
-                              color: theme.primaryColor,
-                              fontSize: TypeScale.caption,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
                     Text(
                       excerpt,
                       maxLines: 8,
@@ -489,6 +460,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
           // ── Word of the Day Section ──────────────
           const WordOfTheDaySection(),
+
+          const SizedBox(height: 16),
+
+          // ── Story of the Day Section ──────────────
+          const StoryOfTheDaySection(),
 
           // Clearance above the floating nav bar
           const SizedBox(height: 140),
@@ -743,5 +719,163 @@ String _todayLabel(BuildContext context) {
   } catch (_) {
     return '${DateFormat.EEEE('en').format(now)} · '
         '${DateFormat.MMMMd('en').format(now)}';
+  }
+}
+
+/// Daily Bible Story section with title, scripture reference, narrative summary snippet,
+/// and [Read story] and [Share] action pills.
+class StoryOfTheDaySection extends ConsumerWidget {
+  final bool showArtwork;
+
+  const StoryOfTheDaySection({super.key, this.showArtwork = false});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final storyAsync = ref.watch(storyOfTheDayProvider);
+
+    return storyAsync.when(
+      data: (story) {
+        if (story == null) return const SizedBox.shrink();
+
+        final snippet = story.retelling.trim().isNotEmpty
+            ? story.retelling.trim()
+            : story.keyVerse.trim();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              context.l10n.homeStoryOfTheDayHeading,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.primaryColor,
+                letterSpacing: 2.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              story.title,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.2,
+                height: 1.35,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              story.ref,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.primaryColor,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(height: 16),
+            GlassContainer(
+              isScrollable: false,
+              borderRadius: BorderRadius.circular(Radii.xxl),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (showArtwork && story.plateSlug != null) ...[
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(Radii.lg),
+                      child: AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: Image.asset(
+                          'assets/devotional/art/${story.plateSlug}.webp',
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                  Text(
+                    snippet,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      height: 1.60,
+                      color: theme.textTheme.bodyMedium?.color
+                          ?.withValues(alpha: 0.82),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _PillButton(
+                          label: context.l10n.homeReadStory,
+                          filled: true,
+                          onPressed: () {
+                            HapticFeedback.selectionClick();
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) =>
+                                    BibleStoryReaderScreen(initialStory: story),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _PillButton(
+                          label: context.l10n.commonShare,
+                          filled: false,
+                          onPressed: () => _shareStory(context, story),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (e, st) {
+        logDebug('storyOfTheDayProvider error: $e\n$st');
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  void _shareStory(BuildContext context, DevotionalStory story) {
+    HapticFeedback.selectionClick();
+    final summary = story.retelling.trim().isNotEmpty
+        ? story.retelling.trim()
+        : story.keyVerse.trim();
+    final shareBody = ShareService.formatStory(
+      title: story.title,
+      summary: summary,
+      reference: story.ref,
+    );
+    showShareOptionsSheet(
+      context: context,
+      copyText: shareBody,
+      shareText: shareBody,
+      imageFilename: 'story_of_the_day',
+      buildCard: (backdrop, style) => ShareCard.story(
+        eyebrow: context.l10n.homeStoryOfTheDay,
+        title: story.title,
+        summary: summary,
+        reference: story.ref,
+        backdrop: backdrop,
+        style: style,
+        artworkPath: story.plateSlug != null
+            ? 'assets/devotional/art/${story.plateSlug}.webp'
+            : null,
+      ),
+    );
   }
 }

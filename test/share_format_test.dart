@@ -139,6 +139,32 @@ void main() {
     });
   });
 
+  group('formatStory', () {
+    test('story format renders title in caps, quoted summary and reference',
+        () {
+      expect(
+        ShareService.formatStory(
+          title: 'The Creation of the World',
+          summary: 'In the beginning God created the heaven and the earth.',
+          reference: 'Genesis 1:1-2:3',
+        ),
+        'THE CREATION OF THE WORLD\n'
+        '"In the beginning God created the heaven and the earth."\n\n'
+        '— Genesis 1:1-2:3',
+      );
+    });
+
+    test('long story summary truncates with an ellipsis', () {
+      final out = ShareService.formatStory(
+        title: 'Noah and the Ark',
+        summary: 'y' * 800,
+        reference: 'Genesis 6:1-9:17',
+        maxSummaryLength: 60,
+      );
+      expect(out.split('\n')[1], '"${'y' * 60}…"');
+    });
+  });
+
   group('referenceFor', () {
     test('single verse', () {
       expect(ShareService.referenceFor('John', 3, [16]), 'John 3:16');

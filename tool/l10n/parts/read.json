@@ -631,6 +631,38 @@
   "sw": "Hakuna neno lililochaguliwa leo — jaribu baadaye.",
   "tl": "Wala pang salitang napili ngayon — subukan mamaya."
  },
+ "homeStoryOfTheDayHeading": {
+  "en": "STORY OF THE DAY",
+  "fr": "HISTOIRE DU JOUR",
+  "it": "STORIA DEL GIORNO",
+  "ro": "POVESTEA ZILEI",
+  "sw": "HADITHI YA SIKU",
+  "tl": "KWENTO NG ARAW"
+ },
+ "homeStoryOfTheDay": {
+  "en": "Story of the day",
+  "fr": "Histoire du jour",
+  "it": "Storia del giorno",
+  "ro": "Povestea zilei",
+  "sw": "Hadithi ya siku",
+  "tl": "Kwento ng araw"
+ },
+ "homeReadStory": {
+  "en": "Read story",
+  "fr": "Lire l'histoire",
+  "it": "Leggi la storia",
+  "ro": "Citește povestea",
+  "sw": "Soma hadithi",
+  "tl": "Basahin ang kwento"
+ },
+ "homeStoryEmpty": {
+  "en": "No story available for today.",
+  "fr": "Aucune histoire disponible aujourd'hui.",
+  "it": "Nessuna storia disponibile per oggi.",
+  "ro": "Nicio poveste disponibilă pentru azi.",
+  "sw": "Hakuna hadithi inayopatikana leo.",
+  "tl": "Walang kwentong magagamit para sa araw na ito."
+ },
  "navHome": {
   "en": "Home",
   "fr": "Accueil",

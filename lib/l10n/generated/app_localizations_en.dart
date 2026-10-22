@@ -1354,6 +1354,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeWotdEmpty => 'No word picked for today yet — try again later.';
 
   @override
+  String get homeStoryOfTheDayHeading => 'STORY OF THE DAY';
+
+  @override
+  String get homeStoryOfTheDay => 'Story of the day';
+
+  @override
+  String get homeReadStory => 'Read story';
+
+  @override
+  String get homeStoryEmpty => 'No story available for today.';
+
+  @override
   String get navHome => 'Home';
 
   @override

@@ -1361,6 +1361,18 @@ class AppLocalizationsSw extends AppLocalizations {
       'Hakuna neno lililochaguliwa leo — jaribu baadaye.';
 
   @override
+  String get homeStoryOfTheDayHeading => 'HADITHI YA SIKU';
+
+  @override
+  String get homeStoryOfTheDay => 'Hadithi ya siku';
+
+  @override
+  String get homeReadStory => 'Soma hadithi';
+
+  @override
+  String get homeStoryEmpty => 'Hakuna hadithi inayopatikana leo.';
+
+  @override
   String get navHome => 'Nyumbani';
 
   @override
