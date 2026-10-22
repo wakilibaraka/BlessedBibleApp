@@ -1038,9 +1038,9 @@
     "semantic_hash": ""
   },
   "lib/state/study_layout_provider.dart": {
-    "mtime": 1792628438.6826203,
-    "seen": 1792628518.59182,
-    "ast_hash": "75c5d37af2405568d5ebe0d55aeebdb5",
+    "mtime": 1792633343.9511604,
+    "seen": 1792633386.825143,
+    "ast_hash": "5126f030214367ea42a255752d47915d",
     "semantic_hash": ""
   },
   "lib/state/study_provider.dart": {
@@ -1218,9 +1218,9 @@
     "semantic_hash": ""
   },
   "lib/ui/screens/plans_library_screen.dart": {
-    "mtime": 1792630498.1189363,
-    "seen": 1792630597.713834,
-    "ast_hash": "ef21b3a53761f11a9a3fcd34b10c91b8",
+    "mtime": 1792633337.7234764,
+    "seen": 1792633386.8255732,
+    "ast_hash": "3c2e07a6b79b9aac1b8c765cd0b427f8",
     "semantic_hash": ""
   },
   "lib/ui/screens/privacy_policy_screen.dart": {
@@ -1272,9 +1272,9 @@
     "semantic_hash": ""
   },
   "lib/ui/screens/study_screen_v2.dart": {
-    "mtime": 1792628438.6874201,
-    "seen": 1792628518.592321,
-    "ast_hash": "a1d0c660a711c5baa535022b73445b4e",
+    "mtime": 1792633343.9513752,
+    "seen": 1792633386.825695,
+    "ast_hash": "fff62746ecc3dea346ee364d6a814ffe",
     "semantic_hash": ""
   },
   "lib/ui/screens/today_screen.dart": {
@@ -1446,9 +1446,9 @@
     "semantic_hash": ""
   },
   "lib/ui/widgets/plans_library_widgets.dart": {
-    "mtime": 1792630543.4738493,
-    "seen": 1792630597.714918,
-    "ast_hash": "7df609c6999e9b0736aaa87e2c215c51",
+    "mtime": 1792633337.7238133,
+    "seen": 1792633386.826143,
+    "ast_hash": "8988306a69ead85ea0a9792152b7a64f",
     "semantic_hash": ""
   },
   "lib/ui/widgets/radial_action_menu.dart": {
@@ -1722,9 +1722,9 @@
     "semantic_hash": ""
   },
   "test/plans_library_test.dart": {
-    "mtime": 1792630656.2958138,
-    "seen": 1792631757.3144681,
-    "ast_hash": "8cd6cd7fe9394113615f097ec0e6c0d9",
+    "mtime": 1792633337.7251613,
+    "seen": 1792633386.826785,
+    "ast_hash": "02e74b873d2dd96ae1fef5a653170cac",
     "semantic_hash": ""
   },
   "test/privacy_policy_test.dart": {
@@ -1800,9 +1800,9 @@
     "semantic_hash": ""
   },
   "test/study_layout_test.dart": {
-    "mtime": 1792625066.9380093,
-    "seen": 1792625528.4086,
-    "ast_hash": "3137a352f714109d0e2763bcfbf71c8a",
+    "mtime": 1792633343.951551,
+    "seen": 1792633386.8269372,
+    "ast_hash": "0a887c24688dd934fc8134879b4434f9",
     "semantic_hash": ""
   },
   "test/translation_downloader_test.dart": {
