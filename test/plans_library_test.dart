@@ -20,8 +20,8 @@ void main() {
   group('plans library helpers', () {
     test('hero date is month and day, weekday is upper-cased', () {
       final day = DateTime(2026, 10, 22);
-      expect(libraryMonthDay(day, 'en'), 'October 22');
-      expect(libraryWeekday(day, 'en'), 'THURSDAY');
+      expect(libraryMonthDay(day), 'October 22');
+      expect(libraryWeekday(day), 'THURSDAY');
     });
 
     test('plan initials are stable and sensible', () {
