@@ -10,27 +10,13 @@ import 'package:the_blessed_bible/data/local_storage/preferences_service.dart';
 import 'package:the_blessed_bible/theme/app_theme.dart';
 import 'package:the_blessed_bible/ui/screens/plans_library_screen.dart';
 import 'package:the_blessed_bible/ui/widgets/plans_library_widgets.dart';
-import 'package:the_blessed_bible/ui/widgets/library_calendar_rail.dart';
 
 void main() {
   group('plans library helpers', () {
-    test('date header formats like the reference design', () {
-      expect(
-        libraryDateHeader(DateTime(2025, 11, 10)),
-        'November 10, 2025',
-      );
-    });
-
-    test('calendar week is Monday-first with 7 days containing today', () {
-      // 2025-11-10 is a Monday.
-      final days = libraryWeekDays(DateTime(2025, 11, 12));
-      expect(days.length, 7);
-      expect(days.first.weekday, DateTime.monday);
-      expect(days.last.weekday, DateTime.sunday);
-      expect(
-        days.any((d) => d.day == 12 && d.month == 11),
-        isTrue,
-      );
+    test('hero date is month and day, weekday is upper-cased', () {
+      final day = DateTime(2026, 10, 22);
+      expect(libraryMonthDay(day, 'en'), 'October 22');
+      expect(libraryWeekday(day, 'en'), 'THURSDAY');
     });
 
     test('plan initials are stable and sensible', () {
@@ -84,7 +70,9 @@ void main() {
     testWidgets('renders header, tabs and curated plans', (tester) async {
       await pumpLibrary(tester);
 
-      expect(find.text('Hello,'), findsOneWidget);
+      // The greeting and the calendar strip are gone; the hero shows the
+      // date and the year-progress line instead.
+      expect(find.text('Hello,'), findsNothing);
       expect(find.text('Reading'), findsOneWidget);
       expect(find.text('Books'), findsOneWidget);
       expect(find.textContaining('My Plans'), findsOneWidget);
@@ -99,8 +87,9 @@ void main() {
       // The Bible-story band is gone; no active plan means no hero.
       expect(find.text('Bible story'), findsNothing);
       expect(find.text('My Plans'), findsOneWidget);
-      // Year progress + calendar rail are in the header.
+      // Year progress line is in the hero; no streak chip at 0.
       expect(find.textContaining('Day '), findsWidgets);
+      expect(find.byIcon(Icons.local_fire_department_rounded), findsNothing);
     });
 
     testWidgets('Books tab shows presets, My Plans shows empty state',

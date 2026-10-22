@@ -11,37 +11,44 @@ import '../../theme/design_tokens.dart';
 /// dark and gold. Only the mascot character keeps its own fixed friendly
 /// colors (it is an illustration, not chrome).
 
-/// Long date for the library header, e.g. "November 10, 2025", formatted
-/// for [locale] (intl's default locale when null).
-String libraryDateHeader(DateTime day, [String? locale]) =>
-    DateFormat.yMMMMd(locale).format(day);
+/// Short month and day for the hero, e.g. "October 22", for [locale].
+String libraryMonthDay(DateTime day, [String? locale]) =>
+    DateFormat.MMMMd(locale).format(day);
 
-/// Greeting row: "Hello," + name on the left, a year-progress / verse
-/// button on the right. Both blocks share a baseline so the row reads as
-/// two balanced halves (the old three-part row drifted out of alignment).
-class LibraryGreetingHeader extends StatelessWidget {
-  final String name;
+/// Weekday name for the hero's eyebrow label, e.g. "THURSDAY".
+String libraryWeekday(DateTime day, [String? locale]) =>
+    DateFormat.EEEE(locale).format(day).toUpperCase();
+
+/// Plans hero header: a small weekday eyebrow over a large left-aligned
+/// date, with a quiet year-progress line underneath (tap opens Let's Read)
+/// and an optional streak chip on the right. The chip is hidden at 0 so an
+/// empty streak never reads as a failure.
+class LibraryHeroHeader extends StatelessWidget {
+  final String weekday;
+  final String date;
 
   /// Day-of-year progress, e.g. "Day 277 of 365".
   final String progressLabel;
 
-  /// Remaining days, e.g. "89 days left".
-  final String remainingLabel;
+  /// Consecutive reading days; the chip is hidden when this is 0.
+  final int streakCount;
 
-  final VoidCallback onReadPressed;
-  const LibraryGreetingHeader({
+  final VoidCallback onProgressPressed;
+  const LibraryHeroHeader({
     super.key,
-    required this.name,
+    required this.weekday,
+    required this.date,
     required this.progressLabel,
-    required this.remainingLabel,
-    required this.onReadPressed,
+    required this.streakCount,
+    required this.onProgressPressed,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final palette = context.palette;
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: Column(
@@ -49,59 +56,81 @@ class LibraryGreetingHeader extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                context.l10n.plansHello,
-                style: theme.textTheme.headlineSmall?.copyWith(
+                weekday,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.2,
+                  color: theme.primaryColor,
+                ),
+              ),
+              Text(
+                date,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                   height: 1.1,
                 ),
               ),
-              Text(
-                name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  height: 1.1,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
+              // Quiet text link: no box, so it doesn't compete with the
+              // Today card below. 48dp tall for the touch target.
+              Semantics(
+                button: true,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(Radii.sm),
+                  onTap: onProgressPressed,
+                  child: ConstrainedBox(
+                    constraints:
+                        const BoxConstraints(minHeight: kMinTouchTarget),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            progressLabel,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: palette.textMuted,
+                            ),
+                          ),
+                          Icon(Icons.chevron_right_rounded,
+                              size: 18, color: palette.textMuted),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(width: 12),
-        // 48dp min target, two lines of context, no magic offsets.
-        ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: kMinTouchTarget),
-          child: Material(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(Radii.lg),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(Radii.lg),
-              onTap: onReadPressed,
+        if (streakCount > 0) ...[
+          const SizedBox(width: 12),
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Semantics(
+              label: context.l10n.studyStreakDays(streakCount),
               child: Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(Radii.lg),
-                  border: Border.all(color: theme.dividerColor),
+                  color: palette.warning.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(Radii.pill),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    Icon(Icons.local_fire_department_rounded,
+                        size: 18, color: palette.warning),
+                    const SizedBox(width: 4),
                     Text(
-                      progressLabel,
-                      style: theme.textTheme.titleSmall?.copyWith(
+                      '$streakCount',
+                      style: theme.textTheme.labelLarge?.copyWith(
                         fontWeight: FontWeight.w800,
-                        color: theme.primaryColor,
-                      ),
-                    ),
-                    const SizedBox(height: 1),
-                    Text(
-                      remainingLabel,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: palette.warning,
                       ),
                     ),
                   ],
@@ -109,7 +138,7 @@ class LibraryGreetingHeader extends StatelessWidget {
               ),
             ),
           ),
-        ),
+        ],
       ],
     );
   }

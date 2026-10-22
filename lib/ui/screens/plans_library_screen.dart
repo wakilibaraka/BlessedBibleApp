@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,15 +6,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../data/let_read.dart';
 import '../../data/models/home_data.dart';
-import '../../state/auth_provider.dart';
 import '../../state/home_provider.dart';
 import '../../state/reading_plan_provider.dart';
+import '../../state/streak_provider.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
 import '../widgets/plan_flow.dart';
 import '../widgets/plans_library_widgets.dart';
-import '../widgets/library_calendar_rail.dart';
 import 'custom_plan_builder_v2_screen.dart';
 import '../../data/curated_plans.dart';
 import 'reading_plan_detail_v2_screen.dart';
@@ -97,8 +95,6 @@ class PlansLibraryScreen extends ConsumerStatefulWidget {
 class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabs;
-  final GlobalKey<LibraryCalendarRailState> _railKey =
-      GlobalKey<LibraryCalendarRailState>();
 
   @override
   void initState() {
@@ -210,20 +206,6 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
     ));
   }
 
-  /// Header date tap: pick any date, then slide the rail to that week.
-  Future<void> _pickDateAndScroll() async {
-    unawaited(HapticFeedback.selectionClick());
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: now,
-      firstDate: now.subtract(const Duration(days: 365)),
-      lastDate: now.add(const Duration(days: 730)),
-    );
-    if (picked == null) return;
-    _railKey.currentState?.scrollToDate(picked);
-  }
-
   /// "Let's Read": year progress plus today's shared verse of the day.
   void _openLetRead() {
     final now = DateTime.now();
@@ -273,14 +255,11 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
     final theme = Theme.of(context);
     final appThemeMode = ref.watch(themeProvider);
     final now = DateTime.now();
-    final rawName =
-        ref.watch(accountUserProvider).value?.displayName?.trim() ?? '';
-    final name = rawName.isEmpty
-        ? context.l10n.plansFriend
-        : rawName.split(RegExp(r'\s+')).first;
+    final locale = Localizations.localeOf(context).toString();
+    final streak = ref.watch(streakProvider);
     final activeIds = ref.watch(activePlanIdsProvider);
     final activeCount = activeIds.length;
-    // First active plan drives the calendar's completion dots.
+    // First active plan drives the progress ring in the Today card.
     // readingPlanProvider is a Notifier (not Async): it exposes
     // isLoading/error inline, and planData is empty until built.
     final activePlan = activeIds.isEmpty
@@ -301,68 +280,37 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
-                    // Date header doubles as a picker: choosing a date
-                    // scrolls the calendar rail to that week. The 48dp
-                    // min height replaces the old 8/12dp spacers.
-                    Semantics(
-                      button: true,
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: _pickDateAndScroll,
-                        child: ConstrainedBox(
-                          constraints:
-                              const BoxConstraints(minHeight: kMinTouchTarget),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  libraryDateHeader(
-                                    now,
-                                    Localizations.localeOf(context).toString(),
-                                  ),
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Icon(Icons.edit_calendar_outlined,
-                                  size: 16,
-                                  color: theme.colorScheme.onSurface
-                                      .withValues(alpha: 0.45)),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    LibraryGreetingHeader(
-                      name: name,
+                    LibraryHeroHeader(
+                      weekday: libraryWeekday(now, locale),
+                      date: libraryMonthDay(now, locale),
                       progressLabel: YearProgress.label(now, context.l10n),
-                      remainingLabel:
-                          YearProgress.remainingLabel(now, context.l10n),
-                      onReadPressed: _openLetRead,
+                      streakCount: streak.count,
+                      onProgressPressed: _openLetRead,
                     ),
-                    const SizedBox(height: 12),
-                    LibraryCalendarRail(
-                      key: _railKey,
-                      today: now,
-                      plan: activePlan,
-                    ),
-                    const SizedBox(height: 12),
-                    // Today's reading for the primary plan (replaces the
-                    // old Bible-story band): one tap into the reader.
+                    const SizedBox(height: 16),
+                    // Today's reading for the primary plan: the ring shows
+                    // plan progress, the panel the reading and its button.
                     if (activeIds.isNotEmpty) ...[
                       V2Card(
                         textured: true,
                         featured: true,
                         padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
                         onTap: () => _openDetail(activeIds.first),
-                        child: PlanTodayPanel(
-                          planId: activeIds.first,
-                          compact: true,
-                          caption: _planTitle(activeIds.first),
+                        child: Row(
+                          children: [
+                            V2ProgressRing(
+                              fraction: activePlan?.percentComplete ?? 0,
+                              size: 56,
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: PlanTodayPanel(
+                                planId: activeIds.first,
+                                compact: true,
+                                caption: _planTitle(activeIds.first),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 14),
