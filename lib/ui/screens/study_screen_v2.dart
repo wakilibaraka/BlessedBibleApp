@@ -18,6 +18,9 @@ import '../../state/user_data_provider.dart'
     show bookmarksProvider, highlightsProvider;
 import '../../data/local_storage/preferences_service.dart';
 import '../widgets/account_menu.dart';
+import '../widgets/plan_flow.dart';
+import '../widgets/plans_library_widgets.dart'
+    show PlanCoverPlaceholder, planInitials;
 import '../widgets/study_v2_widgets.dart';
 import 'bible_stories_screen.dart';
 import 'commentary_library_v2_screen.dart';
@@ -633,14 +636,18 @@ class _YourSpaceCard extends ConsumerWidget {
   }
 }
 
-/// Active-plan snapshot (full + half variants).
-/// Merged plans widget: a swipeable live snapshot (page 1) plus a
-/// browse entry (page 2). Replaces the old reading-plan + plans cards.
-class _PlansLiveCard extends ConsumerStatefulWidget {
+/// Reading-plan widget. One card, no hidden pages, sized to its content:
+/// - no plan: a short pitch, three plans to try, "Pick a plan";
+/// - one plan: progress plus today's reading with a Read button that
+///   opens the reader directly (two taps from Study to scripture);
+/// - several plans: up to two rows, each with its own Read button.
+/// Half span keeps the progress summary and a single Read button.
+class _PlansLiveCard extends ConsumerWidget {
   final CardSpan span;
   final bool expanded;
   final String Function(String id) planTitle;
   final void Function(Widget page) onOpen;
+
   const _PlansLiveCard({
     required this.span,
     this.expanded = false,
@@ -649,248 +656,413 @@ class _PlansLiveCard extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<_PlansLiveCard> createState() => _PlansLiveCardState();
-}
-
-class _PlansLiveCardState extends ConsumerState<_PlansLiveCard> {
-  late final PageController _pages = PageController();
-  int _page = 0;
-
-  @override
-  void dispose() {
-    _pages.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l10n = context.l10n;
+  Widget build(BuildContext context, WidgetRef ref) {
     final activeIds = ref.watch(activePlanIdsProvider);
-    void openLibrary() => widget.onOpen(const PlansLibraryScreen());
-    void openDetail(String id) =>
-        widget.onOpen(ReadingPlanDetailV2Screen(planId: id));
+    final full = span == CardSpan.full;
+    void openLibrary() => onOpen(const PlansLibraryScreen());
+    void openDetail(String id) => onOpen(ReadingPlanDetailV2Screen(planId: id));
 
-    final hasActive = activeIds.isNotEmpty;
-    final planId = hasActive ? activeIds.first : null;
-    final plan = planId == null ? null : ref.watch(readingPlanProvider(planId));
-    final total = plan?.planData.length ?? 0;
-    final current = plan?.todayReadingDay ?? total;
-    final behind = plan?.missedDays.length ?? 0;
-
-    Widget livePage() {
-      if (!hasActive) {
-        return Row(
-          children: [
-            Icon(Icons.menu_book_rounded, size: 32, color: theme.primaryColor),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  V2Eyebrow(l10n.studyReadingPlan),
-                  const SizedBox(height: 2),
-                  Text(l10n.studyStartReadingPlan,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      )),
-                ],
-              ),
-            ),
-            const Icon(Icons.chevron_right_rounded),
-          ],
-        );
-      }
-      return Row(
-        children: [
-          V2ProgressRing(
-              fraction: plan!.percentComplete,
-              size: widget.span == CardSpan.full ? 56.0 : 48.0),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                V2Eyebrow(l10n.studyActivePlan),
-                const SizedBox(height: 2),
-                Text(
-                  widget.planTitle(planId!),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Expanded(
-                      child: V2ProgressBar(fraction: plan.percentComplete),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      total == 0 ? '…' : l10n.studyDayOfTotal(current, total),
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  ],
-                ),
-                if (behind > 0) ...[
-                  const SizedBox(height: 4),
-                  V2MetaChip(l10n.studyDaysBehind(behind)),
-                ],
-              ],
-            ),
-          ),
-        ],
+    final Widget child;
+    VoidCallback onTap = openLibrary;
+    if (activeIds.isEmpty) {
+      child = _PlanPitch(full: full, onBrowse: openLibrary, onPlan: openDetail);
+    } else if (!full) {
+      child = _PlanSummaryHalf(planId: activeIds.first, title: planTitle);
+      onTap = () => openDetail(activeIds.first);
+    } else if (activeIds.length == 1) {
+      child = _PlanSummaryFull(
+        planId: activeIds.first,
+        title: planTitle,
+        onAll: openLibrary,
       );
-    }
-
-    Widget browsePage() {
-      return Row(
-        children: [
-          Icon(Icons.manage_search_rounded,
-              size: 32, color: theme.primaryColor),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                V2Eyebrow(l10n.studyPlans),
-                const SizedBox(height: 2),
-                Text(l10n.studyGuidedReading,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    )),
-                const SizedBox(height: 2),
-                Text(l10n.studyGuidedReadingSubtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontStyle: FontStyle.italic,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                    )),
-              ],
-            ),
-          ),
-          const Icon(Icons.chevron_right_rounded),
-        ],
+      onTap = () => openDetail(activeIds.first);
+    } else {
+      child = _PlanStack(
+        planIds: activeIds.take(expanded ? 3 : 2).toList(),
+        count: activeIds.length,
+        title: planTitle,
+        onAll: openLibrary,
+        onPlan: openDetail,
       );
-    }
-
-    void handleTap() {
-      if (_page == 1 || !hasActive) {
-        openLibrary();
-      } else {
-        openDetail(planId!);
-      }
     }
 
     return V2Card(
       textured: true,
-      featured: widget.span == CardSpan.full,
-      onTap: handleTap,
-      padding: EdgeInsets.all(widget.expanded ? 22 : 18),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            // Grows with the system text size so both pages fit.
-            height: MediaQuery.textScalerOf(context).scale(132),
-            child: PageView(
-              controller: _pages,
-              onPageChanged: (i) => setState(() => _page = i),
-              children: [
-                Center(child: livePage()),
-                Center(child: browsePage()),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              for (var i = 0; i < 2; i++)
-                Container(
-                  width: 6,
-                  height: 6,
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: i == _page
-                        ? theme.primaryColor
-                        : theme.colorScheme.onSurface.withValues(alpha: 0.25),
-                  ),
-                ),
-            ],
-          ),
-          if (widget.expanded && hasActive && total > 0) ...[
-            const SizedBox(height: 12),
-            _TodayRow(planId: planId!, current: current, total: total),
-          ],
-        ],
+      featured: full,
+      onTap: onTap,
+      padding: EdgeInsets.all(expanded ? 22 : 18),
+      child: AnimatedSize(
+        duration: Motion.of(context, Motion.normal),
+        curve: Curves.easeOutCubic,
+        alignment: Alignment.topCenter,
+        child: child,
       ),
     );
   }
 }
 
-class _TodayRow extends ConsumerWidget {
+/// Empty state: why a plan helps, three to try, and the way in.
+class _PlanPitch extends StatelessWidget {
+  final bool full;
+  final VoidCallback onBrowse;
+  final void Function(String id) onPlan;
+  const _PlanPitch(
+      {required this.full, required this.onBrowse, required this.onPlan});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final picks = availablePlans.where((p) => p.isAvailable).take(3).toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  V2Eyebrow(l10n.studyReadingPlan),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.planFlowEmptyTitle,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      height: 1.2,
+                    ),
+                  ),
+                  if (full) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.planFlowEmptyBody,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: context.palette.textMuted,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            if (full) ...[
+              const SizedBox(width: 12),
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: theme.primaryColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(Radii.lg),
+                ),
+                child:
+                    Icon(Icons.auto_stories_rounded, color: theme.primaryColor),
+              ),
+            ],
+          ],
+        ),
+        if (full && picks.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          // One swipeable row of plans to try; each opens its Plan page,
+          // where "Start & read day 1" is one more tap.
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            clipBehavior: Clip.none,
+            child: Row(
+              children: [
+                for (final p in picks)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ActionChip(
+                      avatar: Icon(Icons.menu_book_rounded,
+                          size: 16, color: theme.primaryColor),
+                      label: Text(p.title),
+                      onPressed: () => onPlan(p.id),
+                      shape: const StadiumBorder(),
+                      side: BorderSide(color: context.palette.divider),
+                      backgroundColor:
+                          theme.primaryColor.withValues(alpha: 0.06),
+                      labelStyle: theme.textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            FilledButton(
+              onPressed: onBrowse,
+              style: planFilledStyle(context),
+              child: Text(l10n.planFlowPickPlan),
+            ),
+            const Spacer(),
+            Icon(Icons.chevron_right_rounded,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Ring, title, bar and day count for one plan.
+class _PlanProgressHeader extends ConsumerWidget {
   final String planId;
-  final int current;
-  final int total;
-  const _TodayRow({
-    required this.planId,
-    required this.current,
-    required this.total,
+  final String Function(String id) title;
+  const _PlanProgressHeader({required this.planId, required this.title});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final plan = ref.watch(readingPlanProvider(planId));
+    final total = plan.planData.length;
+    final current = plan.todayReadingDay ?? total;
+    return Row(
+      children: [
+        V2ProgressRing(fraction: plan.percentComplete, size: 56),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              V2Eyebrow(l10n.studyActivePlan),
+              const SizedBox(height: 2),
+              Text(
+                title(planId),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Expanded(
+                    child: V2ProgressBar(fraction: plan.percentComplete),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    total == 0 ? '…' : l10n.studyDayOfTotal(current, total),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: context.palette.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PlanSummaryFull extends ConsumerWidget {
+  final String planId;
+  final String Function(String id) title;
+  final VoidCallback onAll;
+  const _PlanSummaryFull(
+      {required this.planId, required this.title, required this.onAll});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final plan = ref.watch(readingPlanProvider(planId));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _PlanProgressHeader(planId: planId, title: title),
+        const SizedBox(height: 14),
+        PlanTodayWell(child: PlanTodayPanel(planId: planId, compact: true)),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            if (plan.planData.isNotEmpty) PlanStatusChip(plan: plan),
+            const Spacer(),
+            PlanLink(label: context.l10n.planFlowAllPlans, onTap: onAll),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _PlanSummaryHalf extends ConsumerWidget {
+  final String planId;
+  final String Function(String id) title;
+  const _PlanSummaryHalf({required this.planId, required this.title});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final plan = ref.watch(readingPlanProvider(planId));
+    final total = plan.planData.length;
+    final target = planTarget(plan);
+    final canRead = total > 0 && target.kind != PlanTargetKind.complete;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          children: [
+            V2ProgressRing(fraction: plan.percentComplete, size: 44),
+            const Spacer(),
+            if (plan.missedDays.isNotEmpty) PlanStatusChip(plan: plan),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Text(
+          title(planId),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            height: 1.2,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          total == 0 ? '…' : l10n.studyDayOfTotal(target.day, total),
+          style: theme.textTheme.labelSmall?.copyWith(
+            fontWeight: FontWeight.w800,
+            color: context.palette.textMuted,
+          ),
+        ),
+        if (canRead) ...[
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: () => openPlanDay(context, planId, target.day),
+              style: planTonalStyle(context),
+              child: Text(target.kind == PlanTargetKind.doneToday
+                  ? l10n.planFlowReadAhead
+                  : l10n.studyRead),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Two or three active plans, each one row with its own Read button.
+class _PlanStack extends ConsumerWidget {
+  final List<String> planIds;
+  final int count;
+  final String Function(String id) title;
+  final VoidCallback onAll;
+  final void Function(String id) onPlan;
+  const _PlanStack({
+    required this.planIds,
+    required this.count,
+    required this.title,
+    required this.onAll,
+    required this.onPlan,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final plan = ref.watch(readingPlanProvider(planId));
-    String label = context.l10n.studyReadyToBegin;
-    if (total > 0 && current >= 1 && current <= total) {
-      label =
-          plan.planData[current - 1].passages.map((p) => p.label).join(' · ');
-    }
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.onSurface.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(Radii.lg),
-        border: Border.all(color: theme.dividerColor),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              context.l10n.studyTodayLabel(label),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w600,
+    final l10n = context.l10n;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          children: [
+            Expanded(child: V2Eyebrow(l10n.planFlowYourPlans(count))),
+            PlanLink(label: l10n.planFlowAllPlans, onTap: onAll),
+          ],
+        ),
+        for (final id in planIds)
+          Builder(builder: (context) {
+            final plan = ref.watch(readingPlanProvider(id));
+            final total = plan.planData.length;
+            final target = planTarget(plan);
+            final done = target.kind == PlanTargetKind.doneToday ||
+                target.kind == PlanTargetKind.complete;
+            final palette = context.palette;
+            return InkWell(
+              borderRadius: BorderRadius.circular(Radii.lg),
+              onTap: () => onPlan(id),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  children: [
+                    PlanCoverPlaceholder(
+                      seed: id,
+                      initials: planInitials(title(id)),
+                      width: 44,
+                      height: 44,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            title(id),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: V2ProgressBar(
+                                    fraction: plan.percentComplete),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                done
+                                    ? '✓'
+                                    : total == 0
+                                        ? '…'
+                                        : l10n.plansDayN(target.day),
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: done
+                                      ? palette.success
+                                      : target.kind == PlanTargetKind.catchUp
+                                          ? palette.warning
+                                          : palette.textMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    if (total > 0 && target.kind != PlanTargetKind.complete)
+                      FilledButton(
+                        onPressed: () => openPlanDay(context, id, target.day),
+                        style: done
+                            ? planTonalStyle(context)
+                            : planFilledStyle(context),
+                        child: Text(
+                            done ? l10n.planFlowReadAhead : l10n.studyRead),
+                      ),
+                  ],
+                ),
               ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          FilledButton.tonal(
-            onPressed: () {
-              Navigator.of(context).push(CupertinoPageRoute<void>(
-                builder: (_) => ReadingPlanDetailV2Screen(planId: planId),
-              ));
-            },
-            child: Text(plan.completedReadings.contains(current)
-                ? context.l10n.studyReview
-                : context.l10n.studyRead),
-          ),
-        ],
-      ),
+            );
+          }),
+      ],
     );
   }
 }

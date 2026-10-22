@@ -338,6 +338,125 @@ class AppLocalizationsTl extends AppLocalizations {
   String get onboardingNotNow => 'Hindi muna';
 
   @override
+  String get planFlowEmptyTitle => 'Basahin ang Biblia nang may plano';
+
+  @override
+  String get planFlowEmptyBody =>
+      'Ilang kabanata bawat araw, sa sarili mong bilis.';
+
+  @override
+  String get planFlowPickPlan => 'Pumili ng plano';
+
+  @override
+  String get planFlowAllPlans => 'Lahat ng plano';
+
+  @override
+  String planFlowYourPlans(int count) {
+    return 'Iyong mga plano · $count aktibo';
+  }
+
+  @override
+  String planFlowTodayDay(int day) {
+    return 'Ngayon · Araw $day';
+  }
+
+  @override
+  String planFlowCatchUpDay(int day) {
+    return 'Habulin · Araw $day';
+  }
+
+  @override
+  String get planFlowDoneToday => 'Tapos na ngayong araw ✓';
+
+  @override
+  String planFlowNextDay(int day) {
+    return 'Susunod · Araw $day';
+  }
+
+  @override
+  String get planFlowReadToday => 'Basahin ngayon';
+
+  @override
+  String planFlowReadDay(int day) {
+    return 'Basahin ang araw $day';
+  }
+
+  @override
+  String get planFlowReadAhead => 'Magbasa nang maaga';
+
+  @override
+  String get planFlowPlanComplete => 'Tapos na ang plano';
+
+  @override
+  String get planFlowPlanCompleteBody =>
+      'Nabasa mo ang bawat araw ng planong ito.';
+
+  @override
+  String get planFlowStartAndRead => 'Simulan at basahin ang araw 1';
+
+  @override
+  String planFlowStartOn(String date) {
+    return 'Simulan sa $date';
+  }
+
+  @override
+  String get planFlowStartsToday => 'Magsisimula ngayon';
+
+  @override
+  String planFlowStartsOn(String date) {
+    return 'Magsisimula sa $date';
+  }
+
+  @override
+  String get planFlowChangeDate => 'Palitan ang petsa';
+
+  @override
+  String planFlowShowEarlier(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Ipakita ang $count naunang araw',
+      one: 'Ipakita ang 1 naunang araw',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get planFlowPace => 'Bilis';
+
+  @override
+  String planFlowFinishDay(int day) {
+    return 'Tapusin ang araw $day';
+  }
+
+  @override
+  String get planFlowMarkDayComplete => 'Markahang tapos ang araw';
+
+  @override
+  String planFlowUpNext(String label) {
+    return 'Susunod: $label';
+  }
+
+  @override
+  String planFlowReaderSubtitle(int day, String plan) {
+    return 'Araw $day · $plan';
+  }
+
+  @override
+  String planFlowPassages(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count talata',
+      one: '1 talata',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get planFlowMyPlans => 'Aking mga Plano';
+
+  @override
   String get plansContinueReading => 'Ituloy ang Pagbasa';
 
   @override
@@ -380,14 +499,6 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get plansHello => 'Kumusta,';
-
-  @override
-  String plansOpenStory(String caption) {
-    return 'Buksan ang kuwento: $caption';
-  }
-
-  @override
-  String get plansBibleStory => 'Kuwento sa Biblia';
 
   @override
   String plansSlotsFull(int count) {

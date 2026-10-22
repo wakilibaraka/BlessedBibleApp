@@ -132,6 +132,13 @@ class AppPalette extends ThemeExtension<AppPalette> {
     );
   }
 
+  /// Text and icon colour that reads on [background]: white on dark
+  /// fills, black on light ones (e.g. Dusk's peach accent).
+  static Color onColor(Color background) =>
+      ThemeData.estimateBrightnessForColor(background) == Brightness.dark
+          ? Colors.white
+          : Colors.black;
+
   static AppPalette of(BuildContext context) {
     final theme = Theme.of(context);
     return theme.extension<AppPalette>() ?? AppPalette.fromTheme(theme);

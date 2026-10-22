@@ -147,6 +147,120 @@
     }
   },
   "onboardingNotNow": "Not now",
+  "planFlowEmptyTitle": "Read the Bible with a plan",
+  "planFlowEmptyBody": "A few chapters a day, at your own pace.",
+  "planFlowPickPlan": "Pick a plan",
+  "planFlowAllPlans": "All plans",
+  "planFlowYourPlans": "Your plans · {count} active",
+  "@planFlowYourPlans": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "planFlowTodayDay": "Today · Day {day}",
+  "@planFlowTodayDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "planFlowCatchUpDay": "Catch up · Day {day}",
+  "@planFlowCatchUpDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "planFlowDoneToday": "Done for today ✓",
+  "planFlowNextDay": "Next · Day {day}",
+  "@planFlowNextDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "planFlowReadToday": "Read today",
+  "planFlowReadDay": "Read day {day}",
+  "@planFlowReadDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "planFlowReadAhead": "Read ahead",
+  "planFlowPlanComplete": "Plan complete",
+  "planFlowPlanCompleteBody": "You've read every day of this plan.",
+  "planFlowStartAndRead": "Start & read day 1",
+  "planFlowStartOn": "Start on {date}",
+  "@planFlowStartOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "planFlowStartsToday": "Starts today",
+  "planFlowStartsOn": "Starts {date}",
+  "@planFlowStartsOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "planFlowChangeDate": "Change date",
+  "planFlowShowEarlier": "{count, plural, =1{Show 1 earlier day} other{Show {count} earlier days}}",
+  "@planFlowShowEarlier": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "planFlowPace": "Pace",
+  "planFlowFinishDay": "Finish day {day}",
+  "@planFlowFinishDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "planFlowMarkDayComplete": "Mark day complete",
+  "planFlowUpNext": "Up next: {label}",
+  "@planFlowUpNext": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "planFlowReaderSubtitle": "Day {day} · {plan}",
+  "@planFlowReaderSubtitle": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "planFlowPassages": "{count, plural, =1{1 passage} other{{count} passages}}",
+  "@planFlowPassages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "planFlowMyPlans": "My Plans",
   "plansContinueReading": "Continue reading",
   "plansResume": "Resume",
   "plansDayCompleteCelebration": "Reading Plan\nDay {day} Complete!",
@@ -185,15 +299,6 @@
     }
   },
   "plansHello": "Hello,",
-  "plansOpenStory": "Open story: {caption}",
-  "@plansOpenStory": {
-    "placeholders": {
-      "caption": {
-        "type": "String"
-      }
-    }
-  },
-  "plansBibleStory": "Bible story",
   "plansSlotsFull": "All {count} plan slots are in use. Pause a plan to free a slot — progress is kept.",
   "@plansSlotsFull": {
     "placeholders": {

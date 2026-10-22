@@ -337,6 +337,123 @@ class AppLocalizationsSw extends AppLocalizations {
   String get onboardingNotNow => 'Si sasa';
 
   @override
+  String get planFlowEmptyTitle => 'Soma Biblia kwa mpango';
+
+  @override
+  String get planFlowEmptyBody => 'Sura chache kwa siku, kwa mwendo wako.';
+
+  @override
+  String get planFlowPickPlan => 'Chagua mpango';
+
+  @override
+  String get planFlowAllPlans => 'Mipango yote';
+
+  @override
+  String planFlowYourPlans(int count) {
+    return 'Mipango yako · $count hai';
+  }
+
+  @override
+  String planFlowTodayDay(int day) {
+    return 'Leo · Siku $day';
+  }
+
+  @override
+  String planFlowCatchUpDay(int day) {
+    return 'Fidia · Siku $day';
+  }
+
+  @override
+  String get planFlowDoneToday => 'Umemaliza leo ✓';
+
+  @override
+  String planFlowNextDay(int day) {
+    return 'Inayofuata · Siku $day';
+  }
+
+  @override
+  String get planFlowReadToday => 'Soma leo';
+
+  @override
+  String planFlowReadDay(int day) {
+    return 'Soma siku $day';
+  }
+
+  @override
+  String get planFlowReadAhead => 'Soma mbele';
+
+  @override
+  String get planFlowPlanComplete => 'Mpango umekamilika';
+
+  @override
+  String get planFlowPlanCompleteBody => 'Umesoma kila siku ya mpango huu.';
+
+  @override
+  String get planFlowStartAndRead => 'Anza na usome siku 1';
+
+  @override
+  String planFlowStartOn(String date) {
+    return 'Anza tarehe $date';
+  }
+
+  @override
+  String get planFlowStartsToday => 'Inaanza leo';
+
+  @override
+  String planFlowStartsOn(String date) {
+    return 'Inaanza $date';
+  }
+
+  @override
+  String get planFlowChangeDate => 'Badilisha tarehe';
+
+  @override
+  String planFlowShowEarlier(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Onyesha siku $count zilizopita',
+      one: 'Onyesha siku 1 iliyopita',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get planFlowPace => 'Mwendo';
+
+  @override
+  String planFlowFinishDay(int day) {
+    return 'Maliza siku $day';
+  }
+
+  @override
+  String get planFlowMarkDayComplete => 'Weka alama siku imekamilika';
+
+  @override
+  String planFlowUpNext(String label) {
+    return 'Inayofuata: $label';
+  }
+
+  @override
+  String planFlowReaderSubtitle(int day, String plan) {
+    return 'Siku $day · $plan';
+  }
+
+  @override
+  String planFlowPassages(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'vifungu $count',
+      one: 'kifungu 1',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get planFlowMyPlans => 'Mipango Yangu';
+
+  @override
   String get plansContinueReading => 'Endelea Kusoma';
 
   @override
@@ -379,14 +496,6 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get plansHello => 'Habari,';
-
-  @override
-  String plansOpenStory(String caption) {
-    return 'Fungua hadithi: $caption';
-  }
-
-  @override
-  String get plansBibleStory => 'Hadithi ya Biblia';
 
   @override
   String plansSlotsFull(int count) {

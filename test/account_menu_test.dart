@@ -48,8 +48,9 @@ void main() {
     // Cards render (Your Space banner + tool cards + merged plans).
     expect(find.text('Bookmarks, highlights, notes & journal'), findsOneWidget);
     expect(find.text('Words defined'), findsOneWidget);
-    // Merged plans_live card (no active plans -> start CTA page).
-    expect(find.text('Start a reading plan'), findsOneWidget);
+    // Plans widget with no active plan: pitch + "Pick a plan".
+    expect(find.text('Read the Bible with a plan'), findsOneWidget);
+    expect(find.text('Pick a plan'), findsOneWidget);
   });
 
   testWidgets('avatar opens the account menu with data rows', (tester) async {

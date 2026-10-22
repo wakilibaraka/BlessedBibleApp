@@ -340,6 +340,124 @@ class AppLocalizationsFr extends AppLocalizations {
   String get onboardingNotNow => 'Pas maintenant';
 
   @override
+  String get planFlowEmptyTitle => 'Lisez la Bible avec un plan';
+
+  @override
+  String get planFlowEmptyBody =>
+      'Quelques chapitres par jour, à votre rythme.';
+
+  @override
+  String get planFlowPickPlan => 'Choisir un plan';
+
+  @override
+  String get planFlowAllPlans => 'Tous les plans';
+
+  @override
+  String planFlowYourPlans(int count) {
+    return 'Vos plans · $count actifs';
+  }
+
+  @override
+  String planFlowTodayDay(int day) {
+    return 'Aujourd\'hui · Jour $day';
+  }
+
+  @override
+  String planFlowCatchUpDay(int day) {
+    return 'Rattrapage · Jour $day';
+  }
+
+  @override
+  String get planFlowDoneToday => 'Terminé pour aujourd\'hui ✓';
+
+  @override
+  String planFlowNextDay(int day) {
+    return 'Suivant · Jour $day';
+  }
+
+  @override
+  String get planFlowReadToday => 'Lire aujourd\'hui';
+
+  @override
+  String planFlowReadDay(int day) {
+    return 'Lire le jour $day';
+  }
+
+  @override
+  String get planFlowReadAhead => 'Lire en avance';
+
+  @override
+  String get planFlowPlanComplete => 'Plan terminé';
+
+  @override
+  String get planFlowPlanCompleteBody => 'Vous avez lu chaque jour de ce plan.';
+
+  @override
+  String get planFlowStartAndRead => 'Commencer et lire le jour 1';
+
+  @override
+  String planFlowStartOn(String date) {
+    return 'Commencer le $date';
+  }
+
+  @override
+  String get planFlowStartsToday => 'Commence aujourd\'hui';
+
+  @override
+  String planFlowStartsOn(String date) {
+    return 'Commence le $date';
+  }
+
+  @override
+  String get planFlowChangeDate => 'Changer la date';
+
+  @override
+  String planFlowShowEarlier(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Afficher $count jours précédents',
+      one: 'Afficher 1 jour précédent',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get planFlowPace => 'Rythme';
+
+  @override
+  String planFlowFinishDay(int day) {
+    return 'Terminer le jour $day';
+  }
+
+  @override
+  String get planFlowMarkDayComplete => 'Marquer le jour comme terminé';
+
+  @override
+  String planFlowUpNext(String label) {
+    return 'Ensuite : $label';
+  }
+
+  @override
+  String planFlowReaderSubtitle(int day, String plan) {
+    return 'Jour $day · $plan';
+  }
+
+  @override
+  String planFlowPassages(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count passages',
+      one: '1 passage',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get planFlowMyPlans => 'Mes plans';
+
+  @override
   String get plansContinueReading => 'Reprendre la lecture';
 
   @override
@@ -382,14 +500,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get plansHello => 'Bonjour,';
-
-  @override
-  String plansOpenStory(String caption) {
-    return 'Ouvrir l\'histoire : $caption';
-  }
-
-  @override
-  String get plansBibleStory => 'Histoire biblique';
 
   @override
   String plansSlotsFull(int count) {

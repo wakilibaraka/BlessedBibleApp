@@ -342,6 +342,123 @@ class AppLocalizationsRo extends AppLocalizations {
   String get onboardingNotNow => 'Nu acum';
 
   @override
+  String get planFlowEmptyTitle => 'Citește Biblia după un plan';
+
+  @override
+  String get planFlowEmptyBody => 'Câteva capitole pe zi, în ritmul tău.';
+
+  @override
+  String get planFlowPickPlan => 'Alege un plan';
+
+  @override
+  String get planFlowAllPlans => 'Toate planurile';
+
+  @override
+  String planFlowYourPlans(int count) {
+    return 'Planurile tale · $count active';
+  }
+
+  @override
+  String planFlowTodayDay(int day) {
+    return 'Azi · Ziua $day';
+  }
+
+  @override
+  String planFlowCatchUpDay(int day) {
+    return 'Recuperare · Ziua $day';
+  }
+
+  @override
+  String get planFlowDoneToday => 'Gata pentru azi ✓';
+
+  @override
+  String planFlowNextDay(int day) {
+    return 'Următoarea · Ziua $day';
+  }
+
+  @override
+  String get planFlowReadToday => 'Citește azi';
+
+  @override
+  String planFlowReadDay(int day) {
+    return 'Citește ziua $day';
+  }
+
+  @override
+  String get planFlowReadAhead => 'Citește înainte';
+
+  @override
+  String get planFlowPlanComplete => 'Plan încheiat';
+
+  @override
+  String get planFlowPlanCompleteBody => 'Ai citit fiecare zi a acestui plan.';
+
+  @override
+  String get planFlowStartAndRead => 'Începe și citește ziua 1';
+
+  @override
+  String planFlowStartOn(String date) {
+    return 'Începe pe $date';
+  }
+
+  @override
+  String get planFlowStartsToday => 'Începe azi';
+
+  @override
+  String planFlowStartsOn(String date) {
+    return 'Începe pe $date';
+  }
+
+  @override
+  String get planFlowChangeDate => 'Schimbă data';
+
+  @override
+  String planFlowShowEarlier(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Arată $count zile anterioare',
+      one: 'Arată 1 zi anterioară',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get planFlowPace => 'Ritm';
+
+  @override
+  String planFlowFinishDay(int day) {
+    return 'Încheie ziua $day';
+  }
+
+  @override
+  String get planFlowMarkDayComplete => 'Marchează ziua ca încheiată';
+
+  @override
+  String planFlowUpNext(String label) {
+    return 'Urmează: $label';
+  }
+
+  @override
+  String planFlowReaderSubtitle(int day, String plan) {
+    return 'Ziua $day · $plan';
+  }
+
+  @override
+  String planFlowPassages(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pasaje',
+      one: '1 pasaj',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get planFlowMyPlans => 'Planurile mele';
+
+  @override
   String get plansContinueReading => 'Continuă lectura';
 
   @override
@@ -385,14 +502,6 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get plansHello => 'Bună,';
-
-  @override
-  String plansOpenStory(String caption) {
-    return 'Deschide povestea: $caption';
-  }
-
-  @override
-  String get plansBibleStory => 'Poveste biblică';
 
   @override
   String plansSlotsFull(int count) {

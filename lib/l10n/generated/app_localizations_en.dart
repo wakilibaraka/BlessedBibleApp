@@ -335,6 +335,123 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingNotNow => 'Not now';
 
   @override
+  String get planFlowEmptyTitle => 'Read the Bible with a plan';
+
+  @override
+  String get planFlowEmptyBody => 'A few chapters a day, at your own pace.';
+
+  @override
+  String get planFlowPickPlan => 'Pick a plan';
+
+  @override
+  String get planFlowAllPlans => 'All plans';
+
+  @override
+  String planFlowYourPlans(int count) {
+    return 'Your plans · $count active';
+  }
+
+  @override
+  String planFlowTodayDay(int day) {
+    return 'Today · Day $day';
+  }
+
+  @override
+  String planFlowCatchUpDay(int day) {
+    return 'Catch up · Day $day';
+  }
+
+  @override
+  String get planFlowDoneToday => 'Done for today ✓';
+
+  @override
+  String planFlowNextDay(int day) {
+    return 'Next · Day $day';
+  }
+
+  @override
+  String get planFlowReadToday => 'Read today';
+
+  @override
+  String planFlowReadDay(int day) {
+    return 'Read day $day';
+  }
+
+  @override
+  String get planFlowReadAhead => 'Read ahead';
+
+  @override
+  String get planFlowPlanComplete => 'Plan complete';
+
+  @override
+  String get planFlowPlanCompleteBody => 'You\'ve read every day of this plan.';
+
+  @override
+  String get planFlowStartAndRead => 'Start & read day 1';
+
+  @override
+  String planFlowStartOn(String date) {
+    return 'Start on $date';
+  }
+
+  @override
+  String get planFlowStartsToday => 'Starts today';
+
+  @override
+  String planFlowStartsOn(String date) {
+    return 'Starts $date';
+  }
+
+  @override
+  String get planFlowChangeDate => 'Change date';
+
+  @override
+  String planFlowShowEarlier(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Show $count earlier days',
+      one: 'Show 1 earlier day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get planFlowPace => 'Pace';
+
+  @override
+  String planFlowFinishDay(int day) {
+    return 'Finish day $day';
+  }
+
+  @override
+  String get planFlowMarkDayComplete => 'Mark day complete';
+
+  @override
+  String planFlowUpNext(String label) {
+    return 'Up next: $label';
+  }
+
+  @override
+  String planFlowReaderSubtitle(int day, String plan) {
+    return 'Day $day · $plan';
+  }
+
+  @override
+  String planFlowPassages(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count passages',
+      one: '1 passage',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get planFlowMyPlans => 'My Plans';
+
+  @override
   String get plansContinueReading => 'Continue reading';
 
   @override
@@ -377,14 +494,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get plansHello => 'Hello,';
-
-  @override
-  String plansOpenStory(String caption) {
-    return 'Open story: $caption';
-  }
-
-  @override
-  String get plansBibleStory => 'Bible story';
 
   @override
   String plansSlotsFull(int count) {

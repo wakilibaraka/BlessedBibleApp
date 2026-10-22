@@ -7,20 +7,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../data/let_read.dart';
 import '../../data/models/home_data.dart';
-import '../../services/devotional_service.dart';
 import '../../state/auth_provider.dart';
-import '../../state/devotional_provider.dart';
 import '../../state/home_provider.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/theme_provider.dart';
 import '../widgets/shared_app_bar.dart';
 import '../widgets/study_v2_widgets.dart';
+import '../widgets/plan_flow.dart';
 import '../widgets/plans_library_widgets.dart';
 import '../widgets/library_calendar_rail.dart';
 import 'custom_plan_builder_v2_screen.dart';
 import '../../data/curated_plans.dart';
 import 'reading_plan_detail_v2_screen.dart';
-import 'bible_story_reader_screen.dart';
 import '../../l10n/l10n.dart';
 import '../../theme/design_tokens.dart';
 
@@ -248,18 +246,6 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
     );
   }
 
-  /// Opens the story that owns the day's artwork plate.
-  Future<void> _openPlate(StoryPlate plate) async {
-    unawaited(HapticFeedback.selectionClick());
-    final story = await ref
-        .read(devotionalServiceProvider)
-        .firstStoryForPrefix(plate.prefix);
-    if (story == null || !mounted) return;
-    await Navigator.of(context).push(CupertinoPageRoute<void>(
-      builder: (_) => BibleStoryReaderScreen(initialStory: story),
-    ));
-  }
-
   void _openToday() {
     final activeIds = ref.read(activePlanIdsProvider);
     if (activeIds.isEmpty) {
@@ -272,7 +258,14 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
       );
       return;
     }
-    _openDetail(activeIds.first);
+    // Straight to the reader: the day the plan's Read button would open.
+    final id = activeIds.first;
+    final plan = ref.read(readingPlanProvider(id));
+    if (plan.planData.isEmpty) {
+      _openDetail(id);
+      return;
+    }
+    openPlanDay(context, id, planTarget(plan).day);
   }
 
   @override
@@ -358,14 +351,31 @@ class _PlansLibraryScreenState extends ConsumerState<PlansLibraryScreen>
                       plan: activePlan,
                     ),
                     const SizedBox(height: 12),
-                    LibraryPlateBand(day: now, onOpen: _openPlate),
-                    const SizedBox(height: 14),
+                    // Today's reading for the primary plan (replaces the
+                    // old Bible-story band): one tap into the reader.
+                    if (activeIds.isNotEmpty) ...[
+                      V2Card(
+                        textured: true,
+                        featured: true,
+                        padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+                        onTap: () => _openDetail(activeIds.first),
+                        child: PlanTodayPanel(
+                          planId: activeIds.first,
+                          compact: true,
+                          caption: _planTitle(activeIds.first),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                    ] else
+                      const SizedBox(height: 2),
                     V2PillTabs(
                       controller: _tabs,
                       tabs: [
                         context.l10n.plansTabReading,
                         context.l10n.plansTabBooks,
-                        context.l10n.plansTabMyPlans(activeCount),
+                        activeCount == 0
+                            ? context.l10n.planFlowMyPlans
+                            : context.l10n.plansTabMyPlans(activeCount),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -413,6 +423,11 @@ class _LibraryCard extends StatelessWidget {
   final VoidCallback onOpen;
   final List<PopupMenuEntry<String>> Function(BuildContext context) menuBuilder;
   final void Function(String action) onMenu;
+
+  /// Set for plans that have never been started: the row then shows the
+  /// plan length and a Start button instead of an empty progress bar
+  /// (which used to say "Not started" twice).
+  final VoidCallback? onStart;
   const _LibraryCard({
     required this.seed,
     required this.title,
@@ -422,6 +437,7 @@ class _LibraryCard extends StatelessWidget {
     required this.onOpen,
     required this.menuBuilder,
     required this.onMenu,
+    this.onStart,
   });
 
   @override
@@ -462,49 +478,62 @@ class _LibraryCard extends StatelessWidget {
                     statusLine,
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: theme.primaryColor,
+                      color: onStart == null
+                          ? theme.primaryColor
+                          : context.palette.textMuted,
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: V2ProgressBar(fraction: fraction),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        // Words read better than a bare "0%".
-                        fraction <= 0
-                            ? context.l10n.plansNotStarted
-                            : context.l10n.plansPercentDone(
-                                (fraction.clamp(0.0, 1.0) * 100).round(),
-                              ),
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.6),
+                  if (onStart == null) ...[
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: V2ProgressBar(fraction: fraction),
                         ),
-                      ),
-                    ],
-                  ),
+                        const SizedBox(width: 8),
+                        Text(
+                          // Words read better than a bare "0%".
+                          fraction <= 0
+                              ? context.l10n.plansNotStarted
+                              : context.l10n.plansPercentDone(
+                                  (fraction.clamp(0.0, 1.0) * 100).round(),
+                                ),
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
-            // 48dp target, icon centred.
-            SizedBox(
-              width: kMinTouchTarget,
-              height: kMinTouchTarget,
-              child: PopupMenuButton<String>(
-                tooltip: context.l10n.spaceMore,
-                padding: EdgeInsets.zero,
-                icon: Icon(
-                  Icons.more_vert_rounded,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                ),
-                onSelected: onMenu,
-                itemBuilder: menuBuilder,
+            if (onStart != null) ...[
+              const SizedBox(width: 8),
+              FilledButton(
+                onPressed: onStart,
+                style: planTonalStyle(context),
+                child: Text(context.l10n.plansStart),
               ),
-            ),
+              const SizedBox(width: 4),
+            ] else
+              // 48dp target, icon centred.
+              SizedBox(
+                width: kMinTouchTarget,
+                height: kMinTouchTarget,
+                child: PopupMenuButton<String>(
+                  tooltip: context.l10n.spaceMore,
+                  padding: EdgeInsets.zero,
+                  icon: Icon(
+                    Icons.more_vert_rounded,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
+                  onSelected: onMenu,
+                  itemBuilder: menuBuilder,
+                ),
+              ),
           ],
         ),
       ),
@@ -561,10 +590,12 @@ class _ReadingTab extends ConsumerWidget {
               final left = total - current;
               status = l10n.plansDayOfTotalLeft(current, total, left);
             }
+            final fresh = !started && !hasProgress;
             return _LibraryCard(
               seed: meta.id,
               title: meta.title,
-              statusLine: status,
+              statusLine: fresh ? l10n.plansDays(meta.durationDays) : status,
+              onStart: fresh ? () => onStart(meta) : null,
               fraction: started ? st.percentComplete : 0,
               featured: isActive,
               onOpen: () => onOpen(meta.id),

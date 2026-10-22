@@ -634,6 +634,168 @@ abstract class AppLocalizations {
   /// **'Not now'**
   String get onboardingNotNow;
 
+  /// No description provided for @planFlowEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Read the Bible with a plan'**
+  String get planFlowEmptyTitle;
+
+  /// No description provided for @planFlowEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A few chapters a day, at your own pace.'**
+  String get planFlowEmptyBody;
+
+  /// No description provided for @planFlowPickPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a plan'**
+  String get planFlowPickPlan;
+
+  /// No description provided for @planFlowAllPlans.
+  ///
+  /// In en, this message translates to:
+  /// **'All plans'**
+  String get planFlowAllPlans;
+
+  /// No description provided for @planFlowYourPlans.
+  ///
+  /// In en, this message translates to:
+  /// **'Your plans · {count} active'**
+  String planFlowYourPlans(int count);
+
+  /// No description provided for @planFlowTodayDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Today · Day {day}'**
+  String planFlowTodayDay(int day);
+
+  /// No description provided for @planFlowCatchUpDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Catch up · Day {day}'**
+  String planFlowCatchUpDay(int day);
+
+  /// No description provided for @planFlowDoneToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Done for today ✓'**
+  String get planFlowDoneToday;
+
+  /// No description provided for @planFlowNextDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Next · Day {day}'**
+  String planFlowNextDay(int day);
+
+  /// No description provided for @planFlowReadToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Read today'**
+  String get planFlowReadToday;
+
+  /// No description provided for @planFlowReadDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Read day {day}'**
+  String planFlowReadDay(int day);
+
+  /// No description provided for @planFlowReadAhead.
+  ///
+  /// In en, this message translates to:
+  /// **'Read ahead'**
+  String get planFlowReadAhead;
+
+  /// No description provided for @planFlowPlanComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan complete'**
+  String get planFlowPlanComplete;
+
+  /// No description provided for @planFlowPlanCompleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve read every day of this plan.'**
+  String get planFlowPlanCompleteBody;
+
+  /// No description provided for @planFlowStartAndRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Start & read day 1'**
+  String get planFlowStartAndRead;
+
+  /// No description provided for @planFlowStartOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Start on {date}'**
+  String planFlowStartOn(String date);
+
+  /// No description provided for @planFlowStartsToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts today'**
+  String get planFlowStartsToday;
+
+  /// No description provided for @planFlowStartsOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts {date}'**
+  String planFlowStartsOn(String date);
+
+  /// No description provided for @planFlowChangeDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Change date'**
+  String get planFlowChangeDate;
+
+  /// No description provided for @planFlowShowEarlier.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Show 1 earlier day} other{Show {count} earlier days}}'**
+  String planFlowShowEarlier(int count);
+
+  /// No description provided for @planFlowPace.
+  ///
+  /// In en, this message translates to:
+  /// **'Pace'**
+  String get planFlowPace;
+
+  /// No description provided for @planFlowFinishDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish day {day}'**
+  String planFlowFinishDay(int day);
+
+  /// No description provided for @planFlowMarkDayComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark day complete'**
+  String get planFlowMarkDayComplete;
+
+  /// No description provided for @planFlowUpNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Up next: {label}'**
+  String planFlowUpNext(String label);
+
+  /// No description provided for @planFlowReaderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day} · {plan}'**
+  String planFlowReaderSubtitle(int day, String plan);
+
+  /// No description provided for @planFlowPassages.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 passage} other{{count} passages}}'**
+  String planFlowPassages(int count);
+
+  /// No description provided for @planFlowMyPlans.
+  ///
+  /// In en, this message translates to:
+  /// **'My Plans'**
+  String get planFlowMyPlans;
+
   /// No description provided for @plansContinueReading.
   ///
   /// In en, this message translates to:
@@ -693,18 +855,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hello,'**
   String get plansHello;
-
-  /// No description provided for @plansOpenStory.
-  ///
-  /// In en, this message translates to:
-  /// **'Open story: {caption}'**
-  String plansOpenStory(String caption);
-
-  /// No description provided for @plansBibleStory.
-  ///
-  /// In en, this message translates to:
-  /// **'Bible story'**
-  String get plansBibleStory;
 
   /// No description provided for @plansSlotsFull.
   ///

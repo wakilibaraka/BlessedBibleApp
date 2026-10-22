@@ -15,7 +15,8 @@ void main() {
   // Started 10 days ago, days 1..8 done -> behind by day 9.
   // NOTE: the provider is pre-loaded here (not after pumpWidget) because
   // rootBundle + compute need real async time, which only runAsync gives.
-  Future<ProviderContainer> makeContainer(WidgetTester tester) async {
+  Future<ProviderContainer> makeContainer(WidgetTester tester,
+      {bool started = true}) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     final container = ProviderContainer(
@@ -24,18 +25,20 @@ void main() {
       ],
     );
     final start = DateTime.now().subtract(const Duration(days: 9));
-    container.read(preferencesProvider).saveReadingPlanState(
-      'chronological_1yr',
-      {
-        'planId': 'chronological_1yr',
-        'planStartedOn': start.toIso8601String(),
-        'paceMode': 'scheduled',
-        'completedReadings': [1, 2, 3, 4, 5, 6, 7, 8],
-        'reminderEnabled': false,
-        'reminderTimeHour': 8,
-        'reminderTimeMinute': 0,
-      },
-    );
+    if (started) {
+      container.read(preferencesProvider).saveReadingPlanState(
+        'chronological_1yr',
+        {
+          'planId': 'chronological_1yr',
+          'planStartedOn': start.toIso8601String(),
+          'paceMode': 'scheduled',
+          'completedReadings': [1, 2, 3, 4, 5, 6, 7, 8],
+          'reminderEnabled': false,
+          'reminderTimeHour': 8,
+          'reminderTimeMinute': 0,
+        },
+      );
+    }
     // Provider creation AND load must both happen under real async:
     // FakeAsync stalls rootBundle + compute futures created outside it.
     await tester.runAsync(() async {
@@ -72,11 +75,20 @@ void main() {
     // List header, not a calendar grid.
     expect(find.textContaining('READINGS ·'), findsOneWidget);
     expect(find.byType(GridView), findsNothing);
-    // Day rows with date + passages.
-    expect(find.textContaining('Genesis 1'), findsWidgets);
-    // Catch-up with the new bulk action.
+    // Hero holds the oldest missed day with one Read button.
+    expect(find.text('CATCH UP · DAY 9'), findsOneWidget);
+    expect(find.text('Read day 9'), findsOneWidget);
+    // Catch-up with the bulk action.
     expect(find.textContaining('Behind by'), findsOneWidget);
     expect(find.text('Mark all previous done'), findsOneWidget);
+    // The list opens one day before the hero; earlier days fold away.
+    expect(find.text('Show 7 earlier days'), findsOneWidget);
+    expect(find.textContaining('Genesis 1:1'), findsNothing);
+    await tester.tap(find.text('Show 7 earlier days'));
+    await tester.pump();
+    expect(find.textContaining('Genesis 1:1'), findsWidgets);
+    // Pace no longer takes room on the page; it lives in the ⋯ sheet.
+    expect(find.text('Flexible'), findsNothing);
   });
 
   testWidgets('mark all previous completes every earlier day', (tester) async {
@@ -104,5 +116,35 @@ void main() {
           reason: 'day $d should be marked (current=$current)');
     }
     expect(find.textContaining('marked as read'), findsOneWidget);
+  });
+
+  testWidgets('not started: start & read adds the plan and starts day 1',
+      (tester) async {
+    final container = await makeContainer(tester, started: false);
+    addTearDown(container.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          theme: AppTheme.lightTheme(1.0),
+          home: const ReadingPlanDetailV2Screen(planId: 'chronological_1yr'),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    // One screen: day 1, the start button, the date inline, the list.
+    expect(find.text('Start & read day 1'), findsOneWidget);
+    expect(find.text('Starts today'), findsOneWidget);
+    expect(find.textContaining('READINGS ·'), findsOneWidget);
+    expect(find.text('Begin plan'), findsNothing);
+
+    await tester.tap(find.text('Start & read day 1'));
+    await tester.pump();
+
+    final state = container.read(readingPlanProvider('chronological_1yr'));
+    expect(state.planStartedOn, isNotNull);
+    expect(
+        container.read(activePlanIdsProvider), contains('chronological_1yr'));
   });
 }

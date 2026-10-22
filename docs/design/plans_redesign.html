@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plans Redesign</title>
+<link href="https://fonts.googleapis.com/css2?family=Gentium+Book+Plus:wght@400;700&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F5F5F7;--surface:#fff;--glass:rgba(240,244,250,.78);--ink:#1D1D1F;--ink2:#6E6E73;--line:#E5E5EA;--accent:#6A3FC4;--accent-soft:rgba(106,63,196,.12);--rim:linear-gradient(135deg,#a993d9,#8fd0ee);--warn:#B56553}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121212;--surface:#1E1E1E;--glass:rgba(40,38,48,.8);--ink:#EAE6E1;--ink2:#AFAAA3;--line:#3F3C39;--accent:#B49BF0;--accent-soft:rgba(180,155,240,.16)}}
+:root[data-theme="dark"]{--bg:#121212;--surface:#1E1E1E;--glass:rgba(40,38,48,.8);--ink:#EAE6E1;--ink2:#AFAAA3;--line:#3F3C39;--accent:#B49BF0;--accent-soft:rgba(180,155,240,.16)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif}
+header{max-width:1200px;margin:auto;padding:32px 16px 8px}h1{font-family:'Gentium Book Plus',serif;margin:0 0 6px;font-size:30px}
+header p{color:var(--ink2);margin:0;max-width:720px;line-height:1.5}
+section{max-width:1200px;margin:auto;padding:24px 16px}
+h2{font-family:'Gentium Book Plus',serif;font-size:22px;margin:0 0 4px}.sub{color:var(--ink2);font-size:14px;margin:0 0 18px;line-height:1.5}
+.row{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.frame{width:360px;max-width:100%}.cap{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink2);margin:0 0 8px}
+.phone{background:radial-gradient(120% 60% at 50% 0%,rgba(255,236,200,.35),transparent),var(--bg);border:1px solid var(--line);border-radius:36px;padding:18px 16px 24px;overflow:hidden}
+.eb{font-size:10.5px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent)}
+.serif{font-family:'Gentium Book Plus',serif;font-weight:700}
+.card{position:relative;background:var(--glass);border-radius:28px;padding:18px;box-shadow:0 8px 24px rgba(60,60,90,.08)}
+.card.feat::before{content:"";position:absolute;inset:0;border-radius:28px;padding:2px;background:var(--rim);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.chev{color:var(--ink2);font-size:22px;line-height:1}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;flex:1}.bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.ring{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;color:var(--accent)}
+.chip{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(181,101,83,.14);color:var(--warn)}
+.btn{border:0;border-radius:99px;padding:9px 16px;font-weight:800;font-size:13px;background:var(--accent);color:#fff;font-family:inherit}
+.btn.tonal{background:var(--accent-soft);color:var(--accent)}
+.today{margin-top:12px;padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(127,127,127,.04);display:flex;gap:10px;align-items:center}
+.flex{display:flex;align-items:center;gap:12px}.grow{flex:1;min-width:0}
+.muted{color:var(--ink2);font-size:12px}
+.mini{display:flex;gap:8px;overflow:hidden;margin-top:12px}
+.mini span{flex:0 0 auto;font-size:12px;font-weight:700;padding:7px 12px;border-radius:99px;border:1px solid var(--line);background:var(--surface)}
+.tabs{display:flex;border:1px solid var(--line);border-radius:99px;background:var(--surface);padding:3px}
+.tabs b{flex:1;text-align:center;padding:10px 0;border-radius:99px;font-family:'Gentium Book Plus',serif;font-size:15px;color:var(--ink2)}
+.tabs b.on{background:var(--ink);color:var(--surface)}
+.cal{display:flex;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:10px 8px}
+.cal div{text-align:center;font-size:10px;letter-spacing:1px;color:var(--ink2);width:36px}.cal div b{display:block;font-size:15px;letter-spacing:0;color:var(--ink);margin-bottom:2px}
+.cal .on{color:var(--accent)}.cal .on b{color:var(--accent)}.cal .dot::after{content:"";display:block;width:5px;height:5px;border-radius:50%;background:var(--accent);margin:3px auto 0}
+.cover{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;color:#fff;font-family:'Gentium Book Plus',serif;font-weight:700;font-size:18px;flex:0 0 auto}
+.plan{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:12px;margin-top:10px}
+.hero{border-radius:24px;padding:16px;background:linear-gradient(135deg,var(--accent-soft),transparent),var(--surface);border:1px solid var(--line)}
+.note{font-size:13px;line-height:1.55;color:var(--ink2);max-width:360px}.note li{margin-bottom:6px}.note b{color:var(--ink)}
+.cut{position:relative;opacity:.45;outline:2px dashed var(--warn);outline-offset:3px;border-radius:24px}
+.cut::after{content:"REMOVED";position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:800;letter-spacing:1.5px;color:#fff;background:var(--warn);padding:3px 8px;border-radius:6px}
+.story{height:70px;border-radius:24px;background:linear-gradient(90deg,#222,#555);color:#fff;padding:14px 18px;font-family:'Gentium Book Plus',serif}
+</style></head><body>
+<header><h1>Reading plans — Study widget &amp; Plans page</h1>
+<p>Draft for refinement, built from <code>study_screen_v2.dart</code> (<code>_PlansLiveCard</code>, <code>_TodayRow</code>) and <code>plans_library_screen.dart</code>. Same tokens: glass <code>V2Card</code> with featured rim, Gentium Book Plus titles, uppercase accent eyebrows, pill tabs, <code>V2ProgressBar</code>.</p></header>
+
+<section><h2>1 · Study page widget</h2>
+<p class="sub">Today the card is a fixed 132dp PageView: the empty state is one short line in a tall, mostly empty card, and the second page (“Browse”) is hidden behind dots. Proposal: drop the swipe and size the card to its content. Browsing becomes an inline link.</p>
+<div class="row">
+ <div class="frame"><p class="cap">A · No plan yet</p><div class="phone">
+  <div class="card feat">
+   <div class="flex"><div class="grow"><div class="eb">Reading plan</div><div class="serif" style="font-size:19px;margin-top:4px">Read the Bible with a plan</div>
+   <div class="muted" style="margin-top:4px">A few chapters a day, at your own pace.</div></div></div>
+   <div class="mini"><span>M'Cheyne · 1 yr</span><span>Chronological</span><span>Gospels 30d</span></div>
+   <div class="flex" style="margin-top:14px"><button class="btn">Pick a plan</button><span class="muted grow">15 plans</span><span class="chev">›</span></div>
+  </div></div></div>
+
+ <div class="frame"><p class="cap">B · Active plan (full span)</p><div class="phone">
+  <div class="card feat">
+   <div class="flex"><div class="ring" style="background:conic-gradient(var(--accent) 0 34%,var(--line) 0)"><div style="width:42px;height:42px;border-radius:50%;background:var(--glass);display:grid;place-items:center">34%</div></div>
+    <div class="grow"><div class="eb">Active plan</div><div class="serif" style="font-size:17px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">M'Cheyne 1-Year Plan</div>
+    <div class="flex" style="gap:8px;margin-top:6px"><div class="bar"><i style="width:34%"></i></div><span class="muted" style="font-weight:800">Day 124 / 365</span></div></div></div>
+   <div class="today"><div class="grow"><div class="eb" style="color:var(--ink2)">Today</div><div style="font-size:13px;font-weight:600;margin-top:2px">Judges 3 · Acts 3 · Jer 13 · Mark 12</div></div><button class="btn tonal">Read</button></div>
+   <div class="flex" style="margin-top:12px"><span class="chip">2 days behind</span><span class="grow"></span><span class="muted" style="font-weight:700;color:var(--accent)">All plans →</span></div>
+  </div></div></div>
+
+ <div class="frame"><p class="cap">C · Multiple plans</p><div class="phone">
+  <div class="card feat">
+   <div class="flex"><div class="eb grow">Your plans · 2 active</div><span class="muted" style="font-weight:700;color:var(--accent)">All →</span></div>
+   <div class="flex" style="margin-top:12px"><div class="cover" style="background:linear-gradient(135deg,#8b4fc9,#6a2fa8);width:40px;height:40px;font-size:14px;border-radius:12px">M1</div><div class="grow"><div class="serif" style="font-size:15px">M'Cheyne 1-Year</div><div class="flex" style="gap:8px;margin-top:4px"><div class="bar"><i style="width:34%"></i></div><span class="muted">Day 124</span></div></div><button class="btn tonal">Read</button></div>
+   <div class="flex" style="margin-top:12px"><div class="cover" style="background:linear-gradient(135deg,#9db53a,#7c9420);width:40px;height:40px;font-size:14px;border-radius:12px">GO</div><div class="grow"><div class="serif" style="font-size:15px">Gospels in 30 Days</div><div class="flex" style="gap:8px;margin-top:4px"><div class="bar"><i style="width:100%;background:#4c9a6a"></i></div><span class="muted">Done today ✓</span></div></div><button class="btn tonal" style="opacity:.6">Review</button></div>
+  </div></div></div>
+</div>
+<ul class="note" style="max-width:none;margin-top:18px"><li><b>No PageView / dots</b> — removes the hidden second page and the fixed 132dp height.</li><li><b>Today row always shown</b> in full span (currently only when <code>expanded</code>); half span keeps ring + title + bar.</li><li><b>Behind chip</b> moves to the footer with the “All plans” link, so the header line stays one height.</li><li>Variant C only if &gt;1 active plan; caps at 2 rows.</li></ul>
+</section>
+
+<section><h2>2 · Plans page</h2>
+<p class="sub">The Bible-story plate band is removed. That frees ~100dp so the list starts higher. Two smaller fixes: the cards say “Not started” twice (status line <i>and</i> progress label), and the greeting/day pill can carry the active plan.</p>
+<div class="row">
+ <div class="frame"><p class="cap">Current (with cut)</p><div class="phone">
+  <div class="serif" style="text-align:center;font-size:17px">October 22, 2026</div>
+  <div class="flex" style="margin:14px 0"><div class="serif grow" style="font-size:18px">Hello,<br><span style="color:var(--ink2)">Friend</span></div><div style="border:1.5px solid var(--ink);border-radius:20px;padding:8px 14px;text-align:right"><div class="serif" style="color:var(--accent)">Day 295 of 365</div><div class="muted" style="font-size:10px">70 days left</div></div></div>
+  <div class="cal"><div>19<br>MON</div><div class="on"><b>22</b>THU</div><div>25</div></div>
+  <div class="cut" style="margin:12px 0"><div class="story"><small style="letter-spacing:2px">Bible story</small><br>Crossing the Jordan</div></div>
+  <div class="tabs"><b class="on">Reading</b><b>Books</b><b>My Plans (0)</b></div>
+  <div class="plan flex"><div class="cover" style="background:linear-gradient(135deg,#8b4fc9,#6a2fa8)">M1</div><div class="grow"><div class="serif">M'Cheyne 1-Year Plan</div><div class="eb" style="letter-spacing:0;text-transform:none;font-size:11px">Not started</div><div class="flex" style="gap:8px;margin-top:4px"><div class="bar"></div><span class="muted">Not started</span></div></div></div>
+ </div></div>
+
+ <div class="frame"><p class="cap">Proposed · no active plan</p><div class="phone">
+  <div class="flex"><span class="chev" style="color:var(--accent)">‹</span><div class="serif grow" style="text-align:center;font-size:18px">Plans</div><span style="width:12px"></span></div>
+  <div class="flex" style="margin:16px 0 12px"><div class="grow"><div class="eb">Thursday · Oct 22</div><div class="serif" style="font-size:22px">Hello, Friend</div></div><div style="border:1px solid var(--line);background:var(--surface);border-radius:18px;padding:8px 12px;text-align:right"><div class="serif" style="color:var(--accent);font-size:15px">Day 295</div><div class="muted" style="font-size:10px">70 days left</div></div></div>
+  <div class="cal"><div>19<br>MON</div><div>20<br>TUE</div><div>21<br>WED</div><div class="on"><b>22</b>THU</div><div><b>23</b>FRI</div><div><b>24</b>SAT</div><div><b>25</b>SUN</div></div>
+  <div style="height:14px"></div>
+  <div class="tabs"><b class="on">Reading</b><b>Books</b><b>My Plans</b></div>
+  <div class="plan flex"><div class="cover" style="background:linear-gradient(135deg,#8b4fc9,#6a2fa8)">M1</div><div class="grow"><div class="serif">M'Cheyne 1-Year Plan</div><div class="muted" style="margin-top:3px">365 days · 4 chapters/day</div></div><button class="btn tonal">Start</button></div>
+  <div class="plan flex"><div class="cover" style="background:linear-gradient(135deg,#4b86b8,#2e6496)">CB</div><div class="grow"><div class="serif">Chronological — Bible in a Year</div><div class="muted" style="margin-top:3px">365 days · ~3 chapters/day</div></div><button class="btn tonal">Start</button></div>
+  <div class="plan flex"><div class="cover" style="background:linear-gradient(135deg,#c24fb0,#9a2a8a)">TL</div><div class="grow"><div class="serif">Ten Lists — 10 Chapters a Day</div><div class="muted" style="margin-top:3px">Ongoing · 10 chapters/day</div></div><button class="btn tonal">Start</button></div>
+ </div></div>
+
+ <div class="frame"><p class="cap">Proposed · with active plan</p><div class="phone">
+  <div class="flex"><span class="chev" style="color:var(--accent)">‹</span><div class="serif grow" style="text-align:center;font-size:18px">Plans</div><span style="width:12px"></span></div>
+  <div class="flex" style="margin:16px 0 12px"><div class="grow"><div class="eb">Thursday · Oct 22</div><div class="serif" style="font-size:22px">Hello, Emmanuel</div></div><div style="border:1px solid var(--line);background:var(--surface);border-radius:18px;padding:8px 12px;text-align:right"><div class="serif" style="color:var(--accent);font-size:15px">Day 295</div><div class="muted" style="font-size:10px">70 days left</div></div></div>
+  <div class="cal"><div class="dot">19<br>MON</div><div class="dot">20<br>TUE</div><div>21<br>WED</div><div class="on"><b>22</b>THU</div><div><b>23</b>FRI</div><div><b>24</b>SAT</div><div><b>25</b>SUN</div></div>
+  <div class="hero" style="margin-top:12px"><div class="eb">Today · M'Cheyne day 124</div><div class="serif" style="font-size:16px;margin-top:4px">Judges 3 · Acts 3 · Jer 13 · Mark 12</div><div class="flex" style="margin-top:10px"><div class="bar"><i style="width:34%"></i></div><button class="btn">Read</button></div></div>
+  <div style="height:12px"></div>
+  <div class="tabs"><b>Reading</b><b>Books</b><b class="on">My Plans (1)</b></div>
+  <div class="plan flex"><div class="cover" style="background:linear-gradient(135deg,#8b4fc9,#6a2fa8)">M1</div><div class="grow"><div class="serif">M'Cheyne 1-Year Plan</div><div class="flex" style="gap:8px;margin-top:6px"><div class="bar"><i style="width:34%"></i></div><span class="muted" style="font-weight:700">34%</span></div><div style="margin-top:6px"><span class="chip">1 day behind</span></div></div><span class="chev">⋮</span></div>
+ </div></div>
+</div>
+<ul class="note" style="max-width:none;margin-top:18px">
+<li><b>Removed:</b> <code>LibraryPlateBand</code> + <code>_openPlate</code> + <code>storyPlateForDay</code> provider usage (Bible Stories stays reachable from Study).</li>
+<li><b>Header:</b> date merges into the greeting eyebrow; the separate date row stays tappable as the picker (move icon next to eyebrow). Day pill loses the heavy black outline → <code>dividerColor</code> border like the calendar.</li>
+<li><b>Today hero</b> takes the band's slot only when a plan is active — it's the one action people come here for.</li>
+<li><b>Card copy:</b> unstarted plans show length/pace + a Start button instead of two “Not started” labels and an empty bar; started plans show bar + %.</li>
+<li>Tab label drops “(0)” when empty.</li></ul>
+</section>
+<section><h2>Flow · from the Study page to the Bible text</h2>
+<p class="sub">Today it takes up to 5 taps to read the first day of a new plan: Study → Plans → Plan (begin) → Start → Day row → Reader. Proposed: <b>2 taps</b> when a plan is already active (the Read button on the Study widget or the Plans hero opens the reader directly), and <b>3 taps</b> for a new plan (Plans → plan → “Start &amp; read day 1”).</p>
+<div class="flex" style="flex-wrap:wrap;gap:8px;font-size:13px;font-weight:700">
+ <span class="chip" style="background:var(--accent-soft);color:var(--accent)">1 · Study widget</span>→
+ <span class="chip" style="background:var(--accent-soft);color:var(--accent)">2 · Plans page</span>→
+ <span class="chip" style="background:var(--accent-soft);color:var(--accent)">3 · Plan page (merged)</span>→
+ <span class="chip" style="background:var(--accent-soft);color:var(--accent)">4 · Reader</span>
+ <span class="muted" style="width:100%;margin-top:4px">Shortcut: the Read button on 1 or 2 jumps straight to 4.</span></div>
+</section>
+
+<section><h2>3 · Plan page (merges “Begin plan” + plan detail)</h2>
+<p class="sub">One screen for both states. The separate begin screen goes away: the start date becomes an inline row, and the readings list shows straight away, so people can see what they're signing up for. The Scheduled / Flexible toggle and its explanation move into the ⋯ menu (Scheduled stays the default), which saves ~200dp. Rows are one line high with a cut-off preview, so ~8 days fit on screen instead of 5.</p>
+<div class="row">
+ <div class="frame"><p class="cap">A · Not started</p><div class="phone">
+  <div class="flex"><span class="chev" style="color:var(--accent)">‹</span><span class="grow"></span><span class="chev">⋯</span></div>
+  <div class="flex" style="margin-top:10px"><div class="cover" style="background:linear-gradient(135deg,#4b86b8,#2e6496)">CB</div><div class="grow"><div class="serif" style="font-size:19px;line-height:1.2">Chronological — Bible in a Year</div><div class="muted" style="margin-top:3px">365 days · ~3 chapters/day · ~15 min</div></div></div>
+  <div class="card feat" style="margin-top:14px">
+   <div class="eb">Day 1 · Genesis 1:1–3:24</div>
+   <div class="serif" style="font-size:16px;margin-top:4px">Creation and the Fall</div>
+   <button class="btn" style="width:100%;margin-top:12px;padding:12px">Start &amp; read day 1 →</button>
+   <div class="flex" style="margin-top:10px;font-size:12px"><span class="muted grow">Starts today, Thu Oct 22</span><span style="color:var(--accent);font-weight:700">Change date</span></div>
+  </div>
+  <div class="flex" style="margin:16px 4px 6px"><span class="cap grow" style="margin:0">Readings · 365 days</span><span class="muted">Jump to ▾</span></div>
+  <div class="plan" style="padding:4px 12px">
+   <div class="flex" style="padding:9px 0;border-bottom:1px solid var(--line)"><b class="muted" style="width:28px">2</b><span class="grow" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Gen 4–5 · 1 Chr 1:1–4 · Gen 6</span><span class="muted">Fri</span></div>
+   <div class="flex" style="padding:9px 0;border-bottom:1px solid var(--line)"><b class="muted" style="width:28px">3</b><span class="grow" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Gen 7–10:5 · 1 Chr 1:5–7 · Gen 10:6–20…</span><span class="muted">Sat</span></div>
+   <div class="flex" style="padding:9px 0;border-bottom:1px solid var(--line)"><b class="muted" style="width:28px">4</b><span class="grow" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Gen 11 · 1 Chr 1:24–27 · Gen 12…</span><span class="muted">Sun</span></div>
+   <div class="flex" style="padding:9px 0"><b class="muted" style="width:28px">5</b><span class="grow" style="font-size:13px">Gen 15:1–17:27</span><span class="muted">Mon</span></div>
+  </div>
+ </div></div>
+
+ <div class="frame"><p class="cap">B · Active</p><div class="phone">
+  <div class="flex"><span class="chev" style="color:var(--accent)">‹</span><span class="grow"></span><span class="chev">⋯</span></div>
+  <div class="serif" style="font-size:19px;margin-top:10px">Chronological — Bible in a Year</div>
+  <div class="flex" style="gap:8px;margin-top:8px"><div class="bar"><i style="width:3%"></i></div><span class="muted" style="font-weight:800">Day 12 / 365</span><span class="chip" style="background:rgba(76,154,106,.14);color:#3d8a5a">On track ✓</span></div>
+  <div class="card feat" style="margin-top:14px">
+   <div class="eb">Today · Day 12 · Thu Oct 22</div>
+   <div style="font-size:14px;font-weight:600;margin-top:6px;line-height:1.5">Job 8–11</div>
+   <div class="muted">4 chapters · ~14 min</div>
+   <button class="btn" style="width:100%;margin-top:12px;padding:12px">Read today →</button>
+  </div>
+  <div class="flex" style="margin:16px 4px 6px"><span class="cap grow" style="margin:0">Readings</span><span class="muted">Jump to ▾</span></div>
+  <div class="plan" style="padding:4px 12px">
+   <div class="flex" style="padding:9px 0;border-bottom:1px solid var(--line)"><b style="width:28px;color:#3d8a5a">✓</b><span class="grow muted" style="font-size:13px">Day 11 · Job 5–7</span><span class="muted">Wed</span></div>
+   <div class="flex" style="padding:9px 0;border-bottom:1px solid var(--line);background:var(--accent-soft);margin:0 -12px;padding-left:12px;padding-right:12px"><b style="width:28px;color:var(--accent)">12</b><span class="grow" style="font-size:13px;font-weight:700">Job 8–11</span><span style="color:var(--accent);font-weight:700;font-size:12px">Today</span></div>
+   <div class="flex" style="padding:9px 0;border-bottom:1px solid var(--line)"><b class="muted" style="width:28px">13</b><span class="grow" style="font-size:13px">Job 12–15</span><span class="muted">Fri</span></div>
+   <div class="flex" style="padding:9px 0"><b class="muted" style="width:28px">14</b><span class="grow" style="font-size:13px">Job 16–18</span><span class="muted">Sat</span></div>
+  </div>
+  <div class="muted" style="margin-top:8px;text-align:center">List opens scrolled to today, with 1 day of history above</div>
+ </div></div>
+
+ <div class="frame"><p class="cap">C · Behind</p><div class="phone">
+  <div class="serif" style="font-size:19px">Chronological — Bible in a Year</div>
+  <div class="flex" style="gap:8px;margin-top:8px"><div class="bar"><i style="width:3%"></i></div><span class="muted" style="font-weight:800">Day 12 / 365</span><span class="chip">2 behind</span></div>
+  <div class="card feat" style="margin-top:14px">
+   <div class="eb" style="color:var(--warn)">Catch up · Day 10 (Tue)</div>
+   <div style="font-size:14px;font-weight:600;margin-top:6px">Job 1–4</div>
+   <button class="btn" style="width:100%;margin-top:12px;padding:12px">Read day 10 →</button>
+   <div class="flex" style="margin-top:10px;font-size:12px"><span style="color:var(--accent);font-weight:700" class="grow">Skip to today</span><span style="color:var(--accent);font-weight:700">Shift schedule</span></div>
+  </div>
+  <ul class="note" style="margin-top:14px;padding-left:18px"><li><b>The hero is always the next unread day</b>, so there is one obvious button.</li><li>“Shift schedule” = switch to Flexible without opening the menu.</li><li>Tick circles stay on rows (long-press or swipe to mark done without reading).</li></ul>
+ </div></div>
+</div>
+</section>
+
+<section><h2>4 · Reader in plan mode</h2>
+<p class="sub">Keeps the existing reader. The header says which plan day you're on, a bottom bar steps through the day's passages, and the last passage ends with “Mark day complete”. That replaces going back to the list to tick it off.</p>
+<div class="row">
+ <div class="frame"><p class="cap">Passage 1 of 4</p><div class="phone" style="padding-bottom:12px">
+  <div class="flex"><span class="chev">←</span><div class="grow"><div class="serif" style="font-size:17px">Genesis 1</div><div class="muted" style="font-size:10px">KJV · Day 1 of Chronological</div></div><span class="muted" style="font-weight:700">Aa</span></div>
+  <div class="flex" style="gap:4px;margin:10px 0 14px"><i style="flex:1;height:4px;border-radius:9px;background:var(--accent)"></i><i style="flex:1;height:4px;border-radius:9px;background:var(--line)"></i><i style="flex:1;height:4px;border-radius:9px;background:var(--line)"></i><i style="flex:1;height:4px;border-radius:9px;background:var(--line)"></i></div>
+  <div class="serif" style="color:var(--accent);font-style:italic;font-size:17px">The Six Days of Creation</div>
+  <p style="font-family:'Gentium Book Plus',serif;font-size:15px;line-height:1.7;margin:8px 0"><sup style="color:var(--accent)">1</sup> In the beginning God created the heaven and the earth. <sup style="color:var(--accent)">2</sup> And the earth was without form, and void; and darkness was upon the face of the deep…</p>
+  <div class="card" style="padding:10px 12px;border-radius:22px;margin-top:20px"><div class="flex"><span class="muted grow">Next: Genesis 2</span><button class="btn">Next passage →</button></div></div>
+ </div></div>
+ <div class="frame"><p class="cap">Last passage</p><div class="phone" style="padding-bottom:12px">
+  <div class="flex"><span class="chev">←</span><div class="grow"><div class="serif" style="font-size:17px">Genesis 3</div><div class="muted" style="font-size:10px">KJV · Day 1 of Chronological</div></div><span class="muted" style="font-weight:700">Aa</span></div>
+  <div class="flex" style="gap:4px;margin:10px 0 14px"><i style="flex:1;height:4px;border-radius:9px;background:var(--accent)"></i><i style="flex:1;height:4px;border-radius:9px;background:var(--accent)"></i><i style="flex:1;height:4px;border-radius:9px;background:var(--accent)"></i><i style="flex:1;height:4px;border-radius:9px;background:var(--accent)"></i></div>
+  <p style="font-family:'Gentium Book Plus',serif;font-size:15px;line-height:1.7;margin:8px 0;color:var(--ink2)">…<sup>24</sup> So he drove out the man; and he placed at the east of the garden of Eden Cherubims…</p>
+  <div class="card feat" style="margin-top:20px;text-align:center"><div class="serif" style="font-size:17px">Day 1 done 🎉</div><div class="muted" style="margin:4px 0 12px">Tomorrow: Genesis 4–6</div><button class="btn" style="width:100%;padding:12px">Mark day complete ✓</button><div style="color:var(--accent);font-weight:700;font-size:12px;margin-top:10px">Keep reading Genesis 4</div></div>
+ </div></div>
+ <ul class="note"><li><b>Segmented progress</b> replaces the small gold “Passage 1 of 4” text.</li><li>The “Full chapter” pill moves into the <b>Aa</b> menu.</li><li>Swipe left/right also moves between passages.</li><li>After “Mark complete” → return to the Plan page with the next day in the hero.</li></ul>
+</div>
+</section>
+</body></html>

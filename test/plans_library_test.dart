@@ -90,11 +90,15 @@ void main() {
       expect(find.textContaining('My Plans'), findsOneWidget);
       // Curated plan cards on the Reading tab.
       expect(find.text("M'Cheyne 1-Year Plan"), findsOneWidget);
-      // Status line now varies per plan (no four identical "New
-      // readings" labels), and unstarted plans read in words.
-      expect(find.text('Not started'), findsWidgets);
+      // Unstarted plans show their length and a Start button instead of
+      // an empty bar labelled "Not started" twice.
+      expect(find.text('365 days'), findsWidgets);
+      expect(find.text('Start'), findsWidgets);
+      expect(find.text('Not started'), findsNothing);
       expect(find.text('New readings'), findsNothing);
-      expect(find.text('Not started'), findsWidgets);
+      // The Bible-story band is gone; no active plan means no hero.
+      expect(find.text('Bible story'), findsNothing);
+      expect(find.text('My Plans'), findsOneWidget);
       // Year progress + calendar rail are in the header.
       expect(find.textContaining('Day '), findsWidgets);
     });
