@@ -1,17 +1,17 @@
-# Graph Report - Blessed Bible  (2026-10-22)
+# Graph Report - Blessed Bible  (2026-10-26)
 
 ## Corpus Check
-- 384 files · ~4,149,740 words
+- 384 files · ~3,884,920 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 133 file(s) not represented in the graph (top: .ttf 48, .xml 32, (none) 12)
 
 ## Summary
-- 12393 nodes · 15168 edges · 179 communities (163 shown, 16 thin omitted)
+- 12396 nodes · 15171 edges · 186 communities (169 shown, 17 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `67c8ce71`
+- Built from commit: `ddf4b149`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -27,9 +27,9 @@
 - themeProvider
 - search_screen.dart
 - preferencesProvider
-- onboarding_screen.dart
+- StatelessWidget
 - app_colors.dart
-- commentary_hub_screen.dart
+- ReadingTokens
 - search_engine.dart
 - reading_plan_detail_v2_screen.dart
 - reading_plan_provider.dart
@@ -37,7 +37,7 @@
 - custom_plan_builder_v2_screen.dart
 - dynamic_toast.dart
 - study_screen_v2.dart
-- notes_list_screen.dart
+- ../../theme/design_tokens.dart
 - read_screen.dart
 - theme_picker_sheet.dart
 - home_screen.dart
@@ -56,9 +56,9 @@
 - [0.0.4] - 2026-10-22
 - translation_pack_store.dart
 - bible_sync.dart
-- commentary_view.dart
+- onboarding_screen.dart
 - state_views.dart
-- commentary_library_v2_screen.dart
+- home_provider.dart
 - Changelog
 - plan_spec.dart
 - dictionary_provider.dart
@@ -72,17 +72,17 @@
 - storage_screen.dart
 - book_chapter_selector_sheet.dart
 - dictionary_underline_test.dart
-- restore_prompt.dart
+- journey_map_screen.dart
 - fetch_dore_art.py
 - search_settings_provider.dart
 - typography_provider.dart
-- package:the_blessed_bible/data/local_storage/preferences_service.dart
+- reminders_provider.dart
 - translation_downloader.dart
 - Production Readiness: Status and Plan
 - Targeted UX/UI Fixes
 - verse_link_text.dart
 - reading_plan.dart
-- package:flutter_test/flutter_test.dart
+- animated_segmented_tile.dart
 - app_theme.dart
 - textured_glass_container.dart
 - 📖 Blessed Bible (The Blessed Bible)
@@ -100,7 +100,7 @@
 - package:flutter/services.dart
 - build_topical.py
 - devotional_story.dart
-- navProvider
+- plans_library_widgets.dart
 - ✨ Flagship Features
 - ai_journal_service.dart
 - widget_settings_provider.dart
@@ -108,7 +108,7 @@
 - AppDelegate
 - json
 - abbreviation
-- package:shared_preferences/shared_preferences.dart
+- package:flutter_test/flutter_test.dart
 - bible_provider.dart
 - locale_provider.dart
 - story_of_the_day_provider.dart
@@ -120,16 +120,16 @@
 - build_content.py
 - auth_provider.dart
 - study_greetings_test.dart
-- dart:math
+- bouncy_entrance.dart
 - study_greetings.dart
 - Pericope Dataset — Whole-System Audit Report
 - pericope_entry.dart
 - wotd_provider.dart
 - reading_tokens.dart
-- readSettingsProvider
+- package:flutter/services.dart
 - streak_provider.dart
 - read_location_provider.dart
-- search_engine_test.dart
+- study_layout_provider.dart
 - curated_plans.dart
 - shared_app_bar.dart
 - os
@@ -145,7 +145,7 @@
 - Content Licenses Register
 - sys
 - AppLocalizations
-- CustomPainter
+- day_complete_celebration.dart
 - package:flutter_riverpod/flutter_riverpod.dart
 - verse_action_sheet.dart
 - upload_packs
@@ -173,8 +173,9 @@
 - Shared Accounts: The Blessed Bible + Blessed Arcade
 - share_card_test.dart
 - pull_request_template.md
-- verse_action_sheet_test.dart
-- main.dart
+- most_read_provider.dart
+- bible_model.dart
+- firebase_options_stub.dart
 - MainActivity.kt
 - Applied Fixes
 - PHASE_6_PLAN.md
@@ -184,7 +185,13 @@
 - crossed_swords_icon.dart
 - bible_provider.dart
 - translation_picker_sheet.dart
-- strongs_provider.dart
+- dictionary_search_provider.dart
+- State
+- let_read.dart
+- journal_entry.dart
+- content_sync_service.dart
+- concordance_terms.dart
+- cross_references_provider.dart
 - Notifier
 
 ## God Nodes (most connected - your core abstractions)
@@ -202,19 +209,19 @@
 ## Surprising Connections (you probably didn't know these)
 - `4. Work breakdown (one PR each)` --references--> `merge()`  [INFERRED]
   docs/PHASE_5B_SYNC_PLAN.md → tool/build_topical.py
-- `exportData` --references--> `preferencesProvider`  [EXTRACTED]
-  lib/services/backup_service.dart → lib/data/local_storage/preferences_service.dart
 - `_rememberSignIn` --references--> `preferencesProvider`  [EXTRACTED]
   lib/state/auth_provider.dart → lib/data/local_storage/preferences_service.dart
 - `build` --references--> `preferencesProvider`  [EXTRACTED]
   lib/state/commentary_provider.dart → lib/data/local_storage/preferences_service.dart
 - `toggleBookmark` --references--> `preferencesProvider`  [EXTRACTED]
   lib/state/commentary_provider.dart → lib/data/local_storage/preferences_service.dart
+- `build` --references--> `preferencesProvider`  [EXTRACTED]
+  lib/state/devotional_provider.dart → lib/data/local_storage/preferences_service.dart
 
 ## Import Cycles
 - None detected.
 
-## Communities (179 total, 16 thin omitted)
+## Communities (186 total, 17 thin omitted)
 
 ### Community 0 - "app_localizations.dart"
 Cohesion: 0.00
@@ -250,27 +257,27 @@ Nodes (148): _activePlanIdsKey, _activeTranslationKey, _appUsageDatesKey, _bento
 
 ### Community 8 - "themeProvider"
 Cohesion: 0.05
-Nodes (83): build, _TheBlessedBibleAppState, widgetUpdateServiceProvider, bibleProvider, flatChaptersProvider, translationChapterProvider, commentaryBookmarksProvider, commentaryProvider (+75 more)
+Nodes (101): build, _TheBlessedBibleAppState, ShareService, widgetUpdateServiceProvider, wordCountServiceProvider, bibleProvider, flatChaptersProvider, translationChapterProvider (+93 more)
 
 ### Community 9 - "search_screen.dart"
-Cohesion: 0.03
-Nodes (50): _animationController, _buildFilterChip, _buildResultItem, _buildSearchResults, _buildSectionHeader, _buildSnippet, _controller, createState (+42 more)
+Cohesion: 0.08
+Nodes (26): mostReadProvider, _performSearch, searchStateProvider, searchSettingsProvider, _animationController, build, _buildFilterChip, _buildRecentPlaces (+18 more)
 
 ### Community 10 - "preferencesProvider"
-Cohesion: 0.03
-Nodes (96): preferencesProvider, aiJournalServiceProvider, notificationServiceProvider, build, hasSeen, hintsProvider, markSeen, maybeShowHint (+88 more)
+Cohesion: 0.04
+Nodes (60): preferencesProvider, BookmarkData, aiJournalServiceProvider, exportData, build, hasSeen, markSeen, maybeShowHint (+52 more)
 
-### Community 11 - "onboarding_screen.dart"
-Cohesion: 0.02
-Nodes (116): _RefBox, _RestChip, _TrackCard, _accent, _amber, _bg, body, child (+108 more)
+### Community 11 - "StatelessWidget"
+Cohesion: 0.04
+Nodes (52): _RefBox, _RestChip, _TrackCard, _ChoiceTile, _ClassicThemeButton, _FeatureRow, _FontChip, _LanguagePage (+44 more)
 
 ### Community 12 - "app_colors.dart"
 Cohesion: 0.03
 Nodes (78): AppColors, darkBackground, darkBorder, darkSurface, darkTextPrimary, darkTextSecondary, dawnAccent, dawnBackground (+70 more)
 
-### Community 13 - "commentary_hub_screen.dart"
-Cohesion: 0.06
-Nodes (24): AppPalette, ReadingTokens, book, _buildDropdownChip, _buildEntryCard, _buildEntryContent, _buildFilters, chapter (+16 more)
+### Community 13 - "ReadingTokens"
+Cohesion: 0.40
+Nodes (3): AppPalette, ReadingTokens, _StyleMeta
 
 ### Community 14 - "search_engine.dart"
 Cohesion: 0.03
@@ -278,15 +285,15 @@ Nodes (66): activeTranslation, addNoteTokens, addTokens, args, baseIndexFuture, 
 
 ### Community 15 - "reading_plan_detail_v2_screen.dart"
 Cohesion: 0.05
-Nodes (40): _BeginPanel, behind, createState, dateLabel, _dateMap, _dateOnly, day, dayLabel (+32 more)
+Nodes (38): behind, createState, dateLabel, _dateMap, _dateOnly, day, dayLabel, done (+30 more)
 
 ### Community 16 - "reading_plan_provider.dart"
 Cohesion: 0.03
-Nodes (72): addPlan, appWeekday, bookName, build, _canonCache, _canonIndex, chapterNum, completedAtomIds (+64 more)
+Nodes (66): appWeekday, bookName, _canonCache, _canonIndex, chapterNum, completedAtomIds, completedReadings, copyWith (+58 more)
 
 ### Community 17 - "commentary_library_v2_screen.dart"
 Cohesion: 0.05
-Nodes (33): bookmarkedWordsProvider, dictionaryDefinitionProvider, db, DictionaryHeadword, dictionaryIndexProvider, dictionarySearchProvider, displayHeadword, grouped (+25 more)
+Nodes (41): bookmarkedWordsProvider, dictionaryDefinitionProvider, dictionarySearchProvider, book, chapter, CommentaryHubV2Screen, _CommentaryHubV2ScreenState, CommentaryLibraryV2Screen (+33 more)
 
 ### Community 18 - "custom_plan_builder_v2_screen.dart"
 Cohesion: 0.04
@@ -298,39 +305,39 @@ Nodes (22): actionLabel, build, _controller, createState, didChangeDependencies,
 
 ### Community 20 - "study_screen_v2.dart"
 Cohesion: 0.03
-Nodes (97): BackupService, importData, homeProvider, journalProvider, activePlanContextProvider, activePlanIdsProvider, readingPlanProvider, storyOfTheDayProvider (+89 more)
+Nodes (103): BackupService, importData, homeProvider, votdPoolProvider, activePlanIdsProvider, readingPlanProvider, streakProvider, studyLayoutProvider (+95 more)
 
-### Community 21 - "notes_list_screen.dart"
-Cohesion: 0.05
-Nodes (36): bookAbbrev, chapter, reference, verseNum, build, contentController, createState, deleteNoteWithUndo (+28 more)
+### Community 21 - "../../theme/design_tokens.dart"
+Cohesion: 0.03
+Nodes (73): journalProvider, strongsProvider, PaperlikeTransform, bookAbbrev, chapter, reference, verseNum, contentController (+65 more)
 
 ### Community 22 - "read_screen.dart"
 Cohesion: 0.03
-Nodes (55): _animateToPage, _buildNormalVerse, _buildReadingLayoutVerse, _buildSideButton, _buildThemedPill, clear, clearHighlights, _clearSelection (+47 more)
+Nodes (61): bbeSubstitutionsProvider, hintsProvider, navHiddenProvider, activePlanContextProvider, _buildFabIcon, _fabTooltip, _animateToPage, _buildEndOfChapterBlock (+53 more)
 
 ### Community 23 - "theme_picker_sheet.dart"
-Cohesion: 0.04
-Nodes (54): AppThemeMode, AppThemeModeExtension, build, _engineModeKey, _loadTheme, _lockedThemeKey, NoAnimationPageTransitionsBuilder, resolve (+46 more)
+Cohesion: 0.03
+Nodes (61): CustomPlanBuilderV2Screen, OnboardingScreen, PlansLibraryScreen, ReadScreen, SettingsScreen, StorageScreen, _StorageScreenState, StudyReaderScreen (+53 more)
 
 ### Community 24 - "home_screen.dart"
-Cohesion: 0.04
-Nodes (47): appGroupId, _formatDate, _init, _l10n, _ref, service, streakWidgetName, syncAllWidgets (+39 more)
+Cohesion: 0.03
+Nodes (51): appGroupId, _formatDate, _init, _l10n, _ref, service, streakWidgetName, syncAllWidgets (+43 more)
 
 ### Community 25 - "search_provider.dart"
-Cohesion: 0.04
-Nodes (51): bookAbbrev, bookName, build, chapter, fromKey, incrementVisit, key, MostReadItem (+43 more)
+Cohesion: 0.06
+Nodes (32): searchEngineProvider, addRecentPlace, _addRecentQuery, build, clearRecentQueries, copyWith, _debounce, exactMatch (+24 more)
 
 ### Community 26 - "plan_flow.dart"
-Cohesion: 0.04
-Nodes (44): ReadingPlanState, build, completedDays, createState, _currentWeek, dispose, _initialized, initState (+36 more)
+Cohesion: 0.06
+Nodes (28): accent, build, caption, child, compact, current, day, footer (+20 more)
 
 ### Community 27 - "goldens_test.dart"
-Cohesion: 0.07
-Nodes (25): main, prefs, _pump, pumpWidget, _screens, _themes, main, _noop (+17 more)
+Cohesion: 0.09
+Nodes (14): main, prefs, _pump, pumpWidget, _screens, _themes, main, _noop (+6 more)
 
 ### Community 28 - "main_nav_screen.dart"
 Cohesion: 0.03
-Nodes (37): _buildActionIcon, _buildActionMenuIcons, _buildColorDot, _buildColorDotRow, _buildGlassWrapper, _buildMorphingSlot, _buildRaindropColorRow, _controller (+29 more)
+Nodes (54): commentaryForChapterProvider, _openBook, _buildPage, _buildNode, _buildActionIcon, _buildActionMenuIcons, _buildColorDot, _buildColorDotRow (+46 more)
 
 ### Community 29 - "study_reader_screen.dart"
 Cohesion: 0.04
@@ -338,11 +345,11 @@ Nodes (50): book, bookAbbrev, bookName, chapter, chapterNum, _clearSelection, cr
 
 ### Community 30 - "plan_generator.dart"
 Cohesion: 0.03
-Nodes (63): PaceRemapService, _addPortion, allPericopes, book, _Chunk, _distributeTrack, endCh, endsOnChapter (+55 more)
+Nodes (68): PaceRemapService, _addPortion, allPericopes, book, _Chunk, _distributeTrack, endCh, endsOnChapter (+60 more)
 
 ### Community 31 - "account_menu.dart"
-Cohesion: 0.05
-Nodes (36): AccountAvatar, accountSyncedOn, actions, _askAccountChoice, clearAllUserData, _confirmReset, controller, customIds (+28 more)
+Cohesion: 0.03
+Nodes (51): currentVersion, authActionsProvider, syncControllerProvider, accountSyncedOn, actions, _askAccountChoice, build, clearAllUserData (+43 more)
 
 ### Community 32 - "design_tokens.dart"
 Cohesion: 0.04
@@ -353,8 +360,8 @@ Cohesion: 0.04
 Nodes (46): activeHighlightColorIndex, _activeHighlightColorIndexKey, build, copyWith, cycleHighlightColor, defaultStartTab, dictionaryUnderlinesEnabled, difficultAndNames (+38 more)
 
 ### Community 34 - "your_space_screen.dart"
-Cohesion: 0.04
-Nodes (46): abbrevUpper, bookAbbrev, bookmarkData, _BookmarkViewType, bookName, bookNumber, _buildRealVerseCard, chapter (+38 more)
+Cohesion: 0.03
+Nodes (68): build, notesProvider, bookmarkDataProvider, build, highlightsProvider, toggle, clearLocalData, write (+60 more)
 
 ### Community 35 - "Contributing: Project Rules & Workflow"
 Cohesion: 0.20
@@ -374,23 +381,23 @@ Nodes (42): abbreviation, bundledPackIds, _catalogFile, _copyAssetPack, coreIds,
 
 ### Community 39 - "bible_sync.dart"
 Cohesion: 0.05
-Nodes (53): build, notesProvider, bookmarkDataProvider, build, highlightsProvider, toggle, ActivePlansSync, afterSignIn (+45 more)
+Nodes (42): ActivePlansSync, afterSignIn, _applyingRemote, BookmarksSync, _collections, CustomPlansSync, debounce, deviceId (+34 more)
 
-### Community 40 - "commentary_view.dart"
+### Community 40 - "onboarding_screen.dart"
 Cohesion: 0.04
-Nodes (38): bookName, bookNumber, chapterNum, color, createState, _getBookAbbrev, icon, initState (+30 more)
+Nodes (48): appLocaleProvider, _accent, _amber, _bg, body, child, _chooseLanguage, color (+40 more)
 
 ### Community 41 - "state_views.dart"
-Cohesion: 0.04
-Nodes (47): CastingLotsDialog, _CastingLotsDialogState, build, _buildSection, createState, effectiveDate, fromJson, load (+39 more)
+Cohesion: 0.12
+Nodes (14): actionLabel, build, createState, EmptyState, error, ErrorState, _ErrorStateState, icon (+6 more)
 
-### Community 42 - "commentary_library_v2_screen.dart"
-Cohesion: 0.04
-Nodes (54): dayOfYear, daysInYear, daysRemaining, index, label, remainingLabel, start, verseForDay (+46 more)
+### Community 42 - "home_provider.dart"
+Cohesion: 0.11
+Nodes (16): HomeData, bibleState, books, commentaries, commentaryState, defaultFallback, _extractSnippet, _fetchData (+8 more)
 
 ### Community 43 - "Changelog"
-Cohesion: 0.22
-Nodes (5): 1.0.2+9, Changelog, 📥 Download & Install, prerelease-1, [Unreleased]
+Cohesion: 0.29
+Nodes (7): [0.0.5] - 2026-10-22, 1.0.2+9, Changelog, 📥 Download & Install, Home Screen & Daily Content, prerelease-1, [Unreleased]
 
 ### Community 44 - "plan_spec.dart"
 Cohesion: 0.05
@@ -410,11 +417,11 @@ Nodes (41): abbrevKey, bad, badRefs, badWeeks, _bookMap, bookName, _canonicalNam
 
 ### Community 48 - "_"
 Cohesion: 0.05
-Nodes (47): _, align, artworkPath, _Backdrop, body, _boundaryKey, build, caption (+39 more)
+Nodes (44): _, align, artworkPath, body, _boundaryKey, build, caption, context (+36 more)
 
 ### Community 49 - "notification_service.dart"
 Cohesion: 0.09
-Nodes (15): cancelDailyReminder, cancelPrayerReminder, cancelReminder, cancelSabbathReminders, cancelWeeklyReminder, _flutterLocalNotificationsPlugin, initialize, _initialized (+7 more)
+Nodes (17): cancelDailyReminder, cancelPrayerReminder, cancelReminder, cancelSabbathReminders, cancelWeeklyReminder, _flutterLocalNotificationsPlugin, initialize, _initialized (+9 more)
 
 ### Community 50 - "devotional_provider.dart"
 Cohesion: 0.05
@@ -425,8 +432,8 @@ Cohesion: 0.09
 Nodes (17): BlessedBibleWidgets, .body, Color, Provider, SimpleEntry, StreakWidget, .body, StreakWidgetEntryView (+9 more)
 
 ### Community 52 - "home_data.dart"
-Cohesion: 0.04
-Nodes (43): kBibleBookNames, category, ConcordanceTerm, countKjv, definition, kConcordanceTerms, keyVerse, word (+35 more)
+Cohesion: 0.08
+Nodes (24): activeStudy, author, chaptersRemaining, commentarySnippet, content, count, date, fromJson (+16 more)
 
 ### Community 53 - "storage_screen.dart"
 Cohesion: 0.06
@@ -434,15 +441,15 @@ Nodes (33): abbr, build, bundled, _busy, _cacheBytes, _cacheBytesUsed, _clearCac
 
 ### Community 54 - "book_chapter_selector_sheet.dart"
 Cohesion: 0.07
-Nodes (34): book, BookChapterSelectorSheet, books, _buildBookSelection, _buildBreadcrumbs, _buildBreadcrumbSegment, _buildChapterSelection, _buildGridTile (+26 more)
+Nodes (37): bibleNavSettingsProvider, _buildNavigationPage, book, BookChapterSelectorSheet, books, build, _buildBookSelection, _buildBreadcrumbs (+29 more)
 
 ### Community 55 - "dictionary_underline_test.dart"
-Cohesion: 0.14
-Nodes (12): argsFor, container, main, makeContainer, map, markedWords, out, prefs (+4 more)
+Cohesion: 0.08
+Nodes (17): argsFor, container, main, makeContainer, map, markedWords, out, prefs (+9 more)
 
-### Community 56 - "restore_prompt.dart"
-Cohesion: 0.10
-Nodes (20): authActionsProvider, build, _save, _FeaturesAndAccountPage, _AccountMenuBody, build, _showAccountSheet, _signOut (+12 more)
+### Community 56 - "journey_map_screen.dart"
+Cohesion: 0.06
+Nodes (30): AppThemeMode, AppThemeModeExtension, build, _engineModeKey, _loadTheme, _lockedThemeKey, NoAnimationPageTransitionsBuilder, resolve (+22 more)
 
 ### Community 57 - "fetch_dore_art.py"
 Cohesion: 0.15
@@ -456,9 +463,9 @@ Nodes (32): _autoOpenKey, autoOpenSingleSearchResult, build, copyWith, _defaultC
 Cohesion: 0.07
 Nodes (28): build, copyWith, fontFamily, _fontFamilyKey, fontSize, _fontSizeKey, fontStyle, fontWeight (+20 more)
 
-### Community 60 - "package:the_blessed_bible/data/local_storage/preferences_service.dart"
-Cohesion: 0.12
-Nodes (6): main, pumpAtTab, main, main, main, main
+### Community 60 - "reminders_provider.dart"
+Cohesion: 0.07
+Nodes (34): notificationServiceProvider, resyncPlanReminders, _syncReminder, build, copyWith, customWeeklyDay, customWeeklyEnabled, customWeeklyHour (+26 more)
 
 ### Community 61 - "translation_downloader.dart"
 Cohesion: 0.07
@@ -474,23 +481,23 @@ Nodes (8): 1. Navigation Modal Performance (Critical), 2. Navigation Flow Logic 
 
 ### Community 64 - "verse_link_text.dart"
 Cohesion: 0.07
-Nodes (26): BoldSegment, boldStyle, build, _buildSpans, createState, defaultStyle, dictionaryWordStyle, didUpdateWidget (+18 more)
+Nodes (24): BoldSegment, boldStyle, build, _buildSpans, createState, defaultStyle, dictionaryWordStyle, didUpdateWidget (+16 more)
 
 ### Community 65 - "reading_plan.dart"
 Cohesion: 0.07
 Nodes (27): book, cadence, clampReason, copyWith, dayNumber, days, endChapter, endVerse (+19 more)
 
-### Community 66 - "package:flutter_test/flutter_test.dart"
-Cohesion: 0.11
-Nodes (7): host, main, main, main, main, makeContainer, main
+### Community 66 - "animated_segmented_tile.dart"
+Cohesion: 0.10
+Nodes (18): AnimatedSegmentedTile, build, createState, _isPressed, isSelected, onChanged, option, options (+10 more)
 
 ### Community 67 - "app_theme.dart"
 Cohesion: 0.07
 Nodes (23): accent, applyFreshPaperlike, applyPaperlike, AppTheme, background, customAccentTheme, darkTheme, dawnTheme (+15 more)
 
 ### Community 68 - "textured_glass_container.dart"
-Cohesion: 0.07
-Nodes (26): baseColor, borderOpacity, borderRadius, child, fillColor, isActive, isDark, isScrollable (+18 more)
+Cohesion: 0.05
+Nodes (42): _JourneyPathPainter, _CrossedSwordsPainter, borderRadius, build, child, GlassContainer, isScrollable, margin (+34 more)
 
 ### Community 69 - "📖 Blessed Bible (The Blessed Bible)"
 Cohesion: 0.25
@@ -525,20 +532,20 @@ Cohesion: 0.08
 Nodes (24): _autoCloseKey, autoCloseOnFinalSelection, BibleNavSettingsNotifier, BibleNavSettingsState, build, copyWith, depth, _depthKey (+16 more)
 
 ### Community 77 - "return"
-Cohesion: 0.05
-Nodes (28): _asMap, cacheFileName, collectionName, ContentSyncService, _encodeJsonMap, loadLocalCache, _parseJsonMap, syncDeltas (+20 more)
+Cohesion: 0.07
+Nodes (19): activateAppCheck, crashlytics, initCrashReporting, reportNonFatal, setCrashlyticsCollectionEnabled, setCrashReportingEnabled, backupCustomPlan, firestorePlanJson (+11 more)
 
 ### Community 78 - "commentary_provider.dart"
 Cohesion: 0.08
 Nodes (23): book, build, _cachedChapters, _cachedFormattedVerses, _cachedVersesWithCommentary, _cachedVersesWithDevotionals, _cachedVersesWithNotes, chapter (+15 more)
 
 ### Community 79 - "bible_sync_test.dart"
-Cohesion: 0.12
-Nodes (9): main, openMenu, pumpHub, col, db, device, main, settle (+1 more)
+Cohesion: 0.08
+Nodes (14): main, openMenu, pumpHub, col, db, device, main, settle (+6 more)
 
 ### Community 81 - "package:flutter/services.dart"
-Cohesion: 0.07
-Nodes (24): CreditItem, CreditSection, creditSections, detail, _fontCopyrights, heading, items, note (+16 more)
+Cohesion: 0.12
+Nodes (14): actions, build, confirmDestructive, destructive, false, icon, ItemAction, ItemContextSheet (+6 more)
 
 ### Community 82 - "build_topical.py"
 Cohesion: 0.13
@@ -548,13 +555,13 @@ Nodes (16): 1. Current state (audit, 2026-10-10), 2. What syncs, 3. Design, 4. W
 Cohesion: 0.09
 Nodes (22): book, copyWithEnriched, count, DevotionalBookInfo, DevotionalStory, fromJson, grouping, id (+14 more)
 
-### Community 84 - "navProvider"
+### Community 84 - "plans_library_widgets.dart"
 Cohesion: 0.09
-Nodes (31): build, ChromeHiddenNotifier, chromeHiddenProvider, NavHiddenNotifier, navHiddenProvider, toggle, navProvider, bottomNavVisibilityProvider (+23 more)
+Nodes (21): build, count, date, height, initials, LibraryHeroHeader, libraryMonthDay, libraryWeekday (+13 more)
 
 ### Community 85 - "✨ Flagship Features"
-Cohesion: 0.25
-Nodes (8): 🔍 Built-In Biblical Concordance, 📖 Distraction-Free Scripture Reading, 🎨 Dynamic Themes & Custom Typography, ✨ Flagship Features, 📜 Historicist Commentary, 🏷️ Personal Study Space ("Your Space"), ☁️ Privacy-First & Cloud Sync, 📅 Redesigned Reading Plans & Plan Reader
+Cohesion: 0.22
+Nodes (9): 🔍 Built-In Biblical Concordance, 📖 Distraction-Free Scripture Reading, 🎨 Dynamic Themes & Custom Typography, ✨ Flagship Features, 📜 Historicist Commentary & Clean Home Cards, 🏷️ Personal Study Space & Enhanced Sharing, ☁️ Privacy-First & Cloud Sync, 📅 Redesigned Reading Plans & Plan Reader (+1 more)
 
 ### Community 86 - "ai_journal_service.dart"
 Cohesion: 0.18
@@ -562,7 +569,7 @@ Nodes (9): AiJournalService, analyzeEntry, emotionLabel, emotions, _emotionVerse
 
 ### Community 87 - "widget_settings_provider.dart"
 Cohesion: 0.12
-Nodes (17): backgroundStyle, _bgStyleKey, build, copyWith, emoji, fromId, id, label (+9 more)
+Nodes (16): backgroundStyle, _bgStyleKey, build, copyWith, emoji, fromId, id, label (+8 more)
 
 ### Community 88 - "build_bible_db.dart"
 Cohesion: 0.10
@@ -580,17 +587,17 @@ Nodes (8): main(), book_names(), main(), catalog_ids(), find(), get_json(), hash
 Cohesion: 0.51
 Nodes (19): meta, meta, meta, meta, abbreviation, is_complete, is_downloaded, language_code (+11 more)
 
-### Community 92 - "package:shared_preferences/shared_preferences.dart"
-Cohesion: 0.12
-Nodes (8): main, c, freshContainer, main, prefs, read, main, makeContainer
+### Community 92 - "package:flutter_test/flutter_test.dart"
+Cohesion: 0.05
+Nodes (24): main, host, main, main, pumpAtTab, main, main, makeContainer (+16 more)
 
 ### Community 93 - "bible_provider.dart"
-Cohesion: 0.08
-Nodes (22): abbreviation, BibleBook, BibleChapter, BibleVerse, chapters, fromJson, isBookmarked, isHighlighted (+14 more)
+Cohesion: 0.14
+Nodes (11): BibleChapter, book, books, chapter, currentBookNum, currentChapterNum, decoded, entriesList (+3 more)
 
 ### Community 94 - "locale_provider.dart"
-Cohesion: 0.07
-Nodes (21): AppLanguage, appLanguageFor, appLanguages, bibleId, build, code, deviceLanguage, key (+13 more)
+Cohesion: 0.10
+Nodes (17): AppLanguage, appLanguageFor, appLanguages, AppLocaleNotifier, bibleId, build, code, deviceLanguage (+9 more)
 
 ### Community 95 - "story_of_the_day_provider.dart"
 Cohesion: 0.18
@@ -609,8 +616,8 @@ Cohesion: 0.12
 Nodes (12): description, devDependencies, firebase, @firebase/rules-unit-testing, firebase-tools, name, private, scripts (+4 more)
 
 ### Community 99 - "locale_reschedule_test.dart"
-Cohesion: 0.17
-Nodes (8): NotificationService, calls, _FakeNotifications, initialize, main, scheduleDailyReminder, schedulePrayerReminder, syncReadingPlanReminder
+Cohesion: 0.11
+Nodes (14): calls, initialize, main, scheduleDailyReminder, schedulePrayerReminder, syncReadingPlanReminder, main, _next (+6 more)
 
 ### Community 100 - "bible_stories_screen.dart"
 Cohesion: 0.08
@@ -628,13 +635,13 @@ Nodes (9): _account, AuthActions, deleteAccount, ref, _rememberSignIn, _setSigne
 Cohesion: 0.22
 Nodes (7): at, _cheer, _en, _evening, _grace, main, _morning
 
-### Community 104 - "dart:math"
-Cohesion: 0.18
-Nodes (6): AppTypography, getTheme, getNextDayOfWeek, getSunset, SunsetCalculator, main
+### Community 104 - "bouncy_entrance.dart"
+Cohesion: 0.11
+Nodes (16): animateIn, build, child, _controller, createState, delay, _delayTimer, didUpdateWidget (+8 more)
 
 ### Community 105 - "study_greetings.dart"
-Cohesion: 0.12
-Nodes (16): _dailyGreetings, day, dayIndex, _encouragementGreetings, _eveningGreetings, _graceGreetings, greetingEyebrow, greetingEyebrowNight (+8 more)
+Cohesion: 0.07
+Nodes (25): _dailyGreetings, day, dayIndex, _encouragementGreetings, _eveningGreetings, _graceGreetings, greetingEyebrow, greetingEyebrowNight (+17 more)
 
 ### Community 106 - "Pericope Dataset — Whole-System Audit Report"
 Cohesion: 0.12
@@ -645,16 +652,16 @@ Cohesion: 0.12
 Nodes (15): book, buildId, confidence, endChapter, endVerse, fromJson, id, isPlanBreak (+7 more)
 
 ### Community 108 - "wotd_provider.dart"
-Cohesion: 0.13
-Nodes (12): allWords, dayIndex, def, defs, headword, index, normalized, now (+4 more)
+Cohesion: 0.08
+Nodes (18): allWords, dayIndex, def, defs, headword, index, normalized, now (+10 more)
 
 ### Community 109 - "reading_tokens.dart"
 Cohesion: 0.22
 Nodes (8): copyWith, lerp, readingAccent, readingBorder, readingInk, readingInkMuted, readingPaper, readingSurface
 
-### Community 110 - "readSettingsProvider"
-Cohesion: 0.09
-Nodes (36): ShareService, wordCountServiceProvider, bibleNavSettingsProvider, crossReferencesProvider, readSettingsProvider, adjustPace, ReadingPlanNotifier, activeTranslationProvider (+28 more)
+### Community 110 - "package:flutter/services.dart"
+Cohesion: 0.05
+Nodes (35): CreditItem, CreditSection, creditSections, detail, _fontCopyrights, heading, items, note (+27 more)
 
 ### Community 111 - "streak_provider.dart"
 Cohesion: 0.15
@@ -664,9 +671,9 @@ Nodes (11): build, _calculateState, consecutiveDays, count, distinctDaysThisYear
 Cohesion: 0.09
 Nodes (19): currentIndex, hasSelection, isManualHidden, isRead, isScrollHidden, true, bookAbbrev, bookName (+11 more)
 
-### Community 113 - "search_engine_test.dart"
-Cohesion: 0.18
-Nodes (5): main, corpus, index, main, testEngine
+### Community 113 - "study_layout_provider.dart"
+Cohesion: 0.12
+Nodes (16): build, CardSize, CardSpan, defaultLayoutV2, fromJson, id, move, reorder (+8 more)
 
 ### Community 114 - "curated_plans.dart"
 Cohesion: 0.15
@@ -697,7 +704,7 @@ Cohesion: 0.13
 Nodes (13): build, EarthHeavenStyle, EarthHeavenStyleNotifier, eh, _loadState, _migrationKey, resolveEarthSurface, setStyle (+5 more)
 
 ### Community 122 - "tool/"
-Cohesion: 0.33
+Cohesion: 0.20
 Nodes (6): Bible text and translation packs, Commentary, Devotional (Bible Stories), Legal and CI, Study data, tool/
 
 ### Community 123 - "concordance_screen.dart"
@@ -705,8 +712,8 @@ Cohesion: 0.06
 Nodes (31): bookNumber, build, chapter, _clearSearch, _ConcordanceHit, ConcordanceScreen, _ConcordanceScreenState, _controller (+23 more)
 
 ### Community 124 - "reading_plan_detail_test.dart"
-Cohesion: 0.18
-Nodes (6): days, daysAgo, main, plan, main, makeContainer
+Cohesion: 0.33
+Nodes (4): days, daysAgo, main, plan
 
 ### Community 125 - "Phase 6 device test checklist"
 Cohesion: 0.20
@@ -724,17 +731,17 @@ Nodes (3): build_html(), build_md(), main()
 Cohesion: 0.20
 Nodes (9): AppLocalizations, _AppLocalizationsDelegate, AppLocalizationsEn, AppLocalizationsFr, AppLocalizationsIt, of, AppLocalizationsRo, AppLocalizationsSw (+1 more)
 
-### Community 129 - "CustomPainter"
-Cohesion: 0.20
-Nodes (9): _JourneyPathPainter, _CrossedSwordsPainter, _ToastPainter, _GrainPainter, _RingPainter, _ClaymorphicPainter, _FrutigerAeroPainter, _RimAndNoisePainter (+1 more)
+### Community 129 - "day_complete_celebration.dart"
+Cohesion: 0.13
+Nodes (12): build, _confettiController, _controller, createState, day, DayCompleteCelebration, _DayCompleteCelebrationState, dispose (+4 more)
 
 ### Community 130 - "package:flutter_riverpod/flutter_riverpod.dart"
 Cohesion: 0.02
-Nodes (63): currentVersion, exportData, cleanVerseText, copyText, formatStory, formatVerse, formatWord, referenceFor (+55 more)
+Nodes (74): activateAppCheck, authGateway, createState, initCrashReporting, initialize, initializeApp, main, prefs (+66 more)
 
 ### Community 131 - "verse_action_sheet.dart"
-Cohesion: 0.03
-Nodes (53): NavMenuTriggerNotifier, build, color, createState, _handleTap, icon, onLongPress, onTap (+45 more)
+Cohesion: 0.04
+Nodes (51): NavMenuTriggerNotifier, build, color, createState, _handleTap, icon, onLongPress, onTap (+43 more)
 
 ### Community 132 - "upload_packs"
 Cohesion: 0.22
@@ -836,13 +843,13 @@ Nodes (4): host, long, main, short
 Cohesion: 0.33
 Nodes (5): Checklist, How it was tested, Screenshots, What changed, Why
 
-### Community 157 - "verse_action_sheet_test.dart"
-Cohesion: 0.40
-Nodes (3): actions, main, openSheet
+### Community 157 - "most_read_provider.dart"
+Cohesion: 0.14
+Nodes (11): bookAbbrev, bookName, build, chapter, fromKey, incrementVisit, key, MostReadItem (+3 more)
 
-### Community 159 - "main.dart"
-Cohesion: 0.09
-Nodes (11): activateAppCheck, authGateway, createState, initCrashReporting, initialize, initializeApp, main, prefs (+3 more)
+### Community 158 - "bible_model.dart"
+Cohesion: 0.17
+Nodes (11): abbreviation, BibleBook, BibleVerse, chapters, fromJson, isBookmarked, isHighlighted, name (+3 more)
 
 ### Community 174 - "radial_action_menu.dart"
 Cohesion: 0.09
@@ -853,40 +860,64 @@ Cohesion: 0.11
 Nodes (17): build, color, _controller, createState, CrossedSwordsIcon, _CrossedSwordsIconState, didChangeDependencies, dispose (+9 more)
 
 ### Community 176 - "bible_provider.dart"
-Cohesion: 0.08
-Nodes (22): BibleNotifier, BibleState, book, bookNumber, books, build, chapter, ChapterKey (+14 more)
+Cohesion: 0.11
+Nodes (16): BibleNotifier, BibleState, book, bookNumber, books, build, chapter, ChapterKey (+8 more)
 
 ### Community 177 - "translation_picker_sheet.dart"
 Cohesion: 0.05
-Nodes (33): ReadingLayout, _activeTab, AppearanceTab, build, createState, icon, initialTab, initState (+25 more)
+Nodes (34): ReadingLayout, _activeTab, AppearanceSettingsSheet, _AppearanceSettingsSheetState, AppearanceTab, build, createState, icon (+26 more)
 
-### Community 184 - "strongs_provider.dart"
+### Community 178 - "dictionary_search_provider.dart"
+Cohesion: 0.17
+Nodes (11): db, DictionaryHeadword, dictionaryIndexProvider, displayHeadword, grouped, likeTerm, normalizedWord, q (+3 more)
+
+### Community 179 - "State"
+Cohesion: 0.23
+Nodes (10): CastingLotsDialog, _CastingLotsDialogState, PrivacyPolicyScreen, _PrivacyPolicyScreenState, ActionIcon, _ActionIconState, BouncyEntrance, _BouncyEntranceState (+2 more)
+
+### Community 180 - "let_read.dart"
+Cohesion: 0.18
+Nodes (9): dayOfYear, daysInYear, daysRemaining, index, label, remainingLabel, start, verseForDay (+1 more)
+
+### Community 181 - "journal_entry.dart"
+Cohesion: 0.18
+Nodes (9): content, date, detectedEmotions, fromJson, id, JournalEntry, prayerPoints, recommendedVerses (+1 more)
+
+### Community 182 - "content_sync_service.dart"
 Cohesion: 0.20
-Nodes (9): db, definition, id, lemma, maps, pronunciation, row, StrongsEntry (+1 more)
+Nodes (8): _asMap, cacheFileName, collectionName, ContentSyncService, _encodeJsonMap, loadLocalCache, _parseJsonMap, syncDeltas
+
+### Community 183 - "concordance_terms.dart"
+Cohesion: 0.25
+Nodes (7): category, ConcordanceTerm, countKjv, definition, kConcordanceTerms, keyVerse, word
+
+### Community 184 - "cross_references_provider.dart"
+Cohesion: 0.25
+Nodes (6): CrossRef, CrossRefKey, toBookNumber, toChapter, toVerse, votes
 
 ### Community 185 - "Notifier"
-Cohesion: 0.05
-Nodes (44): BookmarkData, CommentaryBookmarksNotifier, CommentaryNotifier, DevotionalFavoritesNotifier, DevotionalReadNotifier, BookmarkedWordsNotifier, HintsNotifier, VotdOverrideNotifier (+36 more)
+Cohesion: 0.06
+Nodes (36): kBibleBookNames, CommentaryBookmarksNotifier, CommentaryNotifier, DevotionalFavoritesNotifier, DevotionalReadNotifier, BookmarkedWordsNotifier, HintsNotifier, VotdOverrideNotifier (+28 more)
 
 ## Knowledge Gaps
 - **10502 isolated node(s):** `firebase-tools`, `XCTest`, `WidgetKit`, `SwiftUI`, `.body` (+10497 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 11057 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **16 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 11059 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **17 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `ReadingTokens` connect `commentary_hub_screen.dart` to `app_theme.dart`, `textured_glass_container.dart`, `commentary_view.dart`, `onboarding_screen.dart`, `reading_tokens.dart`, `read_screen.dart`, `main_nav_screen.dart`?**
+- **Why does `ReadingTokens` connect `ReadingTokens` to `package:flutter_riverpod/flutter_riverpod.dart`, `app_theme.dart`, `textured_glass_container.dart`, `StatelessWidget`, `reading_tokens.dart`, `../../theme/design_tokens.dart`, `read_screen.dart`, `main_nav_screen.dart`?**
   _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **What connects `firebase-tools`, `XCTest`, `WidgetKit` to the rest of the system?**
   _10502 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `app_localizations.dart` be split into smaller, more focused modules?**
   _Cohesion score 0.0017857142857142857 - nodes in this community are weakly interconnected._
-- **Why does `_` connect `_` to `verse_link_text.dart`, `CustomPainter`, `package:flutter_riverpod/flutter_riverpod.dart`, `dart:math`, `preferencesProvider`, `dart:convert`, `package:flutter/services.dart`, `commentary_library_v2_screen.dart`, `home_data.dart`, `notes_list_screen.dart`, `home_screen.dart`, `package:shared_preferences/shared_preferences.dart`?**
+- **Why does `_` connect `_` to `verse_link_text.dart`, `package:flutter_riverpod/flutter_riverpod.dart`, `textured_glass_container.dart`, `onboarding_screen.dart`, `preferencesProvider`, `StatelessWidget`, `wotd_provider.dart`, `dart:convert`, `package:flutter/services.dart`, `commentary_library_v2_screen.dart`, `../../theme/design_tokens.dart`, `Notifier`, `package:flutter_test/flutter_test.dart`?**
   _High betweenness centrality (0.006) - this node is a cross-community bridge._
 - **Should `app_localizations_en.dart` be split into smaller, more focused modules?**
   _Cohesion score 0.0018083182640144665 - nodes in this community are weakly interconnected._
-- **Why does `preferencesProvider` connect `preferencesProvider` to `package:flutter_riverpod/flutter_riverpod.dart`, `preferences_service.dart`, `themeProvider`, `onboarding_screen.dart`, `reading_plan_provider.dart`, `study_screen_v2.dart`, `search_provider.dart`, `plan_flow.dart`, `account_menu.dart`, `bible_sync.dart`, `_`, `devotional_provider.dart`, `home_data.dart`, `restore_prompt.dart`, `Notifier`, `commentary_provider.dart`, `widget_settings_provider.dart`, `locale_provider.dart`, `auth_provider.dart`, `readSettingsProvider`, `streak_provider.dart`, `read_location_provider.dart`?**
+- **Why does `preferencesProvider` connect `preferencesProvider` to `package:flutter_riverpod/flutter_riverpod.dart`, `preferences_service.dart`, `themeProvider`, `study_screen_v2.dart`, `read_screen.dart`, `search_provider.dart`, `plan_flow.dart`, `most_read_provider.dart`, `account_menu.dart`, `your_space_screen.dart`, `bible_sync.dart`, `onboarding_screen.dart`, `_`, `devotional_provider.dart`, `Notifier`, `reminders_provider.dart`, `commentary_provider.dart`, `widget_settings_provider.dart`, `locale_provider.dart`, `auth_provider.dart`, `streak_provider.dart`, `read_location_provider.dart`, `study_layout_provider.dart`?**
   _High betweenness centrality (0.005) - this node is a cross-community bridge._
 - **Should `app_localizations_fr.dart` be split into smaller, more focused modules?**
   _Cohesion score 0.0018099547511312218 - nodes in this community are weakly interconnected._

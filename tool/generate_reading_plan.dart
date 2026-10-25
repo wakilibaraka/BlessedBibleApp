@@ -32,229 +32,229 @@ import 'dart:io';
 // ---------------------------------------------------------------------------
 const Map<String, String> _bookMap = {
   // ---- Full canonical names (lowercase) — source may spell these out in full ----
-  'genesis':          'Genesis',
-  'exodus':           'Exodus',
-  'leviticus':        'Leviticus',
-  'numbers':          'Numbers',
-  'deuteronomy':      'Deuteronomy',
-  'joshua':           'Joshua',
-  'judges':           'Judges',
-  'ruth':             'Ruth',
-  '1 samuel':         '1 Samuel',
-  '2 samuel':         '2 Samuel',
-  '1 kings':          '1 Kings',
-  '2 kings':          '2 Kings',
-  '1 chronicles':     '1 Chronicles',
-  '2 chronicles':     '2 Chronicles',
-  'ezra':             'Ezra',
-  'nehemiah':         'Nehemiah',
-  'esther':           'Esther',
-  'job':              'Job',
-  'psalms':           'Psalms',
-  'psalm':            'Psalms',      // defensive alias
-  'proverbs':         'Proverbs',
-  'ecclesiastes':     'Ecclesiastes',
-  'song of solomon':  'Song of Solomon',
-  'isaiah':           'Isaiah',
-  'jeremiah':         'Jeremiah',
-  'lamentations':     'Lamentations',
-  'ezekiel':          'Ezekiel',
-  'daniel':           'Daniel',
-  'hosea':            'Hosea',
-  'joel':             'Joel',
-  'amos':             'Amos',
-  'obadiah':          'Obadiah',
-  'jonah':            'Jonah',
-  'micah':            'Micah',
-  'nahum':            'Nahum',
-  'habakkuk':         'Habakkuk',
-  'zephaniah':        'Zephaniah',
-  'haggai':           'Haggai',
-  'zechariah':        'Zechariah',
-  'malachi':          'Malachi',
-  'matthew':          'Matthew',
-  'mark':             'Mark',
-  'luke':             'Luke',
-  'john':             'John',
-  'acts':             'Acts',
-  'romans':           'Romans',
-  '1 corinthians':    '1 Corinthians',
-  '2 corinthians':    '2 Corinthians',
-  'galatians':        'Galatians',
-  'ephesians':        'Ephesians',
-  'philippians':      'Philippians',
-  'colossians':       'Colossians',
-  '1 thessalonians':  '1 Thessalonians',
-  '2 thessalonians':  '2 Thessalonians',
-  '1 timothy':        '1 Timothy',
-  '2 timothy':        '2 Timothy',
-  'titus':            'Titus',
-  'philemon':         'Philemon',
-  'hebrews':          'Hebrews',
-  'james':            'James',
-  '1 peter':          '1 Peter',
-  '2 peter':          '2 Peter',
-  '1 john':           '1 John',
-  '2 john':           '2 John',
-  '3 john':           '3 John',
-  'jude':             'Jude',
-  'revelation':       'Revelation',
+  'genesis': 'Genesis',
+  'exodus': 'Exodus',
+  'leviticus': 'Leviticus',
+  'numbers': 'Numbers',
+  'deuteronomy': 'Deuteronomy',
+  'joshua': 'Joshua',
+  'judges': 'Judges',
+  'ruth': 'Ruth',
+  '1 samuel': '1 Samuel',
+  '2 samuel': '2 Samuel',
+  '1 kings': '1 Kings',
+  '2 kings': '2 Kings',
+  '1 chronicles': '1 Chronicles',
+  '2 chronicles': '2 Chronicles',
+  'ezra': 'Ezra',
+  'nehemiah': 'Nehemiah',
+  'esther': 'Esther',
+  'job': 'Job',
+  'psalms': 'Psalms',
+  'psalm': 'Psalms', // defensive alias
+  'proverbs': 'Proverbs',
+  'ecclesiastes': 'Ecclesiastes',
+  'song of solomon': 'Song of Solomon',
+  'isaiah': 'Isaiah',
+  'jeremiah': 'Jeremiah',
+  'lamentations': 'Lamentations',
+  'ezekiel': 'Ezekiel',
+  'daniel': 'Daniel',
+  'hosea': 'Hosea',
+  'joel': 'Joel',
+  'amos': 'Amos',
+  'obadiah': 'Obadiah',
+  'jonah': 'Jonah',
+  'micah': 'Micah',
+  'nahum': 'Nahum',
+  'habakkuk': 'Habakkuk',
+  'zephaniah': 'Zephaniah',
+  'haggai': 'Haggai',
+  'zechariah': 'Zechariah',
+  'malachi': 'Malachi',
+  'matthew': 'Matthew',
+  'mark': 'Mark',
+  'luke': 'Luke',
+  'john': 'John',
+  'acts': 'Acts',
+  'romans': 'Romans',
+  '1 corinthians': '1 Corinthians',
+  '2 corinthians': '2 Corinthians',
+  'galatians': 'Galatians',
+  'ephesians': 'Ephesians',
+  'philippians': 'Philippians',
+  'colossians': 'Colossians',
+  '1 thessalonians': '1 Thessalonians',
+  '2 thessalonians': '2 Thessalonians',
+  '1 timothy': '1 Timothy',
+  '2 timothy': '2 Timothy',
+  'titus': 'Titus',
+  'philemon': 'Philemon',
+  'hebrews': 'Hebrews',
+  'james': 'James',
+  '1 peter': '1 Peter',
+  '2 peter': '2 Peter',
+  '1 john': '1 John',
+  '2 john': '2 John',
+  '3 john': '3 John',
+  'jude': 'Jude',
+  'revelation': 'Revelation',
 
   // ---- Short abbreviations (those not identical to a full-name key above) ----
 
   // Pentateuch
-  'gen':   'Genesis',
-  'exo':   'Exodus',
-  'lev':   'Leviticus',
-  'num':   'Numbers',
-  'deu':   'Deuteronomy',
+  'gen': 'Genesis',
+  'exo': 'Exodus',
+  'lev': 'Leviticus',
+  'num': 'Numbers',
+  'deu': 'Deuteronomy',
 
   // History
-  'jos':   'Joshua',
-  'jdg':   'Judges',
-  'jud':   'Judges',    // abbrev for Judges; "jude" (full word) → Jude above
-  'rth':   'Ruth',
-  'rut':   'Ruth',
-  '1sm':   '1 Samuel',
-  '1sam':  '1 Samuel',
+  'jos': 'Joshua',
+  'jdg': 'Judges',
+  'jud': 'Judges', // abbrev for Judges; "jude" (full word) → Jude above
+  'rth': 'Ruth',
+  'rut': 'Ruth',
+  '1sm': '1 Samuel',
+  '1sam': '1 Samuel',
   '1 sam': '1 Samuel',
-  '2sm':   '2 Samuel',
-  '2sam':  '2 Samuel',
+  '2sm': '2 Samuel',
+  '2sam': '2 Samuel',
   '2 sam': '2 Samuel',
-  '1ki':   '1 Kings',
-  '1kgs':  '1 Kings',
-  '1 ki':  '1 Kings',
-  '2ki':   '2 Kings',
-  '2kgs':  '2 Kings',
-  '2 ki':  '2 Kings',
-  '1ch':   '1 Chronicles',
-  '1chr':  '1 Chronicles',
+  '1ki': '1 Kings',
+  '1kgs': '1 Kings',
+  '1 ki': '1 Kings',
+  '2ki': '2 Kings',
+  '2kgs': '2 Kings',
+  '2 ki': '2 Kings',
+  '1ch': '1 Chronicles',
+  '1chr': '1 Chronicles',
   '1 chr': '1 Chronicles',
-  '2ch':   '2 Chronicles',
-  '2chr':  '2 Chronicles',
+  '2ch': '2 Chronicles',
+  '2chr': '2 Chronicles',
   '2 chr': '2 Chronicles',
-  'ezr':   'Ezra',
-  'ne':    'Nehemiah',
-  'neh':   'Nehemiah',
-  'est':   'Esther',
-  'et':    'Esther',
+  'ezr': 'Ezra',
+  'ne': 'Nehemiah',
+  'neh': 'Nehemiah',
+  'est': 'Esther',
+  'et': 'Esther',
 
   // Poetry
-  'psa':   'Psalms',   // CRITICAL: "Psalms" with the 's'
-  'pss':   'Psalms',
-  'pro':   'Proverbs',
-  'prv':   'Proverbs',
-  'ecc':   'Ecclesiastes',
-  'ec':    'Ecclesiastes',
-  'song':  'Song of Solomon',
-  'so':    'Song of Solomon',
-  'sol':   'Song of Solomon',
+  'psa': 'Psalms', // CRITICAL: "Psalms" with the 's'
+  'pss': 'Psalms',
+  'pro': 'Proverbs',
+  'prv': 'Proverbs',
+  'ecc': 'Ecclesiastes',
+  'ec': 'Ecclesiastes',
+  'song': 'Song of Solomon',
+  'so': 'Song of Solomon',
+  'sol': 'Song of Solomon',
 
   // Major Prophets
-  'isa':   'Isaiah',
-  'is':    'Isaiah',
-  'jer':   'Jeremiah',
-  'jr':    'Jeremiah',
-  'lam':   'Lamentations',
-  'lm':    'Lamentations',
-  'eze':   'Ezekiel',
-  'ez':    'Ezekiel',
-  'dan':   'Daniel',
-  'dn':    'Daniel',
+  'isa': 'Isaiah',
+  'is': 'Isaiah',
+  'jer': 'Jeremiah',
+  'jr': 'Jeremiah',
+  'lam': 'Lamentations',
+  'lm': 'Lamentations',
+  'eze': 'Ezekiel',
+  'ez': 'Ezekiel',
+  'dan': 'Daniel',
+  'dn': 'Daniel',
 
   // Minor Prophets
-  'hos':   'Hosea',
-  'ho':    'Hosea',
-  'joe':   'Joel',
-  'jl':    'Joel',
-  'amo':   'Amos',
-  'am':    'Amos',
-  'oba':   'Obadiah',
-  'ob':    'Obadiah',
-  'jon':   'Jonah',    // CRITICAL: Jon=Jonah; John is Joh
-  'jnh':   'Jonah',
-  'mic':   'Micah',
-  'mi':    'Micah',
-  'nah':   'Nahum',
-  'na':    'Nahum',
-  'hab':   'Habakkuk',
-  'hk':    'Habakkuk',
-  'zep':   'Zephaniah',
-  'zp':    'Zephaniah',
-  'hag':   'Haggai',
-  'hg':    'Haggai',
-  'zec':   'Zechariah',
-  'zc':    'Zechariah',
-  'mal':   'Malachi',
-  'ml':    'Malachi',
+  'hos': 'Hosea',
+  'ho': 'Hosea',
+  'joe': 'Joel',
+  'jl': 'Joel',
+  'amo': 'Amos',
+  'am': 'Amos',
+  'oba': 'Obadiah',
+  'ob': 'Obadiah',
+  'jon': 'Jonah', // CRITICAL: Jon=Jonah; John is Joh
+  'jnh': 'Jonah',
+  'mic': 'Micah',
+  'mi': 'Micah',
+  'nah': 'Nahum',
+  'na': 'Nahum',
+  'hab': 'Habakkuk',
+  'hk': 'Habakkuk',
+  'zep': 'Zephaniah',
+  'zp': 'Zephaniah',
+  'hag': 'Haggai',
+  'hg': 'Haggai',
+  'zec': 'Zechariah',
+  'zc': 'Zechariah',
+  'mal': 'Malachi',
+  'ml': 'Malachi',
 
   // Gospels & Acts
-  'mat':   'Matthew',
-  'mt':    'Matthew',
-  'mar':   'Mark',
-  'mk':    'Mark',
-  'luk':   'Luke',
-  'lk':    'Luke',
-  'joh':   'John',     // CRITICAL: Joh=John; Jonah is Jon
-  'jo':    'John',
-  'act':   'Acts',
+  'mat': 'Matthew',
+  'mt': 'Matthew',
+  'mar': 'Mark',
+  'mk': 'Mark',
+  'luk': 'Luke',
+  'lk': 'Luke',
+  'joh': 'John', // CRITICAL: Joh=John; Jonah is Jon
+  'jo': 'John',
+  'act': 'Acts',
 
   // Epistles
-  'rom':   'Romans',
-  'rm':    'Romans',
-  '1co':   '1 Corinthians',
-  '1cor':  '1 Corinthians',
+  'rom': 'Romans',
+  'rm': 'Romans',
+  '1co': '1 Corinthians',
+  '1cor': '1 Corinthians',
   '1 cor': '1 Corinthians',
-  '2co':   '2 Corinthians',
-  '2cor':  '2 Corinthians',
+  '2co': '2 Corinthians',
+  '2cor': '2 Corinthians',
   '2 cor': '2 Corinthians',
-  'gal':   'Galatians',
-  'gl':    'Galatians',
-  'eph':   'Ephesians',
-  'phi':   'Philippians', // CRITICAL: Phi=Philippians; Philemon is Phm
-  'ph':    'Philippians',
-  'phl':   'Philippians',
-  'col':   'Colossians',
-  'cl':    'Colossians',
-  '1th':   '1 Thessalonians',
-  '1 th':  '1 Thessalonians',
-  '1ts':   '1 Thessalonians',
-  '2th':   '2 Thessalonians',
-  '2 th':  '2 Thessalonians',
-  '2ts':   '2 Thessalonians',
-  '1ti':   '1 Timothy',
-  '1tm':   '1 Timothy',
-  '1tim':  '1 Timothy',
+  'gal': 'Galatians',
+  'gl': 'Galatians',
+  'eph': 'Ephesians',
+  'phi': 'Philippians', // CRITICAL: Phi=Philippians; Philemon is Phm
+  'ph': 'Philippians',
+  'phl': 'Philippians',
+  'col': 'Colossians',
+  'cl': 'Colossians',
+  '1th': '1 Thessalonians',
+  '1 th': '1 Thessalonians',
+  '1ts': '1 Thessalonians',
+  '2th': '2 Thessalonians',
+  '2 th': '2 Thessalonians',
+  '2ts': '2 Thessalonians',
+  '1ti': '1 Timothy',
+  '1tm': '1 Timothy',
+  '1tim': '1 Timothy',
   '1 tim': '1 Timothy',
-  '2ti':   '2 Timothy',
-  '2tm':   '2 Timothy',
-  '2tim':  '2 Timothy',
+  '2ti': '2 Timothy',
+  '2tm': '2 Timothy',
+  '2tim': '2 Timothy',
   '2 tim': '2 Timothy',
-  'tit':   'Titus',
-  'tt':    'Titus',
-  'phm':   'Philemon',   // CRITICAL: Phm=Philemon; Philippians is Phi
-  'heb':   'Hebrews',
-  'hb':    'Hebrews',
-  'jam':   'James',
-  'jm':    'James',
-  '1pe':   '1 Peter',
-  '1pet':  '1 Peter',
-  '1 pe':  '1 Peter',
-  '2pe':   '2 Peter',
-  '2pet':  '2 Peter',
-  '2 pe':  '2 Peter',
-  '1jo':   '1 John',
-  '1joh':  '1 John',
+  'tit': 'Titus',
+  'tt': 'Titus',
+  'phm': 'Philemon', // CRITICAL: Phm=Philemon; Philippians is Phi
+  'heb': 'Hebrews',
+  'hb': 'Hebrews',
+  'jam': 'James',
+  'jm': 'James',
+  '1pe': '1 Peter',
+  '1pet': '1 Peter',
+  '1 pe': '1 Peter',
+  '2pe': '2 Peter',
+  '2pet': '2 Peter',
+  '2 pe': '2 Peter',
+  '1jo': '1 John',
+  '1joh': '1 John',
   '1 joh': '1 John',
-  '2jo':   '2 John',
-  '2joh':  '2 John',
+  '2jo': '2 John',
+  '2joh': '2 John',
   '2 joh': '2 John',
-  '3jo':   '3 John',
-  '3joh':  '3 John',
+  '3jo': '3 John',
+  '3joh': '3 John',
   '3 joh': '3 John',
-  'jde':   'Jude',
-  'rev':   'Revelation',
-  're':    'Revelation',
+  'jde': 'Jude',
+  'rev': 'Revelation',
+  're': 'Revelation',
 };
 
 // ---------------------------------------------------------------------------
@@ -262,22 +262,72 @@ const Map<String, String> _bookMap = {
 // Exact strings from assets/bible/kjv.json.
 // ---------------------------------------------------------------------------
 const Set<String> _canonicalNames = {
-  'Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
-  'Joshua', 'Judges', 'Ruth',
-  '1 Samuel', '2 Samuel', '1 Kings', '2 Kings',
-  '1 Chronicles', '2 Chronicles',
-  'Ezra', 'Nehemiah', 'Esther',
-  'Job', 'Psalms', 'Proverbs', 'Ecclesiastes', 'Song of Solomon',
-  'Isaiah', 'Jeremiah', 'Lamentations', 'Ezekiel', 'Daniel',
-  'Hosea', 'Joel', 'Amos', 'Obadiah', 'Jonah', 'Micah',
-  'Nahum', 'Habakkuk', 'Zephaniah', 'Haggai', 'Zechariah', 'Malachi',
-  'Matthew', 'Mark', 'Luke', 'John', 'Acts',
-  'Romans', '1 Corinthians', '2 Corinthians', 'Galatians', 'Ephesians',
-  'Philippians', 'Colossians',
-  '1 Thessalonians', '2 Thessalonians',
-  '1 Timothy', '2 Timothy', 'Titus', 'Philemon', 'Hebrews',
-  'James', '1 Peter', '2 Peter',
-  '1 John', '2 John', '3 John', 'Jude', 'Revelation',
+  'Genesis',
+  'Exodus',
+  'Leviticus',
+  'Numbers',
+  'Deuteronomy',
+  'Joshua',
+  'Judges',
+  'Ruth',
+  '1 Samuel',
+  '2 Samuel',
+  '1 Kings',
+  '2 Kings',
+  '1 Chronicles',
+  '2 Chronicles',
+  'Ezra',
+  'Nehemiah',
+  'Esther',
+  'Job',
+  'Psalms',
+  'Proverbs',
+  'Ecclesiastes',
+  'Song of Solomon',
+  'Isaiah',
+  'Jeremiah',
+  'Lamentations',
+  'Ezekiel',
+  'Daniel',
+  'Hosea',
+  'Joel',
+  'Amos',
+  'Obadiah',
+  'Jonah',
+  'Micah',
+  'Nahum',
+  'Habakkuk',
+  'Zephaniah',
+  'Haggai',
+  'Zechariah',
+  'Malachi',
+  'Matthew',
+  'Mark',
+  'Luke',
+  'John',
+  'Acts',
+  'Romans',
+  '1 Corinthians',
+  '2 Corinthians',
+  'Galatians',
+  'Ephesians',
+  'Philippians',
+  'Colossians',
+  '1 Thessalonians',
+  '2 Thessalonians',
+  '1 Timothy',
+  '2 Timothy',
+  'Titus',
+  'Philemon',
+  'Hebrews',
+  'James',
+  '1 Peter',
+  '2 Peter',
+  '1 John',
+  '2 John',
+  '3 John',
+  'Jude',
+  'Revelation',
 };
 
 // ---------------------------------------------------------------------------
@@ -314,7 +364,7 @@ List<String> _chapRangeToRefs(String bookName, String chapStr) {
     final parts = chapStr.split('-');
     if (parts.length == 2) {
       final start = int.tryParse(parts[0].trim());
-      final end   = int.tryParse(parts[1].trim());
+      final end = int.tryParse(parts[1].trim());
       if (start != null && end != null && end >= start) {
         return [for (int c = start; c <= end; c++) '$bookName $c'];
       }
@@ -353,7 +403,7 @@ Map<String, dynamic> parsePassageToken(String token) {
   // Group 2: the alpha part, e.g. "Sam", "Chr", "Joh", "Gen"
   // Group 3: everything after (chapters/verses, may contain commas)
   final re = RegExp(r'^(\d)\s+([A-Za-z]+)\s*(.*)$');
-  final m  = re.firstMatch(token);
+  final m = re.firstMatch(token);
 
   String abbrevKey;
   String rest;
@@ -362,29 +412,36 @@ Map<String, dynamic> parsePassageToken(String token) {
     // Numbered book: e.g. "1 Sam 1-4", "2 Chr 10", "1 Joh 1-5"
     final digit = m.group(1)!;
     final alpha = m.group(2)!;
-    rest        = (m.group(3) ?? '').trim();
-    abbrevKey   = '$digit ${alpha.toLowerCase()}'; // e.g. "1 sam", "2 chr"
+    rest = (m.group(3) ?? '').trim();
+    abbrevKey = '$digit ${alpha.toLowerCase()}'; // e.g. "1 sam", "2 chr"
   } else {
     // Non-numbered book: e.g. "Gen 1-2", "Psa 8, 104", "John 1:1-3", "Oba"
     final re2 = RegExp(r'^([A-Za-z]+)\s*(.*)$');
-    final m2  = re2.firstMatch(token);
+    final m2 = re2.firstMatch(token);
     if (m2 == null) {
-      return {'label': label, 'refs': <String>[label]};
+      return {
+        'label': label,
+        'refs': <String>[label]
+      };
     }
     abbrevKey = m2.group(1)!.toLowerCase(); // e.g. "gen", "psa", "john"
-    rest      = (m2.group(2) ?? '').trim();
+    rest = (m2.group(2) ?? '').trim();
   }
 
   final bookName = resolveBook(abbrevKey);
 
   if (rest.isEmpty) {
     // No chapter/verse portion: single-chapter book or bare book name
-    return {'label': label, 'refs': <String>[bookName]};
+    return {
+      'label': label,
+      'refs': <String>[bookName]
+    };
   }
 
   // Split rest on ',' → multiple chapter refs for the same book
   // e.g. "8, 104" → ["8","104"] → each processed individually
-  final segments = rest.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+  final segments =
+      rest.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
   final List<String> refs = [];
   for (final seg in segments) {
     refs.addAll(_chapRangeToRefs(bookName, seg));
@@ -464,9 +521,9 @@ void main() async {
       globalDay++;
       final passages = parseDayString(currentDays[d]!);
       readings.add({
-        'day':      globalDay,
-        'week':     currentWeek,
-        'title':    currentTheme,
+        'day': globalDay,
+        'week': currentWeek,
+        'title': currentTheme,
         'passages': passages,
       });
     }
@@ -496,13 +553,13 @@ void main() async {
   // Build output JSON
   // -------------------------------------------------------------------------
   final output = {
-    'id':            'chronological_1yr',
-    'title':         'Chronological Bible in a Year',
-    'description':   'Read the Bible in the order events occurred.',
-    'framework':     'Guthrie – Read the Bible for Life',
+    'id': 'chronological_1yr',
+    'title': 'Chronological Bible in a Year',
+    'description': 'Read the Bible in the order events occurred.',
+    'framework': 'Guthrie – Read the Bible for Life',
     'totalReadings': readings.length,
-    'daysPerWeek':   6,
-    'readings':      readings,
+    'daysPerWeek': 6,
+    'readings': readings,
   };
 
   // -------------------------------------------------------------------------
@@ -519,7 +576,10 @@ void main() async {
   final days = readings.map((r) => r['day'] as int).toList()..sort();
   var contiguous = true;
   for (int i = 0; i < days.length; i++) {
-    if (days[i] != i + 1) { contiguous = false; break; }
+    if (days[i] != i + 1) {
+      contiguous = false;
+      break;
+    }
   }
   print('days contiguous 1..${readings.length}: $contiguous');
 
@@ -552,9 +612,9 @@ void main() async {
   // -------------------------------------------------------------------------
   print('');
   print('=== SPOT CHECKS ===');
-  _printDay(readings, 1,   'Day 1');
-  _printDay(readings, 8,   'Day 8');
-  _printDay(readings, 44,  'Day 44');
+  _printDay(readings, 1, 'Day 1');
+  _printDay(readings, 8, 'Day 8');
+  _printDay(readings, 44, 'Day 44');
   _printWeekDay(readings, 15, 3, 'Week 15 D3  (Psa 7,27,31,34,52)');
   _printWeekDay(readings, 45, 2, 'Week 45 D2  (multi-Gospel harmony)');
   _printDay(readings, 312, 'Day 312');
@@ -562,7 +622,8 @@ void main() async {
   // -------------------------------------------------------------------------
   // Write output JSON
   // -------------------------------------------------------------------------
-  File(outputPath).writeAsStringSync(const JsonEncoder.withIndent('  ').convert(output));
+  File(outputPath)
+      .writeAsStringSync(const JsonEncoder.withIndent('  ').convert(output));
   print('');
   print('Output written → $outputPath');
   print('');
@@ -570,18 +631,23 @@ void main() async {
 
 void _printDay(List<Map<String, dynamic>> readings, int day, String label) {
   final r = readings.firstWhere((r) => r['day'] == day, orElse: () => {});
-  if (r.isEmpty) { print('$label: NOT FOUND'); return; }
+  if (r.isEmpty) {
+    print('$label: NOT FOUND');
+    return;
+  }
   print('$label — Week ${r['week']}, "${r['title']}"');
   for (final p in (r['passages'] as List)) {
     print('  label="${p['label']}", refs=${(p['refs'] as List).join(' | ')}');
   }
 }
 
-void _printWeekDay(List<Map<String, dynamic>> readings, int week, int dayInWeek, String label) {
+void _printWeekDay(List<Map<String, dynamic>> readings, int week, int dayInWeek,
+    String label) {
   final weekR = readings.where((r) => r['week'] == week).toList()
     ..sort((a, b) => (a['day'] as int).compareTo(b['day'] as int));
   if (dayInWeek < 1 || dayInWeek > weekR.length) {
-    print('$label: NOT FOUND'); return;
+    print('$label: NOT FOUND');
+    return;
   }
   final r = weekR[dayInWeek - 1];
   print('$label (global Day ${r['day']}) — Week ${r['week']}, "${r['title']}"');

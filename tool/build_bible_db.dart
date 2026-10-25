@@ -40,18 +40,21 @@ CREATE TABLE translations (
   license          TEXT NOT NULL,
   is_complete      INTEGER NOT NULL DEFAULT 0
 );''');
-  buf.writeln('CREATE INDEX idx_verses ON verses(translation_id, book_number, chapter, verse);');
+  buf.writeln(
+      'CREATE INDEX idx_verses ON verses(translation_id, book_number, chapter, verse);');
   buf.writeln('BEGIN TRANSACTION;');
 
   // ── KJV from local JSON ───────────────────────────────────────────
   print('[KJV] Reading assets/data/kjvbible.json ...');
   final kjvFile = File('assets/data/kjvbible.json');
   if (!kjvFile.existsSync()) {
-    stderr.writeln('ERROR: assets/data/kjvbible.json not found. Run from project root.');
+    stderr.writeln(
+        'ERROR: assets/data/kjvbible.json not found. Run from project root.');
     exit(1);
   }
 
-  final kjvJson = jsonDecode(kjvFile.readAsStringSync()) as Map<String, dynamic>;
+  final kjvJson =
+      jsonDecode(kjvFile.readAsStringSync()) as Map<String, dynamic>;
   final kjvVerses = kjvJson['verses'] as List<dynamic>;
 
   int kjvCount = 0;
@@ -62,11 +65,12 @@ CREATE TABLE translations (
     final bookNum = m['book'] as int;
     final chapter = m['chapter'] as int;
     final verse = m['verse'] as int;
-    String text = (m['text'] as String)
-        .replaceAll('¶ ', '').replaceAll('¶', '');
+    String text =
+        (m['text'] as String).replaceAll('¶ ', '').replaceAll('¶', '');
 
     final escapedText = text.replaceAll("'", "''");
-    buf.writeln("INSERT INTO verses VALUES('kjv','en',$bookNum,$chapter,$verse,'$escapedText');");
+    buf.writeln(
+        "INSERT INTO verses VALUES('kjv','en',$bookNum,$chapter,$verse,'$escapedText');");
     kjvCount++;
     if (bookNum < kjvMinBook) kjvMinBook = bookNum;
     if (bookNum > kjvMaxBook) kjvMaxBook = bookNum;
@@ -75,33 +79,114 @@ CREATE TABLE translations (
 
   // Translations to process from helloao
   final apiTranslations = [
-    {'id': 'ENGWEBP', 'db_id': 'web', 'lang': 'en', 'langName': 'English', 'name': 'World English Bible', 'abbr': 'WEB', 'license': 'Public Domain'},
-    {'id': 'spa_r09', 'db_id': 'spa_r09', 'lang': 'es', 'langName': 'Spanish', 'name': 'Reina Valera 1909', 'abbr': 'RV1909', 'license': 'Public Domain'},
-    {'id': 'fra_lsg', 'db_id': 'fra_lsg', 'lang': 'fr', 'langName': 'French', 'name': 'Louis Segond 1910', 'abbr': 'LSG', 'license': 'Public Domain'},
-    {'id': 'deu_l12', 'db_id': 'deu_l12', 'lang': 'de', 'langName': 'German', 'name': 'Luther Bible 1912', 'abbr': 'L1912', 'license': 'Public Domain'},
-    {'id': 'ita_dio', 'db_id': 'ita_dio', 'lang': 'it', 'langName': 'Italian', 'name': 'Diodati 1885', 'abbr': 'DIO', 'license': 'Public Domain'},
-    {'id': 'ron_btf', 'db_id': 'ron_btf', 'lang': 'ro', 'langName': 'Romanian', 'name': 'Romanian BTF Bible', 'abbr': 'BTF', 'license': 'Public Domain'},
-    {'id': 'nld_',    'db_id': 'nld_', 'lang': 'nl', 'langName': 'Dutch', 'name': 'Dutch Bible 1917', 'abbr': 'NLD', 'license': 'Public Domain'},
-    {'id': 'swh_ulb', 'db_id': 'swh_ulb', 'lang': 'sw', 'langName': 'Swahili', 'name': 'Swahili Unlocked Literal Bible', 'abbr': 'ULB', 'license': 'CC BY-SA 4.0'},
-    {'id': 'tgl_ulb', 'db_id': 'tgl_ulb', 'lang': 'tl', 'langName': 'Tagalog', 'name': 'Tagalog Unlocked Literal Bible', 'abbr': 'ULB', 'license': 'CC BY-SA 4.0'},
-    {'id': 'por_blj', 'db_id': 'por_blj', 'lang': 'pt', 'langName': 'Portuguese', 'name': 'Bíblia Livre', 'abbr': 'BLIVRE', 'license': 'CC BY 4.0'},
+    {
+      'id': 'ENGWEBP',
+      'db_id': 'web',
+      'lang': 'en',
+      'langName': 'English',
+      'name': 'World English Bible',
+      'abbr': 'WEB',
+      'license': 'Public Domain'
+    },
+    {
+      'id': 'spa_r09',
+      'db_id': 'spa_r09',
+      'lang': 'es',
+      'langName': 'Spanish',
+      'name': 'Reina Valera 1909',
+      'abbr': 'RV1909',
+      'license': 'Public Domain'
+    },
+    {
+      'id': 'fra_lsg',
+      'db_id': 'fra_lsg',
+      'lang': 'fr',
+      'langName': 'French',
+      'name': 'Louis Segond 1910',
+      'abbr': 'LSG',
+      'license': 'Public Domain'
+    },
+    {
+      'id': 'deu_l12',
+      'db_id': 'deu_l12',
+      'lang': 'de',
+      'langName': 'German',
+      'name': 'Luther Bible 1912',
+      'abbr': 'L1912',
+      'license': 'Public Domain'
+    },
+    {
+      'id': 'ita_dio',
+      'db_id': 'ita_dio',
+      'lang': 'it',
+      'langName': 'Italian',
+      'name': 'Diodati 1885',
+      'abbr': 'DIO',
+      'license': 'Public Domain'
+    },
+    {
+      'id': 'ron_btf',
+      'db_id': 'ron_btf',
+      'lang': 'ro',
+      'langName': 'Romanian',
+      'name': 'Romanian BTF Bible',
+      'abbr': 'BTF',
+      'license': 'Public Domain'
+    },
+    {
+      'id': 'nld_',
+      'db_id': 'nld_',
+      'lang': 'nl',
+      'langName': 'Dutch',
+      'name': 'Dutch Bible 1917',
+      'abbr': 'NLD',
+      'license': 'Public Domain'
+    },
+    {
+      'id': 'swh_ulb',
+      'db_id': 'swh_ulb',
+      'lang': 'sw',
+      'langName': 'Swahili',
+      'name': 'Swahili Unlocked Literal Bible',
+      'abbr': 'ULB',
+      'license': 'CC BY-SA 4.0'
+    },
+    {
+      'id': 'tgl_ulb',
+      'db_id': 'tgl_ulb',
+      'lang': 'tl',
+      'langName': 'Tagalog',
+      'name': 'Tagalog Unlocked Literal Bible',
+      'abbr': 'ULB',
+      'license': 'CC BY-SA 4.0'
+    },
+    {
+      'id': 'por_blj',
+      'db_id': 'por_blj',
+      'lang': 'pt',
+      'langName': 'Portuguese',
+      'name': 'Bíblia Livre',
+      'abbr': 'BLIVRE',
+      'license': 'CC BY 4.0'
+    },
   ];
 
   final report = <String, Map<String, dynamic>>{};
-  
+
   for (final t in apiTranslations) {
     final apiId = t['id']!;
     final dbId = t['db_id']!;
     final langCode = t['lang']!;
-    
+
     print('\n[$apiId] Fetching complete json ...');
-    
+
     int tCount = 0;
     int tMinBook = 999;
     int tMaxBook = 0;
 
     try {
-      final completeData = await _fetchJson('https://bible.helloao.org/api/$apiId/complete.json');
+      final completeData = await _fetchJson(
+          'https://bible.helloao.org/api/$apiId/complete.json');
       final books = completeData['books'] as List<dynamic>;
       print('[$apiId] ${books.length} books found, inserting verses...');
 
@@ -139,18 +224,18 @@ CREATE TABLE translations (
                 .replaceAll('\u2013', '-');
 
             final escapedText = text.replaceAll("'", "''");
-            buf.writeln("INSERT INTO verses VALUES('$dbId','$langCode',$bookOrder,$ch,$verseNum,'$escapedText');");
+            buf.writeln(
+                "INSERT INTO verses VALUES('$dbId','$langCode',$bookOrder,$ch,$verseNum,'$escapedText');");
             tCount++;
           }
         }
       }
-      
+
       report[apiId] = {
         'count': tCount,
         'minBook': tMinBook,
         'maxBook': tMaxBook,
       };
-
     } catch (e) {
       print('[$apiId] ERROR: $e');
       exit(1);
@@ -158,7 +243,8 @@ CREATE TABLE translations (
   }
 
   // ── translations seed ─────────────────────────────────────────────
-  buf.writeln("INSERT OR REPLACE INTO translations VALUES('kjv','en','English','King James Version','KJV','Public Domain',1);");
+  buf.writeln(
+      "INSERT OR REPLACE INTO translations VALUES('kjv','en','English','King James Version','KJV','Public Domain',1);");
   for (final t in apiTranslations) {
     final dbId = t['db_id']!;
     final langCode = t['lang']!;
@@ -166,8 +252,9 @@ CREATE TABLE translations (
     final name = t['name']!.replaceAll("'", "''");
     final abbr = t['abbr']!;
     final license = t['license']!.replaceAll("'", "''");
-    
-    buf.writeln("INSERT OR REPLACE INTO translations VALUES('$dbId','$langCode','$langName','$name','$abbr','$license',1);");
+
+    buf.writeln(
+        "INSERT OR REPLACE INTO translations VALUES('$dbId','$langCode','$langName','$name','$abbr','$license',1);");
   }
 
   buf.writeln('COMMIT;');
@@ -199,13 +286,16 @@ CREATE TABLE translations (
     final id = t['id']!;
     final r = report[id]!;
     final padId = id.padRight(8);
-    print('║  $padId: ${r['count']} verses, books ${r['minBook']}-${r['maxBook']}    ║');
+    print(
+        '║  $padId: ${r['count']} verses, books ${r['minBook']}-${r['maxBook']}    ║');
   }
   print('║  File: $dbPath ($sizeMB MB)           ║');
   print('╚══════════════════════════════════════════╝');
   print('\n✅ Done. Verified canonical normalizations.');
 
-  try { File(sqlPath).deleteSync(); } catch (_) {}
+  try {
+    File(sqlPath).deleteSync();
+  } catch (_) {}
 }
 
 Future<Map<String, dynamic>> _fetchJson(String url) async {

@@ -16,8 +16,9 @@ Future<void> main() async {
     }
     final body = await resp.transform(utf8.decoder).join();
     final data = jsonDecode(body);
-    final translations = data is List ? data : (data['translations'] ?? data['data'] ?? []);
-    
+    final translations =
+        data is List ? data : (data['translations'] ?? data['data'] ?? []);
+
     for (var t in translations) {
       if (t['id'] == 'HINIRV') {
         print('ID: ${t['id']}');

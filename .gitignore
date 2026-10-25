@@ -37,6 +37,7 @@ egw_original_recovered.json
 .pub/
 /build/
 /coverage/
+/test/failures/
 
 # Symbolication related
 app.*.symbols
