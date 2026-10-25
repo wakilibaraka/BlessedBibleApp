@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/design_tokens.dart';
 import '../../l10n/l10n.dart';
+import '../../data/localized_book_names.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/bible_provider.dart';
 import '../../state/translation_provider.dart';
@@ -70,7 +71,8 @@ class VersePreviewDialog extends ConsumerWidget {
                 Expanded(
                   child: Text(
                     fullBookName != null
-                        ? '$fullBookName $chapter:$verseNum'
+                        ? context.referenceInLocale(
+                            '$fullBookName $chapter:$verseNum')
                         : reference,
                     style: TextStyle(
                       fontSize: TypeScale.title,

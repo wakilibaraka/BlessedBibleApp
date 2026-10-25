@@ -1147,6 +1147,190 @@
   "sw": "Shiriki kadi ya picha",
   "tl": "Ibahagi ang image card"
  },
+ "shareModeText": {
+  "en": "Text",
+  "fr": "Texte",
+  "it": "Testo",
+  "ro": "Text",
+  "sw": "Maandishi",
+  "tl": "Teksto"
+ },
+ "shareModeImage": {
+  "en": "Image",
+  "fr": "Image",
+  "it": "Immagine",
+  "ro": "Imagine",
+  "sw": "Picha",
+  "tl": "Larawan"
+ },
+ "shareModePdf": {
+  "en": "PDF",
+  "fr": "PDF",
+  "it": "PDF",
+  "ro": "PDF",
+  "sw": "PDF",
+  "tl": "PDF"
+ },
+ "shareFormat": {
+  "en": "Format",
+  "fr": "Format",
+  "it": "Formato",
+  "ro": "Format",
+  "sw": "Muundo",
+  "tl": "Format"
+ },
+ "shareFlavorPlain": {
+  "en": "Plain text",
+  "fr": "Texte brut",
+  "it": "Testo semplice",
+  "ro": "Text simplu",
+  "sw": "Maandishi safi",
+  "tl": "Simpleng teksto"
+ },
+ "shareFlavorWhatsapp": {
+  "en": "WhatsApp",
+  "fr": "WhatsApp",
+  "it": "WhatsApp",
+  "ro": "WhatsApp",
+  "sw": "WhatsApp",
+  "tl": "WhatsApp"
+ },
+ "shareFlavorPlainHint": {
+  "en": "No markup — pastes cleanly anywhere.",
+  "fr": "Sans mise en forme — se colle partout.",
+  "it": "Nessuna formattazione — si incolla ovunque.",
+  "ro": "Fără formatare — se lipește oriunde.",
+  "sw": "Hakuna muundo — inanakiliwa popote.",
+  "tl": "Walang markup — dumidikit nang malinis kahit saan."
+ },
+ "shareFlavorWhatsappHint": {
+  "en": "Bold headings and italic references, styled by WhatsApp.",
+  "fr": "Titres en gras et références en italique, mis en forme par WhatsApp.",
+  "it": "Titoli in grassetto e riferimenti in corsivo, formattati da WhatsApp.",
+  "ro": "Titluri aldine și referințe cursive, formatate de WhatsApp.",
+  "sw": "Vichwa viboldi na marejeo ya italiki, hupambwa na WhatsApp.",
+  "tl": "Makapal na pamagat at italikong sanggunian, inaayos ng WhatsApp."
+ },
+ "shareIncludeReference": {
+  "en": "Include reference",
+  "fr": "Inclure la référence",
+  "it": "Includi riferimento",
+  "ro": "Include referința",
+  "sw": "Jumuisha rejeo",
+  "tl": "Isama ang sanggunian"
+ },
+ "shareFormatPortrait": {
+  "en": "Portrait",
+  "fr": "Portrait",
+  "it": "Ritratto",
+  "ro": "Portret",
+  "sw": "Wima",
+  "tl": "Patayo"
+ },
+ "shareFormatSquare": {
+  "en": "Square",
+  "fr": "Carré",
+  "it": "Quadrato",
+  "ro": "Pătrat",
+  "sw": "Mraba",
+  "tl": "Parisukat"
+ },
+ "shareFormatStory": {
+  "en": "Story",
+  "fr": "Story",
+  "it": "Story",
+  "ro": "Story",
+  "sw": "Story",
+  "tl": "Story"
+ },
+ "shareStyle": {
+  "en": "Style",
+  "fr": "Style",
+  "it": "Stile",
+  "ro": "Stil",
+  "sw": "Mtindo",
+  "tl": "Estilo"
+ },
+ "sharePdfTitle": {
+  "en": "Print-ready PDF",
+  "fr": "PDF prêt à imprimer",
+  "it": "PDF pronto per la stampa",
+  "ro": "PDF gata de tipar",
+  "sw": "PDF tayari kuchapishwa",
+  "tl": "PDF na handa sa paglimbag"
+ },
+ "sharePdfBody": {
+  "en": "The complete text on a typeset page, with the reference and source. Ready to read, print or send.",
+  "fr": "Le texte intégral sur une page composée, avec la référence et la source. Prêt à lire, imprimer ou envoyer.",
+  "it": "Il testo completo su una pagina impaginata, con riferimento e fonte. Pronto da leggere, stampare o inviare.",
+  "ro": "Textul complet pe o pagină culeasă, cu referința și sursa. Gata de citit, tipărit sau trimis.",
+  "sw": "Maandishi yote kwenye ukurasa uliopangwa, pamoja na rejeo na chanzo. Tayari kusoma, kuchapisha au kutuma.",
+  "tl": "Ang buong teksto sa nakaayos na pahina, kasama ang sanggunian at pinagmulan. Handa nang basahin, i-print o ipadala."
+ },
+ "shareSharePdf": {
+  "en": "Share PDF",
+  "fr": "Partager le PDF",
+  "it": "Condividi PDF",
+  "ro": "Partajează PDF",
+  "sw": "Shiriki PDF",
+  "tl": "Ibahagi ang PDF"
+ },
+ "shareBuildingPdf": {
+  "en": "Building PDF…",
+  "fr": "Création du PDF…",
+  "it": "Creazione del PDF…",
+  "ro": "Se creează PDF-ul…",
+  "sw": "Inatengeneza PDF…",
+  "tl": "Ginagawa ang PDF…"
+ },
+ "shareFailed": {
+  "en": "Couldn't share — please try again.",
+  "fr": "Partage impossible — veuillez réessayer.",
+  "it": "Impossibile condividere — riprova.",
+  "ro": "Partajarea a eșuat — încearcă din nou.",
+  "sw": "Imeshindwa kushiriki — tafadhali jaribu tena.",
+  "tl": "Hindi naibahagi — pakisubukang muli."
+ },
+ "shareSaveImage": {
+  "en": "Save to gallery",
+  "fr": "Enregistrer dans la galerie",
+  "it": "Salva nella galleria",
+  "ro": "Salvează în galerie",
+  "sw": "Hifadhi kwenye galari",
+  "tl": "I-save sa gallery"
+ },
+ "shareSavedToGallery": {
+  "en": "Saved to your gallery",
+  "fr": "Enregistré dans votre galerie",
+  "it": "Salvato nella galleria",
+  "ro": "Salvat în galerie",
+  "sw": "Imehifadhiwa kwenye galari",
+  "tl": "Na-save sa iyong gallery"
+ },
+ "shareGalleryDenied": {
+  "en": "Allow photo access to save images.",
+  "fr": "Autorisez l'accès aux photos pour enregistrer des images.",
+  "it": "Consenti l'accesso alle foto per salvare le immagini.",
+  "ro": "Permite accesul la fotografii pentru a salva imagini.",
+  "sw": "Ruhusu ufikiaji wa picha ili kuhifadhi.",
+  "tl": "Payagan ang access sa mga larawan para makapag-save."
+ },
+ "shareSaveFailed": {
+  "en": "Couldn't save the image — please try again.",
+  "fr": "Impossible d'enregistrer l'image — réessayez.",
+  "it": "Impossibile salvare l'immagine — riprova.",
+  "ro": "Imaginea nu a putut fi salvată — încearcă din nou.",
+  "sw": "Imeshindwa kuhifadhi picha — tafadhali jaribu tena.",
+  "tl": "Hindi na-save ang larawan — pakisubukang muli."
+ },
+ "sharePdfPreviewNote": {
+  "en": "Page 1 preview · A4",
+  "fr": "Aperçu de la page 1 · A4",
+  "it": "Anteprima pagina 1 · A4",
+  "ro": "Previzualizare pagina 1 · A4",
+  "sw": "Onyesho la ukurasa wa 1 · A4",
+  "tl": "Preview ng pahina 1 · A4"
+ },
  "spaceStorageTitle": {
   "en": "Storage",
   "fr": "Stockage",

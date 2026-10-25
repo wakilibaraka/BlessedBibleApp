@@ -27,6 +27,7 @@ everything from the repo root.
 | File | Purpose |
 | --- | --- |
 | `commentary-studio.html` | Local browser tool for authoring commentary JSON. |
+| `clean_commentary.py` | Repairs OCR damage in `assets/commentary/commentary.json` (entities, scanner noise, hyphenated line breaks, printing furniture) and drops index/noise pages. Dry run by default; `--write` rewrites the asset. |
 | `hebrews_*.json` | Hebrews commentary source drafts. |
 
 ## Devotional (Bible Stories)

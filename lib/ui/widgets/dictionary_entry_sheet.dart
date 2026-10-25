@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/dictionary_provider.dart';
 import '../../state/typography_provider.dart';
-import '../../services/share_service.dart';
-import 'share_card.dart';
+import '../../models/share_content.dart';
+import 'share_sheet.dart';
 import '../dialogs/verse_preview_dialog.dart';
 import '../../l10n/l10n.dart';
 import '../../theme/design_tokens.dart';
@@ -118,32 +118,16 @@ class DictionaryEntrySheet extends ConsumerWidget {
                           final defs = definitionsAsync.asData?.value;
                           if (defs == null || defs.isEmpty) return;
                           final displayWord = defs.first.displayHeadword;
-                          // Caps word + source per the shared format;
-                          // all entries stack for the text flavor, first
-                          // entry drives the image card.
-                          final text = ShareService.formatWord(
-                            word: displayWord,
-                            definition: defs.first.definition,
-                            sourceName: _formatSourceName(defs.first.source),
-                          );
-                          final full = defs.length > 1
-                              ? '$text\n\n${defs.skip(1).map((d) {
-                                  return "${_formatSourceName(d.source).toUpperCase()}:\n${d.definition.trim()}";
-                                }).join('\n\n')}'
-                              : text;
-                          showShareOptionsSheet(
+                          // The primary entry drives text, card and capture;
+                          // its source becomes the citation line.
+                          showShareSheet(
                             context: context,
-                            copyText: full,
-                            shareText: full,
-                            imageFilename: 'word',
-                            buildCard: (backdrop, style) => ShareCard.word(
-                              eyebrow: context.l10n.studyDictionaryEyebrow
-                                  .toUpperCase(),
+                            content: ShareContent.word(
                               word: displayWord,
                               definition: defs.first.definition,
-                              source: _formatSourceName(defs.first.source),
-                              backdrop: backdrop,
-                              style: style,
+                              sourceName: _formatSourceName(defs.first.source),
+                              eyebrow: context.l10n.studyDictionaryEyebrow
+                                  .toUpperCase(),
                             ),
                           );
                         },

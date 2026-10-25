@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../l10n/l10n.dart';
+import '../../data/localized_book_names.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/user_data_provider.dart';
 import '../../state/read_location_provider.dart';
@@ -17,7 +18,8 @@ import '../../state/read_settings_provider.dart';
 import '../../data/models/bookmark_model.dart';
 import '../widgets/journal_segment.dart';
 import '../widgets/item_context_sheet.dart';
-import '../widgets/share_card.dart';
+import '../../models/share_content.dart';
+import '../widgets/share_sheet.dart';
 import 'package:flutter/services.dart';
 import '../../data/models/home_data.dart';
 import '../../theme/design_tokens.dart';
@@ -563,7 +565,7 @@ class _BookmarksSegmentState extends ConsumerState<_BookmarksSegment> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Text(
-                  groupKey,
+                  context.bookNameInLocale(groupKey),
                   style: widget.theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: widget.theme.colorScheme.primary,
@@ -953,6 +955,7 @@ _ParsedVerseData? _parseVerseRef(
 Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
     _ParsedVerseData data, ThemeData theme,
     {int? highlightColorIndex, bool isBookmarked = false}) {
+  // Canonical: this string is also stored on notes and shared citations.
   final formattedRef = '${data.bookName} ${data.chapter}:${data.verseNum}';
   final highlightColor = (highlightColorIndex != null &&
           highlightColorIndex >= 0 &&
@@ -1000,7 +1003,7 @@ Widget _buildRealVerseCard(BuildContext context, WidgetRef ref, String refStr,
                 children: [
                   Expanded(
                     child: Text(
-                      formattedRef,
+                      context.referenceInLocale(formattedRef),
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: theme.primaryColor,
@@ -1393,33 +1396,20 @@ void _showVerseItemContext(
   }
 
   void shareVerse() {
-    showShareOptionsSheet(
+    showShareSheet(
       context: context,
-      copyText: ShareService.formatVerse(
+      content: ShareContent.verse(
+        reference: formattedRef,
         texts: [data.fallbackText],
-        reference: formattedRef,
         translationTag: 'KJV',
-      ),
-      shareText: ShareService.formatVerse(
-        texts: [data.fallbackText],
-        reference: formattedRef,
-        translationTag: 'KJV',
-        whatsapp: true,
-      ),
-      imageFilename: 'highlight',
-      buildCard: (backdrop, style) => ShareCard.verse(
-        reference: formattedRef,
-        body: ShareService.cleanVerseText(data.fallbackText),
-        translationTag: 'KJV',
-        backdrop: backdrop,
-        style: style,
+        imageFilename: 'highlight',
       ),
     );
   }
 
   ItemContextSheet.show(
     context,
-    title: formattedRef,
+    title: context.referenceInLocale(formattedRef),
     subtitle: isBookmarked
         ? context.l10n.spaceBookmarkedVerse
         : context.l10n.spaceHighlightedVerse,

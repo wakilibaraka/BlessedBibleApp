@@ -47,6 +47,34 @@ void main() {
     }
   });
 
+  test('story position line is translated in every language', () {
+    final en = lookupAppLocalizations(const Locale('en'));
+    expect(en.storiesPosition(3, 12, 'Daniel'), '3 of 12 in Daniel');
+    for (final locale in AppLocalizations.supportedLocales) {
+      if (locale.languageCode == 'en') continue;
+      final label =
+          lookupAppLocalizations(locale).storiesPosition(3, 12, 'Daniel');
+      expect(label, contains('3'), reason: locale.languageCode);
+      expect(label, contains('12'), reason: locale.languageCode);
+      expect(label, contains('Daniel'), reason: locale.languageCode);
+      expect(label, isNot(en.storiesPosition(3, 12, 'Daniel')),
+          reason: locale.languageCode);
+    }
+  });
+
+  test('reader end-of-chapter label is translated in every language', () {
+    final en = lookupAppLocalizations(const Locale('en'));
+    expect(en.readEndOfChapter('Genesis 1'), '· End of Genesis 1 ·');
+    for (final locale in AppLocalizations.supportedLocales) {
+      if (locale.languageCode == 'en') continue;
+      final label =
+          lookupAppLocalizations(locale).readEndOfChapter('Genesis 1');
+      expect(label, contains('Genesis 1'), reason: locale.languageCode);
+      expect(label, isNot(en.readEndOfChapter('Genesis 1')),
+          reason: locale.languageCode);
+    }
+  });
+
   testWidgets('every supported language loads', (tester) async {
     for (final locale in AppLocalizations.supportedLocales) {
       late AppLocalizations l10n;

@@ -10,6 +10,7 @@ import 'commentary_hub_screen.dart';
 import '../../state/commentary_provider.dart';
 import '../../theme/reading_tokens.dart';
 import '../../l10n/l10n.dart';
+import '../../data/localized_book_names.dart';
 import '../../theme/design_tokens.dart';
 
 class VotdArchiveScreen extends ConsumerWidget {
@@ -242,7 +243,7 @@ class VotdArchiveScreen extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 12),
                                   Text(
-                                    reference,
+                                    context.referenceInLocale(reference),
                                     style: theme.textTheme.titleLarge?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: tokens.readingInk,

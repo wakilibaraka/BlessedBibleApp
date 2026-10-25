@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/devotional_story.dart';
+import '../../models/share_content.dart';
 import '../../state/devotional_provider.dart';
-import '../widgets/verse_link_text.dart' show splitBoldSegments;
+import '../widgets/share_sheet.dart';
+import '../widgets/prose_text.dart';
+import '../../state/typography_provider.dart';
+import '../../data/localized_book_names.dart';
+import '../../utils/prose.dart';
 import '../../theme/app_colors.dart';
 import 'bible_stories_screen.dart';
 import '../../l10n/l10n.dart';
@@ -72,9 +77,32 @@ class _BibleStoryReaderScreenState
     });
   }
 
+  /// Share this story as text, an image card or a PDF with the full
+  /// retelling, key verse and reference.
+  void _shareStory() {
+    showShareSheet(
+      context: context,
+      content: ShareContent.story(
+        title: _story.title,
+        body:
+            _story.retelling.trim().isNotEmpty ? _story.retelling : _story.text,
+        reference: _story.ref,
+        eyebrow: context.l10n.storiesTitle.toUpperCase(),
+        keyVerse: _story.keyVerse,
+        keyVerseRef: _story.keyVerseRef,
+        source: _story.book,
+        artworkPath: _story.plateSlug != null
+            ? 'assets/devotional/art/${_story.plateSlug}.webp'
+            : null,
+        imageFilename: 'story-${shareSlug(_story.title)}',
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final typography = ref.watch(typographyProvider);
     final favorites = ref.watch(devotionalFavoritesProvider);
     final isFavorite = favorites.contains(_story.id);
     final positionAsync = ref.watch(_positionProvider(_story.id));
@@ -117,6 +145,11 @@ class _BibleStoryReaderScreenState
                   ref.read(devotionalReadProvider.notifier).markRead(_story.id);
                   setState(() => _markedRead = true);
                 },
+              ),
+              IconButton(
+                icon: const Icon(Icons.ios_share_rounded),
+                tooltip: context.l10n.commonShare,
+                onPressed: _shareStory,
               ),
               const SizedBox(width: 4),
             ],
@@ -178,7 +211,11 @@ class _BibleStoryReaderScreenState
                   if (position != null) ...[
                     const SizedBox(height: 6),
                     Text(
-                      position,
+                      context.l10n.storiesPosition(
+                        position.index,
+                        position.total,
+                        context.bookNameInLocale(position.book),
+                      ),
                       style: theme.textTheme.labelSmall?.copyWith(
                         color:
                             theme.colorScheme.onSurface.withValues(alpha: 0.5),
@@ -211,7 +248,7 @@ class _BibleStoryReaderScreenState
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '"${_story.keyVerse}"',
+                            '“${normalizeProse(_story.keyVerse)}”',
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontFamily: 'Cormorant Garamond',
                               fontStyle: FontStyle.italic,
@@ -224,7 +261,7 @@ class _BibleStoryReaderScreenState
                     ),
                   ],
                   const SizedBox(height: 24),
-                  _PassageText(text: _story.text),
+                  _PassageText(text: _story.text, typography: typography),
                   const SizedBox(height: 28),
                   Row(
                     children: [
@@ -252,11 +289,16 @@ class _BibleStoryReaderScreenState
                     ],
                   ),
                   const SizedBox(height: 20),
-                  Text(
-                    _story.retelling,
-                    style: theme.textTheme.bodyLarge?.copyWith(
+                  ProseText(
+                    text: _story.retelling,
+                    typography: typography,
+                    accent: theme.primaryColor,
+                    paragraphGap: 20,
+                    baseStyle: theme.textTheme.bodyLarge?.copyWith(
                       fontFamily: 'Source Serif 4',
+                      fontSize: typography.fontSize,
                       height: 1.75,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                   if (_story.plateCaption != null) ...[
@@ -328,55 +370,51 @@ class _BibleStoryReaderScreenState
   }
 }
 
-/// KJV passage rendered verse-by-verse with numbered superscripts where the
-/// source provides leading verse numbers.
+/// KJV passage rendered as flowing prose.
+///
+/// The content packs arrive hard-wrapped at ~80 characters, so splitting on
+/// newlines used to break sentences into separate paragraphs. [proseParagraphs]
+/// rejoins the wraps and keeps blank lines as real paragraph breaks.
 class _PassageText extends StatelessWidget {
   final String text;
+  final TypographyState typography;
 
-  const _PassageText({required this.text});
+  const _PassageText({required this.text, required this.typography});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final lines =
-        text.split('\n').map((l) => l.trim()).where((l) => l.isNotEmpty);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (final line in lines)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            // Shared bold parser: hides ** markers, bolds the text.
-            child: Text.rich(
-              TextSpan(
-                children: [
-                  for (final segment in splitBoldSegments(line))
-                    TextSpan(
-                      text: segment.text,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontFamily: 'Cormorant Garamond',
-                        fontSize: TypeScale.titleLarge,
-                        height: 1.55,
-                        fontWeight: segment.bold ? FontWeight.bold : null,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-      ],
+    return ProseText(
+      text: text,
+      typography: typography,
+      accent: theme.primaryColor,
+      paragraphGap: 12,
+      baseStyle: theme.textTheme.bodyLarge?.copyWith(
+        fontFamily: 'Cormorant Garamond',
+        fontSize: TypeScale.titleLarge,
+        height: 1.62,
+        color: theme.colorScheme.onSurface,
+      ),
     );
   }
 }
 
-/// Resolves "N of total in book" for the current story.
+/// Where a story sits inside its book: index, how many stories that book has
+/// and the canonical book name. The reader formats and localizes the line so
+/// no English wording is baked into the data layer.
+typedef StoryPosition = ({int index, int total, String book});
+
 final _positionProvider =
-    FutureProvider.family<String?, String>((ref, id) async {
+    FutureProvider.family<StoryPosition?, String>((ref, id) async {
   final service = ref.watch(devotionalServiceProvider);
   final all = await service.loadAllStoryRefs();
   final i = all.indexWhere((s) => s.id == id);
   if (i == -1) return null;
   final story = all[i];
   final bookStories = all.where((s) => s.prefix == story.prefix).length;
-  return '${story.indexInBook + 1} of $bookStories in ${story.book}';
+  return (
+    index: story.indexInBook + 1,
+    total: bookStories,
+    book: story.book,
+  );
 });

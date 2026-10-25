@@ -250,7 +250,9 @@ class _ReadingPlanDetailV2ScreenState
                   ],
                 )
               : _BeginPanel(
-                  dayLabel: planDayLabel(plan, 1),
+                  dayLabel: planDayLabel(plan, 1,
+                      languageCode:
+                          Localizations.localeOf(context).languageCode),
                   passages: plan.planData.first.passages.length,
                   start: start,
                   onStart: () => _start(start),
@@ -327,7 +329,9 @@ class _ReadingPlanDetailV2ScreenState
                             final date = dateMap[day];
                             return _DayRow(
                               day: day,
-                              summary: planDayLabel(plan, day),
+                              summary: planDayLabel(plan, day,
+                                  languageCode: Localizations.localeOf(context)
+                                      .languageCode),
                               dateLabel: date == null
                                   ? ''
                                   : DateFormat.MMMEd(_locale).format(date),

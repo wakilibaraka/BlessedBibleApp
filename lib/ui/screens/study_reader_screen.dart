@@ -21,6 +21,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/bible_model.dart';
+import '../../data/localized_book_names.dart';
 import '../../state/bible_provider.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/translation_provider.dart';
@@ -428,7 +429,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
     Widget finishCard() {
       final day = widget.payload.dayNum!;
       final next = planState != null && day < planState.planData.length
-          ? '${context.l10n.plansDayN(day + 1)} · ${planDayLabel(planState, day + 1)}'
+          ? '${context.l10n.plansDayN(day + 1)} · ${planDayLabel(planState, day + 1, languageCode: Localizations.localeOf(context).languageCode)}'
           : null;
       return Container(
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
@@ -511,7 +512,8 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              context.l10n.planFlowUpNext(_passages[_passageIndex + 1].label),
+              context.l10n.planFlowUpNext(context
+                  .referenceInLocale(_passages[_passageIndex + 1].label)),
               textAlign: TextAlign.center,
               style: theme.textTheme.labelMedium?.copyWith(
                 color: palette.textMuted,
@@ -622,7 +624,8 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
-                                        passage.label,
+                                        context
+                                            .referenceInLocale(passage.label),
                                         style: TextStyle(
                                           fontFamily: 'EB Garamond',
                                           fontSize: TypeScale.title,

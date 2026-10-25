@@ -12,6 +12,7 @@ import 'package:the_blessed_bible/data/local_storage/preferences_service.dart';
 import 'package:the_blessed_bible/theme/app_theme.dart';
 import 'package:the_blessed_bible/ui/screens/study_screen_v2.dart';
 import 'package:the_blessed_bible/ui/widgets/account_menu.dart';
+import 'package:the_blessed_bible/ui/widgets/study_v2_widgets.dart';
 
 void main() {
   Future<void> pumpHub(WidgetTester tester, {FakeAuthGateway? gateway}) async {
@@ -51,6 +52,61 @@ void main() {
     // Plans widget with no active plan: pitch + "Pick a plan".
     expect(find.text('Read the Bible with a plan'), findsOneWidget);
     expect(find.text('Pick a plan'), findsOneWidget);
+  });
+
+  // Symmetry: Full cards own the whole content width, Half cards split it
+  // evenly, paired halves share top edge and height, and every row in the
+  // column sits on the same 12dp rhythm. Cards that shrink-wrap to their
+  // text used to break this (Full rendering narrower than Full).
+  testWidgets('hub cards keep one width system top to bottom', (tester) async {
+    // Phone-sized viewport: 360dp wide, so card widths are stable numbers.
+    tester.view.physicalSize = const Size(1080, 2340);
+    tester.view.devicePixelRatio = 2.75;
+    addTearDown(tester.view.reset);
+    await pumpHub(tester);
+
+    final cards = <RenderBox>[
+      for (final e in find.byType(V2Card).evaluate())
+        e.renderObject! as RenderBox,
+    ];
+    expect(cards, isNotEmpty);
+
+    Offset origin(RenderBox b) => b.localToGlobal(Offset.zero);
+    final contentLeft = origin(cards.first).dx;
+    final contentRight = contentLeft + cards.first.size.width;
+
+    // Group cards by row (same top edge).
+    final rows = <double, List<RenderBox>>{};
+    for (final c in cards) {
+      rows.putIfAbsent(origin(c).dy, () => []).add(c);
+    }
+
+    for (final entry in rows.entries) {
+      final row = entry.value;
+      final widths = {for (final c in row) c.size.width.roundToDouble()};
+      expect(widths.length, 1,
+          reason: 'row at y=${entry.key} has unequal card widths $widths');
+      final sorted = [for (final c in row) origin(c).dx]..sort();
+      expect(sorted.first, moreOrLessEquals(contentLeft, epsilon: 0.5),
+          reason: 'row at y=${entry.key} does not start at the content edge');
+      final last = row.firstWhere((c) => origin(c).dx == sorted.last);
+      expect(origin(last).dx + last.size.width,
+          moreOrLessEquals(contentRight, epsilon: 0.5),
+          reason: 'row at y=${entry.key} does not reach the content edge');
+    }
+
+    // Uniform vertical rhythm: the gaps between rows are all equal.
+    final tops = rows.keys.toList()..sort();
+    final gaps = <double>[];
+    for (var i = 1; i < tops.length; i++) {
+      final above = rows[tops[i - 1]]!;
+      final bottom = origin(above.first).dy + above.first.size.height;
+      gaps.add(tops[i] - bottom);
+    }
+    for (final g in gaps) {
+      expect(g, moreOrLessEquals(gaps.first, epsilon: 0.5),
+          reason: 'uneven row gaps: $gaps');
+    }
   });
 
   testWidgets('avatar opens the account menu with data rows', (tester) async {

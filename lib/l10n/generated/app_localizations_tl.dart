@@ -74,6 +74,9 @@ class AppLocalizationsTl extends AppLocalizations {
   String get commonClose => 'Isara';
 
   @override
+  String get commonClear => 'Burahin';
+
+  @override
   String get commonOk => 'OK';
 
   @override
@@ -1181,6 +1184,11 @@ class AppLocalizationsTl extends AppLocalizations {
       'Basahin ang komentaryo sa kabanatang ito';
 
   @override
+  String readEndOfChapter(String reference) {
+    return '· Katapusan ng $reference ·';
+  }
+
+  @override
   String get readPreviousChapter => '‹ Nakaraan';
 
   @override
@@ -1683,6 +1691,19 @@ class AppLocalizationsTl extends AppLocalizations {
   @override
   String get settingsVerseActionStyleSubtitle =>
       'Sheet (siksik) o Classic (mataas) kapag pumili ng talata; inilalagay ng Radial ang long-press menu sa bilog';
+
+  @override
+  String get settingsCommentaryStyle => 'Itsura ng komentaryo';
+
+  @override
+  String get settingsCommentaryStyleSubtitle =>
+      'Layout ng mga pahina ng komentaryo. Pinapanatili ng Klasiko ang dating disenyo.';
+
+  @override
+  String get settingsCommentaryRefined => 'Pinino';
+
+  @override
+  String get settingsCommentaryClassic => 'Klasiko';
 
   @override
   String get settingsActionSheet => 'Sheet';
@@ -2665,6 +2686,80 @@ class AppLocalizationsTl extends AppLocalizations {
   String get shareImageCard => 'Ibahagi ang image card';
 
   @override
+  String get shareModeText => 'Teksto';
+
+  @override
+  String get shareModeImage => 'Larawan';
+
+  @override
+  String get shareModePdf => 'PDF';
+
+  @override
+  String get shareFormat => 'Format';
+
+  @override
+  String get shareFlavorPlain => 'Simpleng teksto';
+
+  @override
+  String get shareFlavorWhatsapp => 'WhatsApp';
+
+  @override
+  String get shareFlavorPlainHint =>
+      'Walang markup — dumidikit nang malinis kahit saan.';
+
+  @override
+  String get shareFlavorWhatsappHint =>
+      'Makapal na pamagat at italikong sanggunian, inaayos ng WhatsApp.';
+
+  @override
+  String get shareIncludeReference => 'Isama ang sanggunian';
+
+  @override
+  String get shareFormatPortrait => 'Patayo';
+
+  @override
+  String get shareFormatSquare => 'Parisukat';
+
+  @override
+  String get shareFormatStory => 'Story';
+
+  @override
+  String get shareStyle => 'Estilo';
+
+  @override
+  String get sharePdfTitle => 'PDF na handa sa paglimbag';
+
+  @override
+  String get sharePdfBody =>
+      'Ang buong teksto sa nakaayos na pahina, kasama ang sanggunian at pinagmulan. Handa nang basahin, i-print o ipadala.';
+
+  @override
+  String get shareSharePdf => 'Ibahagi ang PDF';
+
+  @override
+  String get shareBuildingPdf => 'Ginagawa ang PDF…';
+
+  @override
+  String get shareFailed => 'Hindi naibahagi — pakisubukang muli.';
+
+  @override
+  String get shareSaveImage => 'I-save sa gallery';
+
+  @override
+  String get shareSavedToGallery => 'Na-save sa iyong gallery';
+
+  @override
+  String get shareGalleryDenied =>
+      'Payagan ang access sa mga larawan para makapag-save.';
+
+  @override
+  String get shareSaveFailed =>
+      'Hindi na-save ang larawan — pakisubukang muli.';
+
+  @override
+  String get sharePdfPreviewNote => 'Preview ng pahina 1 · A4';
+
+  @override
   String get spaceStorageTitle => 'Storage';
 
   @override
@@ -3056,21 +3151,50 @@ class AppLocalizationsTl extends AppLocalizations {
   String get studyNoCommentaryYet => 'Wala pang komentaryo.';
 
   @override
-  String studyNoBooksMatch(String query) {
-    return 'Walang aklat na tugma sa \"$query\".';
+  String get studyCommentaryShelf => 'Ang istante';
+
+  @override
+  String get studyCommentaryByBook => 'Ayon sa aklat';
+
+  @override
+  String studyCommentaryVolumes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tomo',
+      one: '1 tomo',
+    );
+    return '$_temp0';
   }
 
   @override
-  String studySearchBooksCount(int count) {
-    return 'Maghanap sa $count aklat…';
+  String studyCommentaryEntries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count talâ',
+      one: '1 talâ',
+    );
+    return '$_temp0';
   }
 
   @override
-  String get studyClassicSources => 'Mga klasikong sanggunian';
+  String studyCommentaryChapters(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count kabanata',
+      one: '1 kabanata',
+    );
+    return '$_temp0';
+  }
 
   @override
-  String studyBookAuthorChapters(String author, int count) {
-    return '$author · $count kab.';
+  String get studyCommentarySearchHint => 'Maghanap ng tomo at aklat';
+
+  @override
+  String studyCommentaryNoMatch(String query) {
+    return 'Walang tugma sa \"$query\".';
   }
 
   @override
@@ -3263,6 +3387,11 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get storiesNext => 'Susunod na kuwento';
+
+  @override
+  String storiesPosition(int index, int total, String book) {
+    return '$index ng $total sa $book';
+  }
 
   @override
   String get studyDictionarySearchHint => 'Maghanap sa 3,400+ salita…';

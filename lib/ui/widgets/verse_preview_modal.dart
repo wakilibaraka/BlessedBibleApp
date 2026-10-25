@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/design_tokens.dart';
 import '../../l10n/l10n.dart';
+import '../../data/localized_book_names.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/bible_provider.dart';
 import '../../state/typography_provider.dart';
@@ -101,7 +102,7 @@ class VersePreviewModal extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      reference,
+                      context.referenceInLocale(reference),
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: theme.primaryColor,
                         fontWeight: FontWeight.bold,

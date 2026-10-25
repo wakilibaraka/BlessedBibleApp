@@ -126,6 +126,15 @@ class PreferencesService {
     await prefs.setString('share_card_style', json);
   }
 
+  static const String _shareFlavorKey = 'share_flavor';
+
+  /// Last chosen share-text flavor: `plain` or `whatsapp`.
+  String? getShareFlavor() => prefs.getString(_shareFlavorKey);
+
+  Future<void> saveShareFlavor(String flavor) async {
+    await prefs.setString(_shareFlavorKey, flavor);
+  }
+
   void saveBookmarks(List<String> bookmarks) {
     prefs.setStringList(_bookmarksKey, bookmarks);
   }

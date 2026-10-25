@@ -220,6 +220,12 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get commonClose;
 
+  /// No description provided for @commonClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get commonClear;
+
   /// No description provided for @commonOk.
   ///
   /// In en, this message translates to:
@@ -1864,6 +1870,12 @@ abstract class AppLocalizations {
   /// **'Read commentary on this chapter'**
   String get readChapterCommentary;
 
+  /// Closes a chapter in the reader. {reference} is an already localized book name and chapter, e.g. "Genèse 1".
+  ///
+  /// In en, this message translates to:
+  /// **'· End of {reference} ·'**
+  String readEndOfChapter(String reference);
+
   /// No description provided for @readPreviousChapter.
   ///
   /// In en, this message translates to:
@@ -2763,6 +2775,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sheet (compact) or Classic (tall dock) when verses are selected; Radial moves the long-press menu to a circular ring'**
   String get settingsVerseActionStyleSubtitle;
+
+  /// No description provided for @settingsCommentaryStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Commentary look'**
+  String get settingsCommentaryStyle;
+
+  /// No description provided for @settingsCommentaryStyleSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How commentary pages are laid out. Classic keeps the previous design.'**
+  String get settingsCommentaryStyleSubtitle;
+
+  /// No description provided for @settingsCommentaryRefined.
+  ///
+  /// In en, this message translates to:
+  /// **'Refined'**
+  String get settingsCommentaryRefined;
+
+  /// No description provided for @settingsCommentaryClassic.
+  ///
+  /// In en, this message translates to:
+  /// **'Classic'**
+  String get settingsCommentaryClassic;
 
   /// No description provided for @settingsActionSheet.
   ///
@@ -4594,6 +4630,144 @@ abstract class AppLocalizations {
   /// **'Share image card'**
   String get shareImageCard;
 
+  /// No description provided for @shareModeText.
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get shareModeText;
+
+  /// No description provided for @shareModeImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Image'**
+  String get shareModeImage;
+
+  /// No description provided for @shareModePdf.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF'**
+  String get shareModePdf;
+
+  /// No description provided for @shareFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Format'**
+  String get shareFormat;
+
+  /// No description provided for @shareFlavorPlain.
+  ///
+  /// In en, this message translates to:
+  /// **'Plain text'**
+  String get shareFlavorPlain;
+
+  /// No description provided for @shareFlavorWhatsapp.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp'**
+  String get shareFlavorWhatsapp;
+
+  /// No description provided for @shareFlavorPlainHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No markup — pastes cleanly anywhere.'**
+  String get shareFlavorPlainHint;
+
+  /// No description provided for @shareFlavorWhatsappHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Bold headings and italic references, styled by WhatsApp.'**
+  String get shareFlavorWhatsappHint;
+
+  /// No description provided for @shareIncludeReference.
+  ///
+  /// In en, this message translates to:
+  /// **'Include reference'**
+  String get shareIncludeReference;
+
+  /// No description provided for @shareFormatPortrait.
+  ///
+  /// In en, this message translates to:
+  /// **'Portrait'**
+  String get shareFormatPortrait;
+
+  /// No description provided for @shareFormatSquare.
+  ///
+  /// In en, this message translates to:
+  /// **'Square'**
+  String get shareFormatSquare;
+
+  /// No description provided for @shareFormatStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Story'**
+  String get shareFormatStory;
+
+  /// No description provided for @shareStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Style'**
+  String get shareStyle;
+
+  /// No description provided for @sharePdfTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Print-ready PDF'**
+  String get sharePdfTitle;
+
+  /// No description provided for @sharePdfBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The complete text on a typeset page, with the reference and source. Ready to read, print or send.'**
+  String get sharePdfBody;
+
+  /// No description provided for @shareSharePdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Share PDF'**
+  String get shareSharePdf;
+
+  /// No description provided for @shareBuildingPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Building PDF…'**
+  String get shareBuildingPdf;
+
+  /// No description provided for @shareFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t share — please try again.'**
+  String get shareFailed;
+
+  /// No description provided for @shareSaveImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to gallery'**
+  String get shareSaveImage;
+
+  /// No description provided for @shareSavedToGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to your gallery'**
+  String get shareSavedToGallery;
+
+  /// No description provided for @shareGalleryDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow photo access to save images.'**
+  String get shareGalleryDenied;
+
+  /// No description provided for @shareSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save the image — please try again.'**
+  String get shareSaveFailed;
+
+  /// No description provided for @sharePdfPreviewNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Page 1 preview · A4'**
+  String get sharePdfPreviewNote;
+
   /// No description provided for @spaceStorageTitle.
   ///
   /// In en, this message translates to:
@@ -5278,29 +5452,47 @@ abstract class AppLocalizations {
   /// **'No commentary available yet.'**
   String get studyNoCommentaryYet;
 
-  /// No description provided for @studyNoBooksMatch.
+  /// No description provided for @studyCommentaryShelf.
   ///
   /// In en, this message translates to:
-  /// **'No books match \"{query}\".'**
-  String studyNoBooksMatch(String query);
+  /// **'The shelf'**
+  String get studyCommentaryShelf;
 
-  /// No description provided for @studySearchBooksCount.
+  /// No description provided for @studyCommentaryByBook.
   ///
   /// In en, this message translates to:
-  /// **'Search {count} books…'**
-  String studySearchBooksCount(int count);
+  /// **'By book'**
+  String get studyCommentaryByBook;
 
-  /// No description provided for @studyClassicSources.
+  /// No description provided for @studyCommentaryVolumes.
   ///
   /// In en, this message translates to:
-  /// **'Classic sources'**
-  String get studyClassicSources;
+  /// **'{count, plural, =1{1 volume} other{{count} volumes}}'**
+  String studyCommentaryVolumes(int count);
 
-  /// No description provided for @studyBookAuthorChapters.
+  /// No description provided for @studyCommentaryEntries.
   ///
   /// In en, this message translates to:
-  /// **'{author} · {count} ch'**
-  String studyBookAuthorChapters(String author, int count);
+  /// **'{count, plural, =1{1 entry} other{{count} entries}}'**
+  String studyCommentaryEntries(int count);
+
+  /// No description provided for @studyCommentaryChapters.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 chapter} other{{count} chapters}}'**
+  String studyCommentaryChapters(int count);
+
+  /// No description provided for @studyCommentarySearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search volumes and books'**
+  String get studyCommentarySearchHint;
+
+  /// No description provided for @studyCommentaryNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing matches \"{query}\".'**
+  String studyCommentaryNoMatch(String query);
 
   /// No description provided for @studyReadingRef.
   ///
@@ -5643,6 +5835,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Next story'**
   String get storiesNext;
+
+  /// Where the current Bible story sits in its book, e.g. "3 of 12 in Daniel". {book} is already localized.
+  ///
+  /// In en, this message translates to:
+  /// **'{index} of {total} in {book}'**
+  String storiesPosition(int index, int total, String book);
 
   /// No description provided for @studyDictionarySearchHint.
   ///

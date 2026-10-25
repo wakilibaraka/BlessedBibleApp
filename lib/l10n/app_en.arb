@@ -26,6 +26,7 @@
   "commonSave": "Save",
   "commonDelete": "Delete",
   "commonClose": "Close",
+  "commonClear": "Clear",
   "commonOk": "OK",
   "commonRetry": "Try again",
   "commonShare": "Share",
@@ -741,6 +742,15 @@
   "readCommentaryHint": "Tap the bulb icon next to a verse for commentary",
   "readPassageNotFound": "Passage not found.",
   "readChapterCommentary": "Read commentary on this chapter",
+  "readEndOfChapter": "· End of {reference} ·",
+  "@readEndOfChapter": {
+    "description": "Closes a chapter in the reader. {reference} is an already localized book name and chapter, e.g. \"Genèse 1\".",
+    "placeholders": {
+      "reference": {
+        "type": "String"
+      }
+    }
+  },
   "readPreviousChapter": "‹ Previous",
   "readNextChapter": "Next ›",
   "readPlanDay": "Reading Plan · Day {day}",
@@ -978,6 +988,10 @@
   "settingsTranslationChipsSubtitle": "Adds a compact translation chip row to view saved verses in other translations",
   "settingsVerseActionStyle": "Verse action style",
   "settingsVerseActionStyleSubtitle": "Sheet (compact) or Classic (tall dock) when verses are selected; Radial moves the long-press menu to a circular ring",
+  "settingsCommentaryStyle": "Commentary look",
+  "settingsCommentaryStyleSubtitle": "How commentary pages are laid out. Classic keeps the previous design.",
+  "settingsCommentaryRefined": "Refined",
+  "settingsCommentaryClassic": "Classic",
   "settingsActionSheet": "Sheet",
   "settingsActionClassic": "Classic",
   "settingsActionMinimal": "Minimal",
@@ -1383,6 +1397,29 @@
   "shareImage": "Share image",
   "shareText": "Share text",
   "shareImageCard": "Share image card",
+  "shareModeText": "Text",
+  "shareModeImage": "Image",
+  "shareModePdf": "PDF",
+  "shareFormat": "Format",
+  "shareFlavorPlain": "Plain text",
+  "shareFlavorWhatsapp": "WhatsApp",
+  "shareFlavorPlainHint": "No markup — pastes cleanly anywhere.",
+  "shareFlavorWhatsappHint": "Bold headings and italic references, styled by WhatsApp.",
+  "shareIncludeReference": "Include reference",
+  "shareFormatPortrait": "Portrait",
+  "shareFormatSquare": "Square",
+  "shareFormatStory": "Story",
+  "shareStyle": "Style",
+  "sharePdfTitle": "Print-ready PDF",
+  "sharePdfBody": "The complete text on a typeset page, with the reference and source. Ready to read, print or send.",
+  "shareSharePdf": "Share PDF",
+  "shareBuildingPdf": "Building PDF…",
+  "shareFailed": "Couldn't share — please try again.",
+  "shareSaveImage": "Save to gallery",
+  "shareSavedToGallery": "Saved to your gallery",
+  "shareGalleryDenied": "Allow photo access to save images.",
+  "shareSaveFailed": "Couldn't save the image — please try again.",
+  "sharePdfPreviewNote": "Page 1 preview · A4",
   "spaceStorageTitle": "Storage",
   "spaceClearCacheTitle": "Clear cache?",
   "spaceClearCacheBody": "Removes temporary files (generated share cards, thumbnails). Your notes, bookmarks, highlights and downloads are untouched.",
@@ -1611,31 +1648,38 @@
   "studyCommentaryLibrary": "Commentary library",
   "studyCommentaryLoadError": "Could not load commentary.",
   "studyNoCommentaryYet": "No commentary available yet.",
-  "studyNoBooksMatch": "No books match \"{query}\".",
-  "@studyNoBooksMatch": {
+  "studyCommentaryShelf": "The shelf",
+  "studyCommentaryByBook": "By book",
+  "studyCommentaryVolumes": "{count, plural, =1{1 volume} other{{count} volumes}}",
+  "@studyCommentaryVolumes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "studyCommentaryEntries": "{count, plural, =1{1 entry} other{{count} entries}}",
+  "@studyCommentaryEntries": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "studyCommentaryChapters": "{count, plural, =1{1 chapter} other{{count} chapters}}",
+  "@studyCommentaryChapters": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "studyCommentarySearchHint": "Search volumes and books",
+  "studyCommentaryNoMatch": "Nothing matches \"{query}\".",
+  "@studyCommentaryNoMatch": {
     "placeholders": {
       "query": {
         "type": "String"
-      }
-    }
-  },
-  "studySearchBooksCount": "Search {count} books…",
-  "@studySearchBooksCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "studyClassicSources": "Classic sources",
-  "studyBookAuthorChapters": "{author} · {count} ch",
-  "@studyBookAuthorChapters": {
-    "placeholders": {
-      "author": {
-        "type": "String"
-      },
-      "count": {
-        "type": "int"
       }
     }
   },
@@ -1748,6 +1792,21 @@
   },
   "storiesPrevious": "Previous story",
   "storiesNext": "Next story",
+  "storiesPosition": "{index} of {total} in {book}",
+  "@storiesPosition": {
+    "description": "Where the current Bible story sits in its book, e.g. \"3 of 12 in Daniel\". {book} is already localized.",
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "book": {
+        "type": "String"
+      }
+    }
+  },
   "studyDictionarySearchHint": "Search 3,400+ words…",
   "studyDictionarySavedFilter": "★ Saved",
   "studyNoHeadwords": "No headwords found.",

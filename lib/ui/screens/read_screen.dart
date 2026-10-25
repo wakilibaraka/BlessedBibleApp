@@ -10,6 +10,7 @@ import '../sheets/appearance_settings_sheet.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../l10n/l10n.dart';
+import '../../data/localized_book_names.dart';
 import '../../theme/app_colors.dart';
 
 import 'package:flutter/rendering.dart';
@@ -40,8 +41,9 @@ import '../../state/most_read_provider.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../data/models/translation_model.dart';
 import '../../state/hints_provider.dart';
+import '../../models/share_content.dart';
 import '../../services/share_service.dart';
-import '../widgets/share_card.dart';
+import '../widgets/share_sheet.dart';
 import '../widgets/radial_action_menu.dart';
 import '../widgets/cross_references_sheet.dart';
 import 'notes_list_screen.dart';
@@ -483,16 +485,28 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     ref.read(readSelectionProvider.notifier).clear();
   }
 
+  /// The page that holds [loc]'s chapter. The book *name* wins when the two
+  /// halves of the location disagree, so a stale abbreviation can never open
+  /// a different book's chapter (the bug behind "tap to read in context"
+  /// landing on the wrong book).
+  int _pageIndexFor(ReadLocationState loc, List<FlatChapter> flatChapters) {
+    final name = loc.bookName.toLowerCase();
+    final abbrev = loc.bookAbbrev.toLowerCase();
+    final byName = flatChapters.indexWhere((fc) =>
+        fc.book.name.toLowerCase() == name && fc.chapter.number == loc.chapter);
+    if (byName != -1) return byName;
+    return flatChapters.indexWhere((fc) =>
+        fc.book.abbreviation.toLowerCase() == abbrev &&
+        fc.chapter.number == loc.chapter);
+  }
+
   void _scrollToVerse(int verse, ReadLocationState loc) {
     void tryScroll(int retries) {
       if (!mounted) return;
       final flatChapters = ref.read(flatChaptersProvider);
       if (flatChapters.isEmpty) return;
 
-      final targetIndex = flatChapters.indexWhere((fc) =>
-          (fc.book.abbreviation.toLowerCase() == loc.bookAbbrev.toLowerCase() ||
-              fc.book.name.toLowerCase() == loc.bookName.toLowerCase()) &&
-          fc.chapter.number == loc.chapter);
+      final targetIndex = _pageIndexFor(loc, flatChapters);
       if (targetIndex != -1) {
         final controller = _itemScrollControllers[targetIndex];
         final listener = _itemPositionsListeners[targetIndex];
@@ -516,18 +530,12 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             // Overscroll hack has been removed since we no longer have massive bottom padding.
           }
 
-          // Highlight it faintly upon jumping
-          if (mounted) {
+          // Keep the jumped-to verse marked until the reader interacts
+          // (turns the page or taps a verse), so it is still visible when the
+          // jump crosses hundreds of pages.
+          if (mounted && _navigatedVerseIndex != verse - 1) {
             setState(() {
               _navigatedVerseIndex = verse - 1;
-            });
-            // Clear navigated verse after a short delay so the highlight fades out
-            Future.delayed(const Duration(seconds: 2), () {
-              if (mounted) {
-                setState(() {
-                  _navigatedVerseIndex = null;
-                });
-              }
             });
           }
         } else if (retries < 20) {
@@ -701,7 +709,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 160),
               child: Text(
-                '$currentBookName $currentChapter',
+                '${context.bookNameInLocale(currentBookName)} $currentChapter',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.titleSmall?.copyWith(
@@ -871,10 +879,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final loc = ref.watch(readLocationProvider);
 
     if (flatChapters.isNotEmpty) {
-      final targetIndex = flatChapters.indexWhere((fc) =>
-          (fc.book.abbreviation.toLowerCase() == loc.bookAbbrev.toLowerCase() ||
-              fc.book.name.toLowerCase() == loc.bookName.toLowerCase()) &&
-          fc.chapter.number == loc.chapter);
+      final targetIndex = _pageIndexFor(loc, flatChapters);
       final safeTarget = targetIndex != -1 ? targetIndex : 0;
       if (!_hasInitialJumped) {
         _hasInitialJumped = true;
@@ -902,11 +907,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         if (flatChapters.isNotEmpty && _hasInitialJumped) {
-          final targetIndex = flatChapters.indexWhere((fc) =>
-              (fc.book.abbreviation.toLowerCase() ==
-                      next.bookAbbrev.toLowerCase() ||
-                  fc.book.name.toLowerCase() == next.bookName.toLowerCase()) &&
-              fc.chapter.number == next.chapter);
+          final targetIndex = _pageIndexFor(next, flatChapters);
           if (targetIndex != -1 && _pageController.hasClients) {
             final currentPage = _pageController.page?.round() ?? 0;
             if (currentPage != targetIndex) {
@@ -1686,9 +1687,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                                 right: 12.0),
                                                                             decoration:
                                                                                 BoxDecoration(
-                                                                              color: isSelected ? (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : theme.primaryColor.withValues(alpha: 0.15)) : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.15) : (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : Colors.transparent)),
+                                                                              color: isSelected ? (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : theme.primaryColor.withValues(alpha: 0.15)) : (_navigatedVerseIndex == index ? theme.primaryColor.withValues(alpha: 0.22) : (highlightColor != null ? highlightColor.withValues(alpha: 0.35) : Colors.transparent)),
                                                                               borderRadius: BorderRadius.circular(Radii.md),
-                                                                              border: (isSelected && highlightColor != null) ? Border.all(color: theme.primaryColor.withValues(alpha: 0.5), width: 1.5) : Border.all(color: Colors.transparent, width: 1.5),
+                                                                              border: (isSelected || _navigatedVerseIndex == index) ? Border.all(color: theme.primaryColor.withValues(alpha: 0.5), width: 1.5) : Border.all(color: Colors.transparent, width: 1.5),
                                                                             ),
                                                                             child:
                                                                                 verseWidget,
@@ -2710,7 +2711,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
-                  '· End of ${fc.book.name} ${fc.chapter.number} ·',
+                  context.l10n.readEndOfChapter(
+                      '${context.bookNameInLocale(fc.book.name)} '
+                      '${fc.chapter.number}'),
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontFamily: 'Georgia',
                     fontStyle: FontStyle.italic,
@@ -3366,8 +3369,16 @@ class VerseActionLogic {
     ];
   }
 
-  static Future<void> handleCopy(BuildContext context, WidgetRef ref,
-      String bookName, int chapterNum, List<int> targetVerses) async {
+  /// One verse payload for copy, share and the share sheet, so all three
+  /// show exactly the same text and reference.
+  static Future<ShareContent> verseShareContent(
+    WidgetRef ref,
+    String bookName,
+    int chapterNum,
+    List<int> targetVerses, {
+    String eyebrow = '',
+    String? artworkPath,
+  }) async {
     final sorted = targetVerses.toList()..sort();
     final share = await ShareService.collectVerseShare(
       ref,
@@ -3376,16 +3387,25 @@ class VerseActionLogic {
       targetVerses: sorted,
       texts: primaryShareTexts(ref, bookName, chapterNum, sorted),
     );
-    final text = ShareService.formatVerse(
-      texts: share.texts,
+    return ShareContent.verse(
       reference: share.reference,
+      texts: share.texts,
       translationTag: share.tag,
+      eyebrow: eyebrow,
+      verseNumbers: sorted,
       secondaryTexts: share.secondaryTexts,
       secondaryReference: share.reference,
       secondaryTag: share.secondaryTag,
+      artworkPath: artworkPath,
     );
+  }
+
+  static Future<void> handleCopy(BuildContext context, WidgetRef ref,
+      String bookName, int chapterNum, List<int> targetVerses) async {
+    final content =
+        await verseShareContent(ref, bookName, chapterNum, targetVerses);
     if (!context.mounted) return;
-    await ShareService.copyText(context, text);
+    await ShareService.copyText(context, content.plain);
   }
 
   static void handleCommentary(
@@ -3407,76 +3427,28 @@ class VerseActionLogic {
 
   static Future<void> handleShare(BuildContext context, WidgetRef ref,
       String bookName, int chapterNum, List<int> targetVerses) async {
-    final sorted = targetVerses.toList()..sort();
-    final share = await ShareService.collectVerseShare(
-      ref,
-      bookName: bookName,
-      chapterNum: chapterNum,
-      targetVerses: sorted,
-      texts: primaryShareTexts(ref, bookName, chapterNum, sorted),
+    final content =
+        await verseShareContent(ref, bookName, chapterNum, targetVerses);
+    await ShareService.shareText(
+      body: content.whatsapp,
+      subject: content.reference,
     );
-    final text = ShareService.formatVerse(
-      texts: share.texts,
-      reference: share.reference,
-      translationTag: share.tag,
-      secondaryTexts: share.secondaryTexts,
-      secondaryReference: share.reference,
-      secondaryTag: share.secondaryTag,
-      whatsapp: true,
-    );
-    await ShareService.shareText(body: text);
   }
 
-  /// Verse share options sheet: copy / share text / image card.
+  /// Verse share sheet: copy, share text or image, with format controls.
   static Future<void> handleShareOptions(BuildContext context, WidgetRef ref,
       String bookName, int chapterNum, List<int> targetVerses) async {
-    final sorted = targetVerses.toList()..sort();
-    final share = await ShareService.collectVerseShare(
-      ref,
-      bookName: bookName,
-      chapterNum: chapterNum,
-      targetVerses: sorted,
-      texts: primaryShareTexts(ref, bookName, chapterNum, sorted),
-    );
-    if (!context.mounted) return;
-    final copyBody = ShareService.formatVerse(
-      texts: share.texts,
-      reference: share.reference,
-      translationTag: share.tag,
-      secondaryTexts: share.secondaryTexts,
-      secondaryReference: share.reference,
-      secondaryTag: share.secondaryTag,
-    );
-    final shareBody = ShareService.formatVerse(
-      texts: share.texts,
-      reference: share.reference,
-      translationTag: share.tag,
-      secondaryTexts: share.secondaryTexts,
-      secondaryReference: share.reference,
-      secondaryTag: share.secondaryTag,
-      whatsapp: true,
-    );
-    final slug = share.reference
-        .toLowerCase()
-        .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
-        .replaceAll(RegExp(r'^-|-$'), '');
     // Optional artwork backdrop: today's bundled Doré plate.
     final plate =
         await ref.read(devotionalServiceProvider).plateForDay(DateTime.now());
-    if (!context.mounted) return;
-    await showShareOptionsSheet(
-      context: context,
-      copyText: copyBody,
-      shareText: shareBody,
-      imageFilename: 'verse-$slug',
-      buildCard: (backdrop, style) => ShareCard.verse(
-        reference: share.reference,
-        body: share.texts.map(ShareService.cleanVerseText).join(' '),
-        translationTag: share.tag,
-        backdrop: backdrop,
-        style: style,
-        artworkPath: plate?.assetPath,
-      ),
+    final content = await verseShareContent(
+      ref,
+      bookName,
+      chapterNum,
+      targetVerses,
+      artworkPath: plate?.assetPath,
     );
+    if (!context.mounted) return;
+    await showShareSheet(context: context, content: content);
   }
 }

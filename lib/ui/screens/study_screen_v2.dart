@@ -379,21 +379,24 @@ class _StudyScreenV2State extends ConsumerState<StudyScreenV2> {
                     }
 
                     return Column(
+                      // Stretch so a card whose content has no Expanded/
+                      // Spacer still fills its row instead of collapsing to
+                      // its text width (Full = full width, always).
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         for (final row in rows)
                           if (row.length == 2)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: IntrinsicHeight(
-                                child: Row(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    Expanded(child: cardBox(row[0])),
-                                    const SizedBox(width: gap),
-                                    Expanded(child: cardBox(row[1])),
-                                  ],
-                                ),
+                            // The cards carry the bottom gap themselves, so
+                            // the row must not add a second one: every row
+                            // in the column keeps the same 12dp rhythm.
+                            IntrinsicHeight(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Expanded(child: cardBox(row[0])),
+                                  const SizedBox(width: gap),
+                                  Expanded(child: cardBox(row[1])),
+                                ],
                               ),
                             )
                           else

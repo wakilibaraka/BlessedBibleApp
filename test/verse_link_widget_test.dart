@@ -27,10 +27,13 @@ void main() {
       expect(segs.single.bold, isFalse);
     });
 
-    test('unmatched markers stay literal', () {
-      final segs = splitBoldSegments('A **lonely marker.');
+    test('stray double markers from OCR are dropped', () {
+      // The older content packs carry unmatched `**` runs from scanning;
+      // they should never surface mid-sentence. Single asterisks (footnote
+      // marks) are untouched.
+      final segs = splitBoldSegments('A **lonely marker and a * note.');
       expect(segs.length, 1);
-      expect(segs.single.text, 'A **lonely marker.');
+      expect(segs.single.text, 'A lonely marker and a * note.');
     });
   });
 

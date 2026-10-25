@@ -2,6 +2,7 @@ import 'dart:async';
 import '../../theme/design_tokens.dart';
 import 'package:flutter/material.dart';
 import '../../l10n/l10n.dart';
+import '../../data/localized_book_names.dart';
 import '../sheets/search_settings_sheet.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -320,8 +321,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       _buildFilterChip(
-                                        label: searchState.filterBook ??
-                                            context.l10n.searchAllBooks,
+                                        label: searchState.filterBook == null
+                                            ? context.l10n.searchAllBooks
+                                            : context.bookNameInLocale(
+                                                searchState.filterBook!),
                                         icon: Icons.menu_book_rounded,
                                         isActive:
                                             searchState.filterBook != null,
@@ -833,7 +836,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     void copy() {
       Clipboard.setData(ClipboardData(
           text:
-              '${result.title}\n${searchResultSnippet(result, context.l10n).replaceAll('...', '')}'));
+              '${context.referenceInLocale(result.title)}\n${searchResultSnippet(result, context.l10n).replaceAll('...', '')}'));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.l10n.searchCopied)),
       );
@@ -875,7 +878,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  result.title,
+                  context.referenceInLocale(result.title),
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),

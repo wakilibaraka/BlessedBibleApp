@@ -487,6 +487,38 @@
   "sw": "Paneli (fupi) au Kawaida (ndefu) ukichagua mistari; Mviringo huweka menyu ya kubonyeza kwa muda katika duara",
   "tl": "Sheet (siksik) o Classic (mataas) kapag pumili ng talata; inilalagay ng Radial ang long-press menu sa bilog"
  },
+ "settingsCommentaryStyle": {
+  "en": "Commentary look",
+  "fr": "Style du commentaire",
+  "it": "Stile del commento",
+  "ro": "Aspectul comentariului",
+  "sw": "Muonekano wa ufafanuzi",
+  "tl": "Itsura ng komentaryo"
+ },
+ "settingsCommentaryStyleSubtitle": {
+  "en": "How commentary pages are laid out. Classic keeps the previous design.",
+  "fr": "Mise en page des commentaires. Classique conserve l'ancien design.",
+  "it": "Impaginazione dei commenti. Classico mantiene il design precedente.",
+  "ro": "Aspectul paginilor de comentariu. Clasic păstrează designul anterior.",
+  "sw": "Mpangilio wa kurasa za ufafanuzi. Ya kawaida huhifadhi muundo wa awali.",
+  "tl": "Layout ng mga pahina ng komentaryo. Pinapanatili ng Klasiko ang dating disenyo."
+ },
+ "settingsCommentaryRefined": {
+  "en": "Refined",
+  "fr": "Raffiné",
+  "it": "Rifinito",
+  "ro": "Rafinat",
+  "sw": "Imeboreshwa",
+  "tl": "Pinino"
+ },
+ "settingsCommentaryClassic": {
+  "en": "Classic",
+  "fr": "Classique",
+  "it": "Classico",
+  "ro": "Clasic",
+  "sw": "Ya kawaida",
+  "tl": "Klasiko"
+ },
  "settingsActionSheet": {
   "en": "Sheet",
   "fr": "Panneau",

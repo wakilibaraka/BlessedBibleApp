@@ -749,58 +749,86 @@
   "sw": "Bado hakuna ufafanuzi.",
   "tl": "Wala pang komentaryo."
  },
- "studyNoBooksMatch": {
-  "en": "No books match \"{query}\".",
-  "fr": "Aucun livre ne correspond à « {query} ».",
-  "it": "Nessun libro corrisponde a \"{query}\".",
-  "ro": "Nicio carte nu corespunde cu „{query}”.",
-  "sw": "Hakuna kitabu kinacholingana na \"{query}\".",
-  "tl": "Walang aklat na tugma sa \"{query}\".",
+ "studyCommentaryShelf": {
+  "en": "The shelf",
+  "fr": "Le rayon",
+  "it": "Lo scaffale",
+  "ro": "Raftul",
+  "sw": "Rafu",
+  "tl": "Ang istante"
+ },
+ "studyCommentaryByBook": {
+  "en": "By book",
+  "fr": "Par livre",
+  "it": "Per libro",
+  "ro": "După carte",
+  "sw": "Kwa kitabu",
+  "tl": "Ayon sa aklat"
+ },
+ "studyCommentaryVolumes": {
+  "en": "{count, plural, =1{1 volume} other{{count} volumes}}",
+  "fr": "{count, plural, =1{1 volume} other{{count} volumes}}",
+  "it": "{count, plural, =1{1 volume} other{{count} volumi}}",
+  "ro": "{count, plural, =1{1 volum} few{{count} volume} other{{count} de volume}}",
+  "sw": "{count, plural, =1{Juzuu 1} other{Juzuu {count}}}",
+  "tl": "{count, plural, =1{1 tomo} other{{count} tomo}}",
+  "@": {
+   "placeholders": {
+    "count": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "studyCommentaryEntries": {
+  "en": "{count, plural, =1{1 entry} other{{count} entries}}",
+  "fr": "{count, plural, =1{1 entrée} other{{count} entrées}}",
+  "it": "{count, plural, =1{1 voce} other{{count} voci}}",
+  "ro": "{count, plural, =1{1 articol} few{{count} articole} other{{count} de articole}}",
+  "sw": "{count, plural, =1{Kipengele 1} other{Vipengele {count}}}",
+  "tl": "{count, plural, =1{1 talâ} other{{count} talâ}}",
+  "@": {
+   "placeholders": {
+    "count": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "studyCommentaryChapters": {
+  "en": "{count, plural, =1{1 chapter} other{{count} chapters}}",
+  "fr": "{count, plural, =1{1 chapitre} other{{count} chapitres}}",
+  "it": "{count, plural, =1{1 capitolo} other{{count} capitoli}}",
+  "ro": "{count, plural, =1{1 capitol} few{{count} capitole} other{{count} de capitole}}",
+  "sw": "{count, plural, =1{Sura 1} other{Sura {count}}}",
+  "tl": "{count, plural, =1{1 kabanata} other{{count} kabanata}}",
+  "@": {
+   "placeholders": {
+    "count": {
+     "type": "int"
+    }
+   }
+  }
+ },
+ "studyCommentarySearchHint": {
+  "en": "Search volumes and books",
+  "fr": "Rechercher volumes et livres",
+  "it": "Cerca volumi e libri",
+  "ro": "Caută volume și cărți",
+  "sw": "Tafuta juzuu na vitabu",
+  "tl": "Maghanap ng tomo at aklat"
+ },
+ "studyCommentaryNoMatch": {
+  "en": "Nothing matches \"{query}\".",
+  "fr": "Rien ne correspond à « {query} ».",
+  "it": "Nessuna corrispondenza per \"{query}\".",
+  "ro": "Nimic nu corespunde cu „{query}”.",
+  "sw": "Hakuna kinacholingana na \"{query}\".",
+  "tl": "Walang tugma sa \"{query}\".",
   "@": {
    "placeholders": {
     "query": {
      "type": "String"
-    }
-   }
-  }
- },
- "studySearchBooksCount": {
-  "en": "Search {count} books…",
-  "fr": "Rechercher parmi {count} livres…",
-  "it": "Cerca tra {count} libri…",
-  "ro": "Caută în {count} cărți…",
-  "sw": "Tafuta katika vitabu {count}…",
-  "tl": "Maghanap sa {count} aklat…",
-  "@": {
-   "placeholders": {
-    "count": {
-     "type": "int"
-    }
-   }
-  }
- },
- "studyClassicSources": {
-  "en": "Classic sources",
-  "fr": "Sources classiques",
-  "it": "Fonti classiche",
-  "ro": "Surse clasice",
-  "sw": "Vyanzo vya kale",
-  "tl": "Mga klasikong sanggunian"
- },
- "studyBookAuthorChapters": {
-  "en": "{author} · {count} ch",
-  "fr": "{author} · {count} chap.",
-  "it": "{author} · {count} cap.",
-  "ro": "{author} · {count} cap.",
-  "sw": "{author} · sura {count}",
-  "tl": "{author} · {count} kab.",
-  "@": {
-   "placeholders": {
-    "author": {
-     "type": "String"
-    },
-    "count": {
-     "type": "int"
     }
    }
   }
@@ -1312,6 +1340,28 @@
   "ro": "Povestirea următoare",
   "sw": "Hadithi inayofuata",
   "tl": "Susunod na kuwento"
+ },
+ "storiesPosition": {
+  "en": "{index} of {total} in {book}",
+  "fr": "{index} sur {total} dans {book}",
+  "it": "{index} di {total} in {book}",
+  "ro": "{index} din {total} în {book}",
+  "sw": "{index} kati ya {total} katika {book}",
+  "tl": "{index} ng {total} sa {book}",
+  "@": {
+   "description": "Where the current Bible story sits in its book, e.g. \"3 of 12 in Daniel\". {book} is already localized.",
+   "placeholders": {
+    "index": {
+     "type": "int"
+    },
+    "total": {
+     "type": "int"
+    },
+    "book": {
+     "type": "String"
+    }
+   }
+  }
  },
  "studyDictionarySearchHint": {
   "en": "Search 3,400+ words…",

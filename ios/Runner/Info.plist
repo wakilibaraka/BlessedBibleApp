@@ -35,6 +35,10 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Save verse and story images you create to your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Save verse and story images you create to your photo library.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

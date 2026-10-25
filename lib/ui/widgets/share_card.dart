@@ -1,17 +1,16 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import '../../l10n/l10n.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local_storage/preferences_service.dart';
+import '../../models/share_content.dart';
 import '../../services/share_service.dart';
 import '../../theme/design_tokens.dart';
 
-/// Shareable image cards (1080x1350, WhatsApp-Status-friendly 4:5).
+/// Shareable image cards. 1080 wide in every format, so the PNG stays crisp
+/// and consistent across WhatsApp status, chats and prints.
 ///
 /// Zero-bloat capture: no new packages — a [RepaintBoundary] around the
 /// card, [ShareService.shareImageFromBoundary], temp file only.
@@ -23,8 +22,37 @@ import '../../theme/design_tokens.dart';
 /// AA contrast in every theme.
 enum ShareCardBackdrop { dawn, dusk, artwork, gradient }
 
-/// Typography + alignment controls for the card, persisted as the default
-/// for new cards. Zero-size steps keep it to one tap each.
+/// Export shape: chat portrait, feed square, or full-screen story.
+enum ShareCardFormat {
+  /// 1080×1350 — the chat/feed default (4:5).
+  portrait(1080, 1350),
+
+  /// 1080×1080 — squares for feeds and group posts.
+  square(1080, 1080),
+
+  /// 1080×1920 — WhatsApp status and Instagram stories (9:16).
+  story(1080, 1920);
+
+  final double width;
+  final double height;
+
+  const ShareCardFormat(this.width, this.height);
+
+  double get aspectRatio => width / height;
+
+  /// Vertical breathing room, so the shorter square doesn't crowd.
+  EdgeInsets get padding => switch (this) {
+        ShareCardFormat.portrait =>
+          const EdgeInsets.symmetric(horizontal: 96, vertical: 110),
+        ShareCardFormat.square =>
+          const EdgeInsets.symmetric(horizontal: 90, vertical: 88),
+        ShareCardFormat.story =>
+          const EdgeInsets.symmetric(horizontal: 96, vertical: 168),
+      };
+}
+
+/// Typography, alignment and export-shape controls for the card, persisted
+/// as the default for new cards.
 @immutable
 class ShareCardStyle {
   /// App reading font family, or null for the theme default.
@@ -42,12 +70,16 @@ class ShareCardStyle {
   /// Left or centred passage.
   final TextAlign align;
 
+  /// Export shape.
+  final ShareCardFormat format;
+
   const ShareCardStyle({
     this.fontFamily,
     this.scale = 1.0,
     this.letterSpacing = 0,
     this.lineHeight = 1.45,
     this.align = TextAlign.left,
+    this.format = ShareCardFormat.portrait,
   });
 
   ShareCardStyle copyWith({
@@ -56,6 +88,7 @@ class ShareCardStyle {
     double? letterSpacing,
     double? lineHeight,
     TextAlign? align,
+    ShareCardFormat? format,
     bool clearFont = false,
   }) =>
       ShareCardStyle(
@@ -64,6 +97,7 @@ class ShareCardStyle {
         letterSpacing: letterSpacing ?? this.letterSpacing,
         lineHeight: lineHeight ?? this.lineHeight,
         align: align ?? this.align,
+        format: format ?? this.format,
       );
 
   static const defaults = ShareCardStyle();
@@ -98,6 +132,7 @@ class ShareCardStyleNotifier extends Notifier<ShareCardStyle> {
     if (raw == null || raw.isEmpty) return;
     try {
       final map = Map<String, dynamic>.from(jsonDecode(raw) as Map);
+      final formatName = map['format'] as String?;
       state = ShareCardStyle(
         fontFamily: map['font'] as String?,
         scale: (map['scale'] as num?)?.toDouble() ?? 1.0,
@@ -106,6 +141,10 @@ class ShareCardStyleNotifier extends Notifier<ShareCardStyle> {
         align: (map['align'] as String?) == 'center'
             ? TextAlign.center
             : TextAlign.left,
+        format: ShareCardFormat.values.firstWhere(
+          (f) => f.name == formatName,
+          orElse: () => ShareCardFormat.portrait,
+        ),
       );
     } catch (_) {
       state = ShareCardStyle.defaults;
@@ -121,6 +160,7 @@ class ShareCardStyleNotifier extends Notifier<ShareCardStyle> {
             'spacing': next.letterSpacing,
             'lineHeight': next.lineHeight,
             'align': next.align == TextAlign.center ? 'center' : 'left',
+            'format': next.format.name,
           }),
         );
   }
@@ -130,7 +170,8 @@ final shareCardStyleProvider =
     NotifierProvider<ShareCardStyleNotifier, ShareCardStyle>(
         ShareCardStyleNotifier.new);
 
-/// Shareable card content (verse or word) + the chosen style.
+/// Shareable card content (verse, word, story or commentary) + the chosen
+/// style.
 class ShareCard extends StatelessWidget {
   final ShareCardBackdrop backdrop;
   final String eyebrow;
@@ -143,6 +184,9 @@ class ShareCard extends StatelessWidget {
 
   final ShareCardStyle style;
 
+  /// Drives the decorative quote mark (quoted kinds only).
+  final bool quoted;
+
   const ShareCard._({
     required this.backdrop,
     required this.eyebrow,
@@ -151,9 +195,10 @@ class ShareCard extends StatelessWidget {
     required this.footer,
     this.artworkPath,
     required this.style,
+    this.quoted = false,
   });
 
-  /// Verse card: reference eyebrow, serif passage, translation footer.
+  /// Verse card: reference eyebrow, serif passage, reference footer.
   factory ShareCard.verse({
     required String reference,
     required String body,
@@ -164,11 +209,13 @@ class ShareCard extends StatelessWidget {
   }) {
     return ShareCard._(
       backdrop: backdrop,
-      eyebrow: '$reference · $translationTag',
+      eyebrow:
+          translationTag.isEmpty ? reference : '$reference · $translationTag',
       title: body,
       footer: reference,
       artworkPath: artworkPath,
       style: style,
+      quoted: true,
     );
   }
 
@@ -193,7 +240,7 @@ class ShareCard extends StatelessWidget {
     );
   }
 
-  /// Story card: eyebrow, title, narrative summary, reference footer.
+  /// Story card: eyebrow, title, narrative excerpt, reference footer.
   factory ShareCard.story({
     required String eyebrow,
     required String title,
@@ -214,42 +261,142 @@ class ShareCard extends StatelessWidget {
     );
   }
 
+  /// Commentary card: source eyebrow, quoted insight, attribution footer.
+  factory ShareCard.commentary({
+    required String eyebrow,
+    required String insight,
+    required String attribution,
+    ShareCardBackdrop backdrop = ShareCardBackdrop.gradient,
+    ShareCardStyle style = ShareCardStyle.defaults,
+    String? artworkPath,
+  }) {
+    return ShareCard._(
+      backdrop: backdrop,
+      eyebrow: eyebrow,
+      title: '“${insight.trim()}”',
+      footer: attribution,
+      artworkPath: artworkPath,
+      style: style,
+      quoted: false,
+    );
+  }
+
+  /// Builds the card for any [ShareContent], so every entry point (verses,
+  /// VOTD, WOTD, stories, commentary) shares the same visual language.
+  factory ShareCard.fromContent(
+    ShareContent content, {
+    ShareCardBackdrop backdrop = ShareCardBackdrop.dawn,
+    ShareCardStyle style = ShareCardStyle.defaults,
+  }) {
+    final excerpt = content.excerpt();
+    switch (content.kind) {
+      case ShareKind.verse:
+        return ShareCard.verse(
+          reference: content.reference ?? '',
+          body: content.paragraphs.join(' '),
+          translationTag: content.translation ?? '',
+          backdrop: backdrop,
+          style: style,
+          artworkPath: content.artworkPath,
+        );
+      case ShareKind.word:
+        return ShareCard.word(
+          eyebrow: content.eyebrow,
+          word: content.title ?? '',
+          definition: excerpt,
+          source: content.source ?? '',
+          backdrop: backdrop,
+          style: style,
+          artworkPath: content.artworkPath,
+        );
+      case ShareKind.story:
+        return ShareCard.story(
+          eyebrow: content.eyebrow,
+          title: content.title ?? '',
+          summary: shareExcerpt(excerpt, 320),
+          reference: content.reference ?? '',
+          backdrop: backdrop,
+          style: style,
+          artworkPath: content.artworkPath,
+        );
+      case ShareKind.commentary:
+        return ShareCard.commentary(
+          eyebrow: content.reference ?? content.eyebrow,
+          insight: shareExcerpt(excerpt, 260),
+          attribution: content.attribution ?? content.source ?? '',
+          backdrop: backdrop,
+          style: style,
+          artworkPath: content.artworkPath,
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final s = style;
-    final titleSize = (body == null
-            ? (title.length <= 140
-                ? 64.0
-                : title.length <= 320
-                    ? 52.0
-                    : 44.0)
-            : (title.length <= 24
+    final format = s.format;
+    // Squares sit tighter; stories get more air. Passages shrink to fit via
+    // FittedBox, so this only sets the starting point.
+    final base = switch (format) {
+      ShareCardFormat.square => 0.94,
+      ShareCardFormat.story => 1.04,
+      ShareCardFormat.portrait => 1.0,
+    };
+
+    final hasBody = body != null;
+    final titleSize = (hasBody
+            ? (title.length <= 24
                 ? 92.0
                 : title.length <= 60
                     ? 68.0
-                    : 52.0)) *
-        s.scale;
+                    : 52.0)
+            : (title.length <= 140
+                ? 64.0
+                : title.length <= 320
+                    ? 52.0
+                    : 44.0)) *
+        s.scale *
+        base;
 
     // Exported image: fixed white-on-dark styling, independent of app theme.
+    // `even` leading distributes space above/below glyphs so multi-line
+    // passages stay optically centred instead of sinking into the box.
     TextStyle textStyle(double size, FontWeight weight) => TextStyle(
           fontFamily: s.fontFamily,
           fontSize: size,
           height: s.lineHeight,
+          leadingDistribution: TextLeadingDistribution.even,
           letterSpacing: s.letterSpacing,
           fontWeight: weight,
           color: Colors.white,
         );
 
+    // One hairline expression for the frame and the footer rule, so the
+    // exported art stays consistent.
+    final hairline = Colors.white.withValues(alpha: 0.16);
+    // Long attributions (commentary sources, long dictionary names) drop a
+    // step and wrap to two lines rather than being truncated.
+    final footerSize = footer.length > 34 ? 29.0 * base : 38.0 * base;
+
     return SizedBox(
-      width: 1080,
-      height: 1350,
+      width: format.width,
+      height: format.height,
       child: Stack(
         fit: StackFit.expand,
         children: [
           _Backdrop(backdrop: backdrop, artworkPath: artworkPath),
+          // Hairline frame: gives the export a finished, printed feel.
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 96, vertical: 110),
+            padding: const EdgeInsets.all(34),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border.all(color: hairline, width: 1.5),
+              ),
+            ),
+          ),
+          Padding(
+            padding: format.padding,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -258,41 +405,54 @@ class ShareCard extends StatelessWidget {
                   style: textStyle(34, FontWeight.w700)
                       .copyWith(color: theme.primaryColor, letterSpacing: 6),
                 ),
-                const SizedBox(height: 36),
+                if (quoted) ...[
+                  SizedBox(height: 20 * base),
+                  Text(
+                    '“',
+                    style: textStyle(150 * base, FontWeight.w700).copyWith(
+                      color: theme.primaryColor.withValues(alpha: 0.55),
+                      height: 0.7,
+                    ),
+                  ),
+                ],
+                SizedBox(height: quoted ? 6 : 36),
                 // Flexible + scaleDown: passages of any length shrink to
                 // fit the frame instead of overflowing or clipping.
                 Expanded(
                   child: Align(
                     alignment:
-                        body == null ? Alignment.centerLeft : Alignment.topLeft,
+                        hasBody ? Alignment.topLeft : Alignment.centerLeft,
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
-                      alignment: body == null
-                          ? Alignment.centerLeft
-                          : Alignment.topLeft,
+                      alignment:
+                          hasBody ? Alignment.topLeft : Alignment.centerLeft,
                       child: SizedBox(
                         width: 888,
                         child: Text(
                           title,
                           textAlign: s.align,
-                          maxLines: body == null ? 12 : 20,
+                          maxLines: hasBody ? 12 : 20,
                           overflow: TextOverflow.ellipsis,
-                          style: textStyle(titleSize,
-                              body == null ? FontWeight.w500 : FontWeight.w800),
+                          style: textStyle(
+                              titleSize,
+                              quoted
+                                  ? FontWeight.w500
+                                  : (hasBody
+                                      ? FontWeight.w800
+                                      : FontWeight.w500)),
                         ),
                       ),
                     ),
                   ),
                 ),
-                if (body != null) ...[
+                if (hasBody) ...[
                   const SizedBox(height: 40),
                   Container(height: 3, width: 140, color: theme.primaryColor),
                   const SizedBox(height: 40),
                 ],
                 Flexible(
-                  child: body == null
-                      ? const SizedBox.shrink()
-                      : FittedBox(
+                  child: hasBody
+                      ? FittedBox(
                           fit: BoxFit.scaleDown,
                           alignment: Alignment.topLeft,
                           child: SizedBox(
@@ -302,18 +462,29 @@ class ShareCard extends StatelessWidget {
                               textAlign: s.align,
                               maxLines: 10,
                               overflow: TextOverflow.ellipsis,
-                              style: textStyle(40, FontWeight.w400),
+                              style: textStyle(40 * base, FontWeight.w400),
                             ),
                           ),
-                        ),
+                        )
+                      : const SizedBox.shrink(),
                 ),
-                const SizedBox(height: 40),
-                Text(footer, style: textStyle(38, FontWeight.w600)),
-                const SizedBox(height: 18),
+                const SizedBox(height: 34),
+                Container(height: 1, color: hairline),
+                const SizedBox(height: 22),
                 Text(
-                  '✦ BIBLE',
-                  style: textStyle(28, FontWeight.w400)
-                      .copyWith(color: Colors.white70, letterSpacing: 5),
+                  footer,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: textStyle(footerSize, FontWeight.w600),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  '✦ THE BLESSED BIBLE',
+                  style: textStyle(25 * base, FontWeight.w400).copyWith(
+                    color: Colors.white70,
+                    letterSpacing: 5,
+                    height: 1.2,
+                  ),
                 ),
               ],
             ),
@@ -322,6 +493,25 @@ class ShareCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Backdrop preview (small swatch) for the share sheet's picker.
+class ShareBackdropSwatch extends StatelessWidget {
+  final ShareCardBackdrop backdrop;
+  final String? artworkPath;
+
+  const ShareBackdropSwatch(
+      {super.key, required this.backdrop, this.artworkPath});
+
+  @override
+  Widget build(BuildContext context) => ClipRRect(
+        borderRadius: BorderRadius.circular(Radii.sm),
+        child: SizedBox(
+          width: 26,
+          height: 32,
+          child: _Backdrop(backdrop: backdrop, artworkPath: artworkPath),
+        ),
+      );
 }
 
 /// Theme-derived backdrops. No hardcoded artwork for the gradients, so
@@ -351,7 +541,7 @@ class _Backdrop extends StatelessWidget {
                   _gradient(theme, primary, 0.35, 0.9),
             ),
             // Strong directional scrim: Doré plates are light engravings,
-            // so white text needs a heavy left wash to stay legible.
+            // so white text needs a heavy wash to stay legible.
             DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -437,363 +627,4 @@ class _GrainPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-/// Bottom sheet: scaled card preview + backdrop/style pickers + Share.
-/// The card renders at full 1080x1350 inside the [FittedBox]; capture
-/// uses pixelRatio 1 for exact output dimensions.
-Future<void> showShareCardSheet({
-  required BuildContext context,
-  required ShareCard Function(ShareCardBackdrop backdrop, ShareCardStyle style)
-      buildCard,
-  required String filename,
-  String? caption,
-}) {
-  return showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (ctx) => _ShareCardSheet(
-      buildCard: buildCard,
-      filename: filename,
-      caption: caption,
-    ),
-  );
-}
-
-class _ShareCardSheet extends ConsumerStatefulWidget {
-  final ShareCard Function(ShareCardBackdrop backdrop, ShareCardStyle style)
-      buildCard;
-  final String filename;
-  final String? caption;
-
-  const _ShareCardSheet({
-    required this.buildCard,
-    required this.filename,
-    this.caption,
-  });
-
-  @override
-  ConsumerState<_ShareCardSheet> createState() => _ShareCardSheetState();
-}
-
-class _ShareCardSheetState extends ConsumerState<_ShareCardSheet> {
-  final _boundaryKey = GlobalKey();
-  ShareCardBackdrop _backdrop = ShareCardBackdrop.dawn;
-  ShareCardStyle _style = ShareCardStyle.defaults;
-  bool _sharing = false;
-  bool _initStyle = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_initStyle) return;
-    _initStyle = true;
-    _style = ref.read(shareCardStyleProvider);
-  }
-
-  void _set(ShareCardStyle next) {
-    setState(() => _style = next);
-    HapticFeedback.selectionClick();
-    ref.read(shareCardStyleProvider.notifier).update(next);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    Widget chips<T>(
-      List<T> values,
-      T selected,
-      String Function(T) label,
-      void Function(T) onTap,
-    ) {
-      return Wrap(
-        spacing: 6,
-        runSpacing: 6,
-        alignment: WrapAlignment.center,
-        children: [
-          for (final v in values)
-            ChoiceChip(
-              label: Text(label(v)),
-              selected: v == selected,
-              onSelected: (_) => onTap(v),
-            ),
-        ],
-      );
-    }
-
-    return Container(
-      constraints:
-          BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.92),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: Radii.sheet,
-      ),
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 36,
-              height: 5,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
-                borderRadius: BorderRadius.circular(Radii.xs),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 300,
-              width: double.infinity,
-              child: FittedBox(
-                fit: BoxFit.contain,
-                child: RepaintBoundary(
-                  key: _boundaryKey,
-                  child: widget.buildCard(_backdrop, _style),
-                ),
-              ),
-            ),
-            const SizedBox(height: 14),
-            Text(context.l10n.shareBackdrop,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                  letterSpacing: 1.2,
-                )),
-            const SizedBox(height: 6),
-            chips<ShareCardBackdrop>(
-                ShareCardBackdrop.values,
-                _backdrop,
-                (b) => switch (b) {
-                      ShareCardBackdrop.dawn => context.l10n.shareBackdropDawn,
-                      ShareCardBackdrop.dusk => context.l10n.shareBackdropDusk,
-                      ShareCardBackdrop.artwork =>
-                        context.l10n.shareBackdropArtwork,
-                      ShareCardBackdrop.gradient =>
-                        context.l10n.shareBackdropGradient,
-                    },
-                (b) => setState(() => _backdrop = b)),
-            const SizedBox(height: 12),
-            Text(context.l10n.shareFont,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                  letterSpacing: 1.2,
-                )),
-            const SizedBox(height: 6),
-            chips<String>(
-              ['', ...kShareCardFonts],
-              _style.fontFamily ?? '',
-              (f) => f.isEmpty ? context.l10n.shareFontTheme : f,
-              (f) => _set(_style.copyWith(
-                  fontFamily: f.isEmpty ? null : f, clearFont: f.isEmpty)),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _ControlLabel(context.l10n.shareSize),
-                      chips<double>(
-                          const [0.85, 1.0, 1.2],
-                          _style.scale,
-                          (v) => '${(v * 100).round()}%',
-                          (v) => _set(_style.copyWith(scale: v))),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _ControlLabel(context.l10n.shareSpacing),
-                      chips<double>(
-                          const [0, 1, 2],
-                          _style.letterSpacing,
-                          (v) => v == 0
-                              ? context.l10n.shareSpacingNormal
-                              : context.l10n.shareSpacingWide('${v.toInt()}'),
-                          (v) => _set(_style.copyWith(letterSpacing: v))),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _ControlLabel(context.l10n.shareLineHeight),
-                      chips<double>(
-                          const [1.3, 1.45, 1.6],
-                          _style.lineHeight,
-                          (v) => v.toStringAsFixed(2),
-                          (v) => _set(_style.copyWith(lineHeight: v))),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _ControlLabel(context.l10n.shareAlignment),
-                      chips<TextAlign>(
-                          const [TextAlign.left, TextAlign.center],
-                          _style.align,
-                          (v) => v == TextAlign.center
-                              ? context.l10n.shareAlignCenter
-                              : context.l10n.shareAlignLeft,
-                          (v) => _set(_style.copyWith(align: v))),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 18),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: _sharing
-                    ? null
-                    : () async {
-                        setState(() => _sharing = true);
-                        unawaited(HapticFeedback.mediumImpact());
-                        await ShareService.shareImageFromBoundary(
-                          boundaryKey: _boundaryKey,
-                          filename: widget.filename,
-                          caption: widget.caption,
-                        );
-                        if (context.mounted) {
-                          setState(() => _sharing = false);
-                          Navigator.of(context).pop();
-                        }
-                      },
-                icon: const Icon(Icons.ios_share_rounded),
-                label: Text(_sharing
-                    ? context.l10n.sharePreparing
-                    : context.l10n.shareImage),
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(52),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(Radii.lg),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ControlLabel extends StatelessWidget {
-  final String text;
-  const _ControlLabel(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Text(
-        text,
-        style: theme.textTheme.labelSmall?.copyWith(
-          fontWeight: FontWeight.w800,
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-          letterSpacing: 1.2,
-        ),
-      ),
-    );
-  }
-}
-
-/// Generic share-options sheet: Copy text / Share text / Image card.
-Future<void> showShareOptionsSheet({
-  required BuildContext context,
-  required String copyText,
-  required String shareText,
-  ShareCard Function(ShareCardBackdrop backdrop, ShareCardStyle style)?
-      buildCard,
-  String? imageFilename,
-}) {
-  return showModalBottomSheet(
-    context: context,
-    backgroundColor: Colors.transparent,
-    builder: (ctx) {
-      final theme = Theme.of(ctx);
-      Widget row({
-        required IconData icon,
-        required String label,
-        required VoidCallback onTap,
-      }) {
-        return ListTile(
-          leading: Icon(icon, color: theme.primaryColor),
-          title: Text(label),
-          onTap: onTap,
-        );
-      }
-
-      return Container(
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: Radii.sheet,
-        ),
-        padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 36,
-              height: 5,
-              margin: const EdgeInsets.only(top: 6, bottom: 6),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
-                borderRadius: BorderRadius.circular(Radii.xs),
-              ),
-            ),
-            row(
-              icon: Icons.copy_rounded,
-              label: context.l10n.spaceCopyText,
-              onTap: () {
-                Navigator.of(ctx).pop();
-                ShareService.copyText(context, copyText);
-              },
-            ),
-            row(
-              icon: Icons.ios_share_rounded,
-              label: context.l10n.shareText,
-              onTap: () {
-                Navigator.of(ctx).pop();
-                ShareService.shareText(body: shareText);
-              },
-            ),
-            if (buildCard != null)
-              row(
-                icon: Icons.image_rounded,
-                label: context.l10n.shareImageCard,
-                onTap: () {
-                  Navigator.of(ctx).pop();
-                  showShareCardSheet(
-                    context: context,
-                    buildCard: buildCard,
-                    filename: imageFilename ?? 'bible-card',
-                    caption: shareText,
-                  );
-                },
-              ),
-          ],
-        ),
-      );
-    },
-  );
 }

@@ -4,6 +4,31 @@ All notable changes to The Blessed Bible. Newest first.
 
 ## [Unreleased]
 
+### Commentary & Stories
+- **Commentary Library as a Shelf:** The browser now opens on the volumes themselves — *The Desire of Ages*, *Prophets and Kings*, *Daniel and the Revelation* and the rest — drawn as books with an author imprint, serif title, spine and the scripture each one covers, biggest first. A cover opens its title page and chapter index, so a chapter is two taps away instead of three; the scripture index below lists every covered book with the volumes that treat it, in canonical order. Search spans titles, authors and book names, and an import that kept its verse range inside the source string (`Daniel and the Revelation (13:11-17)`) no longer shows up as a hundred one-verse "volumes".
+- **Refined Commentary Layout:** The commentary page now opens with a verse pull-quote card (accent rule, reference and a tap-to-read hint), one-tap filter pills instead of hidden dropdowns, and editorial entry cards with a source eyebrow, verse/chapter tag, author and share action. The compact bottom sheet uses the same verse card and spacing.
+- **Classic Preset:** Settings → General → Commentary look switches back to the previous flat commentary design at any time.
+- **Prose That Flows:** Commentary and Bible-story text is rejoined from its print hard wraps, double spaces are collapsed, missing spaces after sentence punctuation are restored, and blank lines remain real paragraphs — no more one-sentence-per-line pages in Story of the Day.
+- **Richer Markup:** `**bold**` and `__underline__` are rendered in commentary and story text, stray OCR `**` runs are hidden, scripture references stay tappable into the verse preview, and shared/copied text drops underline markers as well as bold ones.
+- **Localized Story Position:** The story reader's "3 of 12 in Daniel" line now follows the interface language in all six languages and uses the localized book name.
+- **Repaired Scanned Commentary:** The older commentary sources (The Desire of Ages, Patriarchs and Prophets, Daniel and the Revelation) were OCR scans, and their text carried scanner debris — `&gt;`/`&amp;` entities, stray `^` and `\` characters, broken words like `peo- ple`, footnote markers and Project Gutenberg wrapper text. Those are gone, pages of pure scanner noise and the Desire of Ages back-of-the-book index are removed (96 entries, mostly index pages that had been showing against Luke 24), and running heads, plate credits, page ranges, copyright lines and the "This chapter is based on …" notes no longer interrupt the prose. `tool/clean_commentary.py` regenerates the pack and a new test keeps the artifacts from returning.
+
+### Reading
+- **Localized Book Names:** Bible book names now follow the interface language everywhere they are shown (reader header and end-of-chapter line, book picker and breadcrumbs, commentary and cross-reference headers, plan day labels and the plan reader, verse previews, Verse of the Day and its archive, bookmarks/highlights, notes, search results and the book filter) in all five translated languages, not just Kiswahili. Scripture, bookmarks, notes and plans are still stored under the English canonical names.
+- **"Read in Context" Opens the Right Chapter:** Tapping "Tap to read in context" (and every other jump to a verse) now resolves the book name and abbreviation together, so it lands on the requested book and chapter instead of the chapter number of the previously read book.
+- **Visible Jump Target:** The verse you jump to stays marked with an accent border until you turn the page or tap a verse, instead of fading out after two seconds.
+- **Translated Chapter-End Marker:** The reader's end-of-chapter label is now a localization string ("· Fin de Genèse 1 ·", "· Mwisho wa Mwanzo 1 ·") in all six languages, instead of hard-coded English wording around the localized book name.
+
+### Sharing
+- **One Share Sheet:** Verses, Verse of the Day, Word of the Day, Bible stories, highlights and commentary entries now open the same sheet with Text, Image and PDF modes, a live preview of exactly what will be copied, and a choice between plain text and WhatsApp formatting (bold headings, italic citations) with an optional reference.
+- **Commentary Sharing:** Commentary entries gained a share action for text, a quoted insight card and a print-ready PDF.
+- **PDF Export:** Commentary and stories export as a typeset A4 document (running head, reference, source, citation, page numbers) using the bundled fonts, so French, Italian, Romanian, Swahili and Tagalog text renders correctly. Share it straight from the native sheet.
+- **Better Image Cards:** Share cards now come in portrait (4:5), square (1:1) and story (9:16) formats, with a refined verse layout (quote mark, hairline frame, reference and app mark) and a commentary card. Format choice is remembered.
+- **Save to Gallery:** Image cards can be saved straight to the phone's photo library (with permission handling on iOS and Android), as well as shared.
+- **PDF Page Preview:** The PDF tab now shows the first page of the document as it will be exported, instead of a generic icon.
+- **Remembered Text Format:** The plain/WhatsApp choice and card format persist across launches, so the sheet opens with the user's usual layout.
+- **Cleaner Copied Text:** Shared text is stripped of Strong's tags and markup, multi-verse passages keep one verse per line with verse numbers, and story/commentary sharing includes the title, reference and attribution instead of a truncated snippet.
+
 ## [0.0.5] - 2026-10-22
 
 ### Home Screen & Daily Content

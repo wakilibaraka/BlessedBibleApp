@@ -75,6 +75,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get commonClose => 'Închide';
 
   @override
+  String get commonClear => 'Șterge';
+
+  @override
   String get commonOk => 'OK';
 
   @override
@@ -1193,6 +1196,11 @@ class AppLocalizationsRo extends AppLocalizations {
   String get readChapterCommentary => 'Citește comentariul capitolului';
 
   @override
+  String readEndOfChapter(String reference) {
+    return '· Sfârșitul $reference ·';
+  }
+
+  @override
   String get readPreviousChapter => '‹ Anterior';
 
   @override
@@ -1697,6 +1705,19 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get settingsVerseActionStyleSubtitle =>
       'Panou (compact) sau Clasic (bară înaltă) la selectare; Radial afișează meniul de apăsare lungă în cerc';
+
+  @override
+  String get settingsCommentaryStyle => 'Aspectul comentariului';
+
+  @override
+  String get settingsCommentaryStyleSubtitle =>
+      'Aspectul paginilor de comentariu. Clasic păstrează designul anterior.';
+
+  @override
+  String get settingsCommentaryRefined => 'Rafinat';
+
+  @override
+  String get settingsCommentaryClassic => 'Clasic';
 
   @override
   String get settingsActionSheet => 'Panou';
@@ -2674,6 +2695,79 @@ class AppLocalizationsRo extends AppLocalizations {
   String get shareImageCard => 'Distribuie card-ul imagine';
 
   @override
+  String get shareModeText => 'Text';
+
+  @override
+  String get shareModeImage => 'Imagine';
+
+  @override
+  String get shareModePdf => 'PDF';
+
+  @override
+  String get shareFormat => 'Format';
+
+  @override
+  String get shareFlavorPlain => 'Text simplu';
+
+  @override
+  String get shareFlavorWhatsapp => 'WhatsApp';
+
+  @override
+  String get shareFlavorPlainHint => 'Fără formatare — se lipește oriunde.';
+
+  @override
+  String get shareFlavorWhatsappHint =>
+      'Titluri aldine și referințe cursive, formatate de WhatsApp.';
+
+  @override
+  String get shareIncludeReference => 'Include referința';
+
+  @override
+  String get shareFormatPortrait => 'Portret';
+
+  @override
+  String get shareFormatSquare => 'Pătrat';
+
+  @override
+  String get shareFormatStory => 'Story';
+
+  @override
+  String get shareStyle => 'Stil';
+
+  @override
+  String get sharePdfTitle => 'PDF gata de tipar';
+
+  @override
+  String get sharePdfBody =>
+      'Textul complet pe o pagină culeasă, cu referința și sursa. Gata de citit, tipărit sau trimis.';
+
+  @override
+  String get shareSharePdf => 'Partajează PDF';
+
+  @override
+  String get shareBuildingPdf => 'Se creează PDF-ul…';
+
+  @override
+  String get shareFailed => 'Partajarea a eșuat — încearcă din nou.';
+
+  @override
+  String get shareSaveImage => 'Salvează în galerie';
+
+  @override
+  String get shareSavedToGallery => 'Salvat în galerie';
+
+  @override
+  String get shareGalleryDenied =>
+      'Permite accesul la fotografii pentru a salva imagini.';
+
+  @override
+  String get shareSaveFailed =>
+      'Imaginea nu a putut fi salvată — încearcă din nou.';
+
+  @override
+  String get sharePdfPreviewNote => 'Previzualizare pagina 1 · A4';
+
+  @override
   String get spaceStorageTitle => 'Stocare';
 
   @override
@@ -3076,21 +3170,53 @@ class AppLocalizationsRo extends AppLocalizations {
   String get studyNoCommentaryYet => 'Niciun comentariu disponibil încă.';
 
   @override
-  String studyNoBooksMatch(String query) {
-    return 'Nicio carte nu corespunde cu „$query”.';
+  String get studyCommentaryShelf => 'Raftul';
+
+  @override
+  String get studyCommentaryByBook => 'După carte';
+
+  @override
+  String studyCommentaryVolumes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count de volume',
+      few: '$count volume',
+      one: '1 volum',
+    );
+    return '$_temp0';
   }
 
   @override
-  String studySearchBooksCount(int count) {
-    return 'Caută în $count cărți…';
+  String studyCommentaryEntries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count de articole',
+      few: '$count articole',
+      one: '1 articol',
+    );
+    return '$_temp0';
   }
 
   @override
-  String get studyClassicSources => 'Surse clasice';
+  String studyCommentaryChapters(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count de capitole',
+      few: '$count capitole',
+      one: '1 capitol',
+    );
+    return '$_temp0';
+  }
 
   @override
-  String studyBookAuthorChapters(String author, int count) {
-    return '$author · $count cap.';
+  String get studyCommentarySearchHint => 'Caută volume și cărți';
+
+  @override
+  String studyCommentaryNoMatch(String query) {
+    return 'Nimic nu corespunde cu „$query”.';
   }
 
   @override
@@ -3283,6 +3409,11 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get storiesNext => 'Povestirea următoare';
+
+  @override
+  String storiesPosition(int index, int total, String book) {
+    return '$index din $total în $book';
+  }
 
   @override
   String get studyDictionarySearchHint => 'Caută în peste 3.400 de cuvinte…';

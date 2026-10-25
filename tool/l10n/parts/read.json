@@ -129,6 +129,22 @@
   "sw": "Soma ufafanuzi wa sura hii",
   "tl": "Basahin ang komentaryo sa kabanatang ito"
  },
+ "readEndOfChapter": {
+  "en": "· End of {reference} ·",
+  "fr": "· Fin de {reference} ·",
+  "it": "· Fine di {reference} ·",
+  "ro": "· Sfârșitul {reference} ·",
+  "sw": "· Mwisho wa {reference} ·",
+  "tl": "· Katapusan ng {reference} ·",
+  "@": {
+   "description": "Closes a chapter in the reader. {reference} is an already localized book name and chapter, e.g. \"Genèse 1\".",
+   "placeholders": {
+    "reference": {
+     "type": "String"
+    }
+   }
+  }
+ },
  "readPreviousChapter": {
   "en": "‹ Previous",
   "fr": "‹ Précédent",

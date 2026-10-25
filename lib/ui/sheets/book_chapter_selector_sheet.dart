@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/design_tokens.dart';
 import '../../l10n/l10n.dart';
+import '../../data/localized_book_names.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/bible_model.dart';
 import '../../state/pericopes_provider.dart';
@@ -267,7 +268,9 @@ class _BookChapterSelectorSheetState
             final mode = ref.watch(_sheetStateProvider.select((s) => s.mode));
             return _buildBreadcrumbSegment(
                 context.l10n.readBook,
-                bookName.isEmpty ? context.l10n.readSelectBook : bookName,
+                bookName.isEmpty
+                    ? context.l10n.readSelectBook
+                    : context.bookNameInLocale(bookName),
                 SelectionMode.book,
                 mode,
                 theme);
@@ -426,7 +429,7 @@ class _BookChapterSelectorSheetState
             final book = displayedBooks[index];
             final isSel = book.abbreviation == selectedBookAbbrev;
             return _buildGridTile(
-              text: book.name,
+              text: context.bookNameInLocale(book.name),
               isSelected: isSel,
               onTap: () => _onBookSelected(book, settings),
               theme: theme,
@@ -464,7 +467,7 @@ class _BookChapterSelectorSheetState
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 6.0, right: 4.0),
                         child: _buildGridTile(
-                            text: book.name,
+                            text: context.bookNameInLocale(book.name),
                             isSelected: isSel,
                             onTap: () => _onBookSelected(book, settings),
                             theme: theme,
@@ -506,7 +509,7 @@ class _BookChapterSelectorSheetState
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 6.0, left: 4.0),
                         child: _buildGridTile(
-                            text: book.name,
+                            text: context.bookNameInLocale(book.name),
                             isSelected: isSel,
                             onTap: () => _onBookSelected(book, settings),
                             theme: theme,

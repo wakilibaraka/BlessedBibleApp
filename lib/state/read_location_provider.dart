@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/local_storage/preferences_service.dart';
+import 'bible_provider.dart';
 import 'nav_provider.dart';
 
 class ReadLocationState {
@@ -64,9 +65,29 @@ class ReadLocationNotifier extends Notifier<ReadLocationState> {
     int? verse,
     bool openCommentary = false,
   }) {
+    // Callers usually know only one half of the book identity: the commentary
+    // sheet passes a name, the plan reader an abbreviation. Resolve the pair
+    // together, because a stale half would otherwise keep pointing at the
+    // previously read book ("Daniel 11" opening Genesis 11).
+    String? abbrev = bookAbbrev;
+    String? name = bookName;
+    final wanted = (bookName ?? bookAbbrev)?.toLowerCase();
+    if (wanted != null) {
+      for (final book in ref.read(bibleProvider).books) {
+        if (book.name.toLowerCase() == wanted ||
+            book.abbreviation.toLowerCase() == wanted) {
+          abbrev = book.abbreviation;
+          name = book.name;
+          break;
+        }
+      }
+      abbrev ??= name;
+      name ??= abbrev;
+    }
+
     state = state.copyWith(
-      bookAbbrev: bookAbbrev,
-      bookName: bookName,
+      bookAbbrev: abbrev,
+      bookName: name,
       chapter: chapter,
       requestedVerse: verse,
       clearVerse: verse == null && (bookAbbrev != null || chapter != null),

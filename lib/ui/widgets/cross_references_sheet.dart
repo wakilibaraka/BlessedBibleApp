@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/design_tokens.dart';
 import '../../l10n/l10n.dart';
+import '../../data/localized_book_names.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/cross_references_provider.dart';
@@ -72,7 +73,7 @@ class CrossReferencesSheet extends ConsumerWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '$bookName $chapter:$verse',
+                  context.referenceInLocale('$bookName $chapter:$verse'),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     letterSpacing: 0.3,

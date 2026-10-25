@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../l10n/l10n.dart';
+import '../../data/localized_book_names.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/pericopes_provider.dart';
@@ -135,7 +136,7 @@ class NotesListScreen extends ConsumerWidget {
                             if (note.reference != null) ...[
                               const SizedBox(height: 4),
                               Text(
-                                note.reference!,
+                                context.referenceInLocale(note.reference!),
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.primaryColor,
                                   fontWeight: FontWeight.w600,

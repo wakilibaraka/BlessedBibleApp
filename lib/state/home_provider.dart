@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../utils/prose.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/content_sync_service.dart';
 import '../data/models/home_data.dart';
@@ -8,13 +9,52 @@ import '../state/bible_provider.dart';
 import '../models/study_content_category.dart';
 import 'package:collection/collection.dart'; // for firstOrNull
 
-String _extractSnippet(String text) {
-  final matches = RegExp(r'[^.!?]+[.!?]').allMatches(text);
-  if (matches.isEmpty) return text.trim();
+// How much of a commentary entry the home card shows: a short paragraph
+// rather than a single clipped line. The character budget keeps the card a
+// predictable height across sources with very uneven sentence lengths.
+const _snippetMaxSentences = 6;
+const _snippetMaxChars = 420;
 
-  final sentences = matches.map((m) => m.group(0)!.trim()).toList();
-  final takeCount = sentences.length > 3 ? 3 : sentences.length;
-  return sentences.take(takeCount).join(' ');
+/// Excerpt of a commentary entry shown on the Verse-of-the-Day card: whole
+/// sentences up to [_snippetMaxSentences] / [_snippetMaxChars], so the card
+/// shows a paragraph instead of a clipped first line. Never cuts mid-word.
+String extractVotdSnippet(String text) {
+  // Join the packs' hard wraps before splitting sentences; otherwise the
+  // excerpt carries source line breaks and stray bold markers.
+  final plain = normalizeProse(text).replaceAll('**', '').replaceAll('__', '');
+  final matches = RegExp(r'[^.!?]+[.!?]').allMatches(plain);
+  if (matches.isEmpty) return plain;
+
+  // The splitter breaks on every stop, so abbreviations such as "A.D. 508"
+  // arrive as stubs ("A.", "D.", "508."). Fold a stub back into the
+  // sentence it belongs to; otherwise one date eats three excerpt slots and
+  // the card visibly stops mid-thought.
+  final sentences = <String>[];
+  for (final match in matches) {
+    final fragment = match.group(0)!.trim();
+    if (fragment.isEmpty) continue;
+    final words = fragment.split(RegExp(r'\s+'));
+    final isStub = fragment.length <= 12 && words.length <= 2;
+    if (sentences.isNotEmpty && isStub) {
+      sentences[sentences.length - 1] = '${sentences.last} $fragment';
+    } else {
+      sentences.add(fragment);
+    }
+  }
+
+  final buffer = StringBuffer();
+  var taken = 0;
+  for (final sentence in sentences) {
+    if (taken == _snippetMaxSentences) break;
+    // Always keep the first sentence; stop before exceeding the budget.
+    if (taken > 0 && buffer.length + 1 + sentence.length > _snippetMaxChars) {
+      break;
+    }
+    if (taken > 0) buffer.write(' ');
+    buffer.write(sentence);
+    taken++;
+  }
+  return buffer.toString();
 }
 
 final votdPoolProvider = Provider<List<VerseOfTheDay>>((ref) {
@@ -65,7 +105,7 @@ final votdPoolProvider = Provider<List<VerseOfTheDay>>((ref) {
           final verse =
               chapter.verses.firstWhereOrNull((v) => v.number == verseNum);
           if (verse != null && verse.text.isNotEmpty) {
-            final snippet = _extractSnippet(entry.text);
+            final snippet = extractVotdSnippet(entry.text);
             if (snippet.trim().isNotEmpty) {
               pool.add(VerseOfTheDay(
                 refStr,

@@ -1,22 +1,18 @@
-// Share cards render at 1080x1350 with no overflow, for short and long
-// verses and word cards.
+// Share cards render at their export size with no overflow, for short and
+// long verses, word cards, story cards, commentary cards and every format.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:the_blessed_bible/models/share_content.dart';
 import 'package:the_blessed_bible/ui/widgets/share_card.dart';
 
 Widget host(Widget card) => MaterialApp(
       home: Scaffold(
-        // Surface enough room for the full-size card so the layout is
-        // exercised unconstrained inside the FittedBox used in-app.
+        // Both axes scroll so the 1080-wide card is laid out at its export
+        // size instead of being clamped to the test surface.
         body: SingleChildScrollView(
-          child: Center(
-            child: SizedBox(
-              width: 1080,
-              height: 1400,
-              child: card,
-            ),
-          ),
+          scrollDirection: Axis.horizontal,
+          child: SingleChildScrollView(child: card),
         ),
       ),
     );
@@ -55,6 +51,35 @@ void main() {
     expect(find.text('JOHN 3:16-17 · KJV'), findsOneWidget);
   });
 
+  testWidgets('verse card carries a decorative quote mark', (tester) async {
+    await tester.pumpWidget(host(ShareCard.verse(
+      reference: 'John 11:35',
+      body: short,
+      translationTag: 'KJV',
+    )));
+    expect(find.text('\u201c'), findsOneWidget);
+  });
+
+  for (final format in ShareCardFormat.values) {
+    testWidgets('${format.name} export renders at its exact size',
+        (tester) async {
+      await tester.pumpWidget(host(
+        ShareCard.verse(
+          reference: 'John 11:35',
+          body: short,
+          translationTag: 'KJV',
+          style: ShareCardStyle(format: format),
+        ),
+      ));
+      expect(tester.takeException(), isNull);
+      final card = tester.widget<ShareCard>(find.byType(ShareCard));
+      expect(card.style.format, format);
+      final box = tester.getSize(find.byType(ShareCard));
+      expect(box.width, format.width);
+      expect(box.height, format.height);
+    });
+  }
+
   testWidgets('word card renders caps headword and source', (tester) async {
     await tester.pumpWidget(host(ShareCard.word(
       eyebrow: 'Word of the day',
@@ -82,6 +107,21 @@ void main() {
     expect(find.text('In the beginning God created the heaven and the earth.'),
         findsOneWidget);
     expect(find.text('Genesis 1:1-2:3'), findsOneWidget);
+  });
+
+  testWidgets('commentary card renders a quoted insight and attribution',
+      (tester) async {
+    await tester.pumpWidget(host(ShareCard.commentary(
+      eyebrow: 'Genesis 1:2',
+      insight: 'The earth was without form and void.',
+      attribution: 'Ellen G. White, Patriarchs and Prophets',
+    )));
+    expect(tester.takeException(), isNull);
+    expect(find.text('GENESIS 1:2'), findsOneWidget);
+    expect(find.text('\u201cThe earth was without form and void.\u201d'),
+        findsOneWidget);
+    expect(
+        find.text('Ellen G. White, Patriarchs and Prophets'), findsOneWidget);
   });
 
   testWidgets('artwork backdrop renders with a plate path', (tester) async {
@@ -142,6 +182,54 @@ void main() {
     expect(s.copyWith(scale: 0.85).scale, 0.85);
     // Other fields survive.
     expect(s.copyWith(scale: 0.85).fontFamily, 'Lora');
+  });
+
+  test('ShareCardStyle copyWith keeps and replaces the format', () {
+    const s = ShareCardStyle();
+    expect(s.format, ShareCardFormat.portrait);
+    expect(s.copyWith(format: ShareCardFormat.story).format,
+        ShareCardFormat.story);
+    expect(s.copyWith(scale: 0.85).format, ShareCardFormat.portrait);
+  });
+
+  group('ShareCard.fromContent', () {
+    testWidgets('verse content becomes a verse card', (tester) async {
+      await tester.pumpWidget(host(ShareCard.fromContent(ShareContent.verse(
+        reference: 'John 11:35',
+        texts: [short],
+        translationTag: 'KJV',
+      ))));
+      expect(tester.takeException(), isNull);
+      expect(find.text('JOHN 11:35 · KJV'), findsOneWidget);
+      expect(find.text(short), findsOneWidget);
+    });
+
+    testWidgets('story content shows a caps title and excerpt', (tester) async {
+      await tester.pumpWidget(host(ShareCard.fromContent(ShareContent.story(
+        title: 'The Creation of the World',
+        body: 'In the beginning God created the heaven and the earth.',
+        reference: 'Genesis 1:1-2:3',
+        eyebrow: 'Story of the day',
+      ))));
+      expect(tester.takeException(), isNull);
+      expect(find.text('THE CREATION OF THE WORLD'), findsOneWidget);
+      expect(find.text('Genesis 1:1-2:3'), findsOneWidget);
+    });
+
+    testWidgets('commentary content becomes a commentary card', (tester) async {
+      await tester.pumpWidget(host(ShareCard.fromContent(
+        ShareContent.commentary(
+          text: 'The earth was without form and void.',
+          reference: 'Genesis 1:2',
+          source: 'Patriarchs and Prophets',
+          author: 'Ellen G. White',
+        ),
+      )));
+      expect(tester.takeException(), isNull);
+      expect(find.text('GENESIS 1:2'), findsOneWidget);
+      expect(
+          find.text('Ellen G. White, Patriarchs and Prophets'), findsOneWidget);
+    });
   });
 
   testWidgets('word card with a very long definition stays inside',

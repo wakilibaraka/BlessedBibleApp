@@ -34,6 +34,13 @@ enum StrongsIndicatorStyle { asterisk, chain, number }
 
 enum PopupStyle { bottomSheet, floating }
 
+/// Look of the commentary surfaces.
+/// - [refined]: editorial layout — verse pull-quote card, pill filters and
+///   generous prose spacing (default).
+/// - [classic]: the previous flat layout, kept as a preset for anyone who
+///   prefers it.
+enum CommentaryStyle { refined, classic }
+
 class ReadSettingsState {
   final ReadingViewMode readingViewMode;
   final bool isGlowEnabled;
@@ -61,6 +68,8 @@ class ReadSettingsState {
   /// 100 = relaxed, 130 = standard, 200 = brisk.
   final int readingWpm;
 
+  final CommentaryStyle commentaryStyle;
+
   const ReadSettingsState({
     this.readingViewMode = ReadingViewMode.pinned,
     this.isGlowEnabled = true,
@@ -83,6 +92,7 @@ class ReadSettingsState {
     this.strongsIndicatorStyle = StrongsIndicatorStyle.asterisk,
     this.popupStyle = PopupStyle.floating,
     this.readingWpm = 130,
+    this.commentaryStyle = CommentaryStyle.refined,
   });
 
   ReadSettingsState copyWith({
@@ -105,6 +115,7 @@ class ReadSettingsState {
     StrongsIndicatorStyle? strongsIndicatorStyle,
     PopupStyle? popupStyle,
     int? readingWpm,
+    CommentaryStyle? commentaryStyle,
   }) {
     return ReadSettingsState(
       readingViewMode: readingViewMode ?? this.readingViewMode,
@@ -131,6 +142,7 @@ class ReadSettingsState {
           strongsIndicatorStyle ?? this.strongsIndicatorStyle,
       popupStyle: popupStyle ?? this.popupStyle,
       readingWpm: readingWpm ?? this.readingWpm,
+      commentaryStyle: commentaryStyle ?? this.commentaryStyle,
     );
   }
 }
@@ -145,6 +157,7 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
   static const _readingLayoutKey = 'read_settings_reading_layout';
   static const _selectorHeightKey = 'read_settings_selector_height';
   static const _readingWpmKey = 'read_settings_reading_wpm';
+  static const _commentaryStyleKey = 'read_settings_commentary_style';
 
   @override
   ReadSettingsState build() {
@@ -230,6 +243,15 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       );
     }
 
+    final commentaryStyleString = prefs.getString(_commentaryStyleKey);
+    CommentaryStyle commentaryStyle = CommentaryStyle.refined;
+    if (commentaryStyleString != null) {
+      commentaryStyle = CommentaryStyle.values.firstWhere(
+        (e) => e.name == commentaryStyleString,
+        orElse: () => CommentaryStyle.refined,
+      );
+    }
+
     final popupStyleString = prefs.getString('popup_style');
     PopupStyle popupStyle = PopupStyle.floating;
     if (popupStyleString != null) {
@@ -259,7 +281,14 @@ class ReadSettingsNotifier extends Notifier<ReadSettingsState> {
       strongsIndicatorStyle: strongsStyle,
       popupStyle: popupStyle,
       readingWpm: prefs.getInt(_readingWpmKey) ?? 130,
+      commentaryStyle: commentaryStyle,
     );
+  }
+
+  Future<void> setCommentaryStyle(CommentaryStyle style) async {
+    state = state.copyWith(commentaryStyle: style);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_commentaryStyleKey, style.name);
   }
 
   Future<void> setPopupStyle(PopupStyle style) async {

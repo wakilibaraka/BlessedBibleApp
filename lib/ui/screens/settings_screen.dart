@@ -618,6 +618,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       SettingsPillCard(
         children: [
           Consumer(builder: (context, ref, _) {
+            final commentaryStyle = ref
+                .watch(readSettingsProvider.select((s) => s.commentaryStyle));
+            return AnimatedSegmentedTile<CommentaryStyle>(
+              title: context.l10n.settingsCommentaryStyle,
+              subtitle: context.l10n.settingsCommentaryStyleSubtitle,
+              selectedValue: commentaryStyle,
+              options: [
+                MapEntry(CommentaryStyle.refined,
+                    context.l10n.settingsCommentaryRefined),
+                MapEntry(CommentaryStyle.classic,
+                    context.l10n.settingsCommentaryClassic),
+              ],
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(readSettingsProvider.notifier).setCommentaryStyle(val);
+              },
+            );
+          }),
+        ],
+      ),
+      SettingsPillCard(
+        children: [
+          Consumer(builder: (context, ref, _) {
             final keepAwake = ref
                 .watch(readSettingsProvider.select((s) => s.keepScreenAwake));
             return SwitchListTile(

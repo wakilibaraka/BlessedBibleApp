@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/curated_plans.dart';
 import '../../data/local_storage/preferences_service.dart';
+import '../../data/localized_book_names.dart';
 import '../../l10n/l10n.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../theme/design_tokens.dart';
@@ -57,10 +58,13 @@ PlanTarget planTarget(ReadingPlanState s) {
   return PlanTarget(current, PlanTargetKind.today);
 }
 
-/// "Genesis 1 · Psalm 1" for [day], '' when out of range.
-String planDayLabel(ReadingPlanState s, int day) {
+/// "Genesis 1 · Psalm 1" for [day], '' when out of range. Book names are
+/// rendered in [languageCode] (English by default).
+String planDayLabel(ReadingPlanState s, int day, {String languageCode = 'en'}) {
   if (day < 1 || day > s.planData.length) return '';
-  return s.planData[day - 1].passages.map((p) => p.label).join(' · ');
+  return s.planData[day - 1].passages
+      .map((p) => localizedReference(p.label, languageCode))
+      .join(' · ');
 }
 
 /// Display title for a curated or custom plan id.
@@ -168,10 +172,12 @@ class PlanTodayPanel extends ConsumerWidget {
     if (target.kind == PlanTargetKind.complete) {
       body = l10n.planFlowPlanCompleteBody;
     } else if (target.kind == PlanTargetKind.doneToday) {
+      final languageCode = Localizations.localeOf(context).languageCode;
       body =
-          '${l10n.planFlowNextDay(target.day)} · ${planDayLabel(plan, target.day)}';
+          '${l10n.planFlowNextDay(target.day)} · ${planDayLabel(plan, target.day, languageCode: languageCode)}';
     } else {
-      body = planDayLabel(plan, target.day);
+      body = planDayLabel(plan, target.day,
+          languageCode: Localizations.localeOf(context).languageCode);
     }
     final passages = target.day <= plan.planData.length
         ? plan.planData[target.day - 1].passages.length

@@ -74,6 +74,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get commonClose => 'Chiudi';
 
   @override
+  String get commonClear => 'Cancella';
+
+  @override
   String get commonOk => 'OK';
 
   @override
@@ -1175,6 +1178,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get readChapterCommentary => 'Leggi il commento al capitolo';
 
   @override
+  String readEndOfChapter(String reference) {
+    return '· Fine di $reference ·';
+  }
+
+  @override
   String get readPreviousChapter => '‹ Precedente';
 
   @override
@@ -1682,6 +1690,19 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settingsVerseActionStyleSubtitle =>
       'Pannello (compatto) o Classico (barra alta) alla selezione; Radiale mette il menu a pressione lunga in cerchio';
+
+  @override
+  String get settingsCommentaryStyle => 'Stile del commento';
+
+  @override
+  String get settingsCommentaryStyleSubtitle =>
+      'Impaginazione dei commenti. Classico mantiene il design precedente.';
+
+  @override
+  String get settingsCommentaryRefined => 'Rifinito';
+
+  @override
+  String get settingsCommentaryClassic => 'Classico';
 
   @override
   String get settingsActionSheet => 'Pannello';
@@ -2666,6 +2687,79 @@ class AppLocalizationsIt extends AppLocalizations {
   String get shareImageCard => 'Condividi card immagine';
 
   @override
+  String get shareModeText => 'Testo';
+
+  @override
+  String get shareModeImage => 'Immagine';
+
+  @override
+  String get shareModePdf => 'PDF';
+
+  @override
+  String get shareFormat => 'Formato';
+
+  @override
+  String get shareFlavorPlain => 'Testo semplice';
+
+  @override
+  String get shareFlavorWhatsapp => 'WhatsApp';
+
+  @override
+  String get shareFlavorPlainHint =>
+      'Nessuna formattazione — si incolla ovunque.';
+
+  @override
+  String get shareFlavorWhatsappHint =>
+      'Titoli in grassetto e riferimenti in corsivo, formattati da WhatsApp.';
+
+  @override
+  String get shareIncludeReference => 'Includi riferimento';
+
+  @override
+  String get shareFormatPortrait => 'Ritratto';
+
+  @override
+  String get shareFormatSquare => 'Quadrato';
+
+  @override
+  String get shareFormatStory => 'Story';
+
+  @override
+  String get shareStyle => 'Stile';
+
+  @override
+  String get sharePdfTitle => 'PDF pronto per la stampa';
+
+  @override
+  String get sharePdfBody =>
+      'Il testo completo su una pagina impaginata, con riferimento e fonte. Pronto da leggere, stampare o inviare.';
+
+  @override
+  String get shareSharePdf => 'Condividi PDF';
+
+  @override
+  String get shareBuildingPdf => 'Creazione del PDF…';
+
+  @override
+  String get shareFailed => 'Impossibile condividere — riprova.';
+
+  @override
+  String get shareSaveImage => 'Salva nella galleria';
+
+  @override
+  String get shareSavedToGallery => 'Salvato nella galleria';
+
+  @override
+  String get shareGalleryDenied =>
+      'Consenti l\'accesso alle foto per salvare le immagini.';
+
+  @override
+  String get shareSaveFailed => 'Impossibile salvare l\'immagine — riprova.';
+
+  @override
+  String get sharePdfPreviewNote => 'Anteprima pagina 1 · A4';
+
+  @override
   String get spaceStorageTitle => 'Spazio di archiviazione';
 
   @override
@@ -3064,21 +3158,50 @@ class AppLocalizationsIt extends AppLocalizations {
   String get studyNoCommentaryYet => 'Nessun commento ancora disponibile.';
 
   @override
-  String studyNoBooksMatch(String query) {
-    return 'Nessun libro corrisponde a \"$query\".';
+  String get studyCommentaryShelf => 'Lo scaffale';
+
+  @override
+  String get studyCommentaryByBook => 'Per libro';
+
+  @override
+  String studyCommentaryVolumes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count volumi',
+      one: '1 volume',
+    );
+    return '$_temp0';
   }
 
   @override
-  String studySearchBooksCount(int count) {
-    return 'Cerca tra $count libri…';
+  String studyCommentaryEntries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count voci',
+      one: '1 voce',
+    );
+    return '$_temp0';
   }
 
   @override
-  String get studyClassicSources => 'Fonti classiche';
+  String studyCommentaryChapters(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count capitoli',
+      one: '1 capitolo',
+    );
+    return '$_temp0';
+  }
 
   @override
-  String studyBookAuthorChapters(String author, int count) {
-    return '$author · $count cap.';
+  String get studyCommentarySearchHint => 'Cerca volumi e libri';
+
+  @override
+  String studyCommentaryNoMatch(String query) {
+    return 'Nessuna corrispondenza per \"$query\".';
   }
 
   @override
@@ -3269,6 +3392,11 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get storiesNext => 'Storia successiva';
+
+  @override
+  String storiesPosition(int index, int total, String book) {
+    return '$index di $total in $book';
+  }
 
   @override
   String get studyDictionarySearchHint => 'Cerca tra oltre 3.400 parole…';

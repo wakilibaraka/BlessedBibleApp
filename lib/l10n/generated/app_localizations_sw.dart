@@ -74,6 +74,9 @@ class AppLocalizationsSw extends AppLocalizations {
   String get commonClose => 'Funga';
 
   @override
+  String get commonClear => 'Futa';
+
+  @override
   String get commonOk => 'Sawa';
 
   @override
@@ -1174,6 +1177,11 @@ class AppLocalizationsSw extends AppLocalizations {
   String get readChapterCommentary => 'Soma ufafanuzi wa sura hii';
 
   @override
+  String readEndOfChapter(String reference) {
+    return '· Mwisho wa $reference ·';
+  }
+
+  @override
   String get readPreviousChapter => '‹ Iliyotangulia';
 
   @override
@@ -1678,6 +1686,19 @@ class AppLocalizationsSw extends AppLocalizations {
   @override
   String get settingsVerseActionStyleSubtitle =>
       'Paneli (fupi) au Kawaida (ndefu) ukichagua mistari; Mviringo huweka menyu ya kubonyeza kwa muda katika duara';
+
+  @override
+  String get settingsCommentaryStyle => 'Muonekano wa ufafanuzi';
+
+  @override
+  String get settingsCommentaryStyleSubtitle =>
+      'Mpangilio wa kurasa za ufafanuzi. Ya kawaida huhifadhi muundo wa awali.';
+
+  @override
+  String get settingsCommentaryRefined => 'Imeboreshwa';
+
+  @override
+  String get settingsCommentaryClassic => 'Ya kawaida';
 
   @override
   String get settingsActionSheet => 'Paneli';
@@ -2657,6 +2678,78 @@ class AppLocalizationsSw extends AppLocalizations {
   String get shareImageCard => 'Shiriki kadi ya picha';
 
   @override
+  String get shareModeText => 'Maandishi';
+
+  @override
+  String get shareModeImage => 'Picha';
+
+  @override
+  String get shareModePdf => 'PDF';
+
+  @override
+  String get shareFormat => 'Muundo';
+
+  @override
+  String get shareFlavorPlain => 'Maandishi safi';
+
+  @override
+  String get shareFlavorWhatsapp => 'WhatsApp';
+
+  @override
+  String get shareFlavorPlainHint => 'Hakuna muundo — inanakiliwa popote.';
+
+  @override
+  String get shareFlavorWhatsappHint =>
+      'Vichwa viboldi na marejeo ya italiki, hupambwa na WhatsApp.';
+
+  @override
+  String get shareIncludeReference => 'Jumuisha rejeo';
+
+  @override
+  String get shareFormatPortrait => 'Wima';
+
+  @override
+  String get shareFormatSquare => 'Mraba';
+
+  @override
+  String get shareFormatStory => 'Story';
+
+  @override
+  String get shareStyle => 'Mtindo';
+
+  @override
+  String get sharePdfTitle => 'PDF tayari kuchapishwa';
+
+  @override
+  String get sharePdfBody =>
+      'Maandishi yote kwenye ukurasa uliopangwa, pamoja na rejeo na chanzo. Tayari kusoma, kuchapisha au kutuma.';
+
+  @override
+  String get shareSharePdf => 'Shiriki PDF';
+
+  @override
+  String get shareBuildingPdf => 'Inatengeneza PDF…';
+
+  @override
+  String get shareFailed => 'Imeshindwa kushiriki — tafadhali jaribu tena.';
+
+  @override
+  String get shareSaveImage => 'Hifadhi kwenye galari';
+
+  @override
+  String get shareSavedToGallery => 'Imehifadhiwa kwenye galari';
+
+  @override
+  String get shareGalleryDenied => 'Ruhusu ufikiaji wa picha ili kuhifadhi.';
+
+  @override
+  String get shareSaveFailed =>
+      'Imeshindwa kuhifadhi picha — tafadhali jaribu tena.';
+
+  @override
+  String get sharePdfPreviewNote => 'Onyesho la ukurasa wa 1 · A4';
+
+  @override
   String get spaceStorageTitle => 'Hifadhi';
 
   @override
@@ -3048,21 +3141,50 @@ class AppLocalizationsSw extends AppLocalizations {
   String get studyNoCommentaryYet => 'Bado hakuna ufafanuzi.';
 
   @override
-  String studyNoBooksMatch(String query) {
-    return 'Hakuna kitabu kinacholingana na \"$query\".';
+  String get studyCommentaryShelf => 'Rafu';
+
+  @override
+  String get studyCommentaryByBook => 'Kwa kitabu';
+
+  @override
+  String studyCommentaryVolumes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Juzuu $count',
+      one: 'Juzuu 1',
+    );
+    return '$_temp0';
   }
 
   @override
-  String studySearchBooksCount(int count) {
-    return 'Tafuta katika vitabu $count…';
+  String studyCommentaryEntries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Vipengele $count',
+      one: 'Kipengele 1',
+    );
+    return '$_temp0';
   }
 
   @override
-  String get studyClassicSources => 'Vyanzo vya kale';
+  String studyCommentaryChapters(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Sura $count',
+      one: 'Sura 1',
+    );
+    return '$_temp0';
+  }
 
   @override
-  String studyBookAuthorChapters(String author, int count) {
-    return '$author · sura $count';
+  String get studyCommentarySearchHint => 'Tafuta juzuu na vitabu';
+
+  @override
+  String studyCommentaryNoMatch(String query) {
+    return 'Hakuna kinacholingana na \"$query\".';
   }
 
   @override
@@ -3254,6 +3376,11 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get storiesNext => 'Hadithi inayofuata';
+
+  @override
+  String storiesPosition(int index, int total, String book) {
+    return '$index kati ya $total katika $book';
+  }
 
   @override
   String get studyDictionarySearchHint => 'Tafuta maneno 3,400+…';

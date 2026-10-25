@@ -2,6 +2,8 @@ import 'dart:async';
 import '../../theme/design_tokens.dart';
 import 'package:flutter/material.dart';
 import '../../l10n/l10n.dart';
+import '../../utils/prose.dart';
+import '../../data/localized_book_names.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,9 +23,9 @@ import '../widgets/glass_container.dart';
 import '../widgets/bouncy_entrance.dart';
 import '../widgets/commentary_view.dart';
 import '../../state/commentary_provider.dart';
-import '../../services/share_service.dart';
+import '../../models/share_content.dart';
 import '../../state/devotional_provider.dart';
-import '../widgets/share_card.dart';
+import '../widgets/share_sheet.dart';
 import '../../utils/log.dart';
 import 'package:intl/intl.dart';
 import '../../data/models/devotional_story.dart';
@@ -133,27 +135,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final plate =
         await ref.read(devotionalServiceProvider).plateForDay(DateTime.now());
     if (!mounted) return;
-    await showShareOptionsSheet(
+    await showShareSheet(
       context: context,
-      copyText: ShareService.formatVerse(
+      content: ShareContent.verse(
+        reference: votd.reference,
         texts: [votd.text],
-        reference: votd.reference,
         translationTag: 'KJV',
-      ),
-      shareText: ShareService.formatVerse(
-        texts: [votd.text],
-        reference: votd.reference,
-        translationTag: 'KJV',
-        whatsapp: true,
-      ),
-      imageFilename: 'votd',
-      buildCard: (backdrop, style) => ShareCard.verse(
-        reference: votd.reference,
-        body: ShareService.cleanVerseText(votd.text),
-        translationTag: 'KJV',
-        backdrop: backdrop,
-        style: style,
+        eyebrow: context.l10n.homeVerseOfTheDay,
         artworkPath: plate?.assetPath,
+        imageFilename: 'verse-of-the-day',
       ),
     );
   }
@@ -360,7 +350,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   BouncyEntrance(
                     delay: const Duration(milliseconds: 300),
                     child: Text(
-                      data.verseOfTheDay.reference,
+                      context.referenceInLocale(data.verseOfTheDay.reference),
                       style: theme.textTheme.titleSmall?.copyWith(
                         color: theme.primaryColor,
                         fontWeight: FontWeight.w600,
@@ -392,7 +382,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   if (excerpt != null) ...[
                     Text(
                       excerpt,
-                      maxLines: 8,
+                      maxLines: 12,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodySmall?.copyWith(
                         height: 1.60,
@@ -627,26 +617,14 @@ class WordOfTheDaySection extends ConsumerWidget {
                             filled: false,
                             onPressed: () {
                               HapticFeedback.selectionClick();
-                              showShareOptionsSheet(
+                              showShareSheet(
                                 context: context,
-                                copyText: ShareService.formatWord(
+                                content: ShareContent.word(
                                   word: wotd.word,
                                   definition: wotd.snippet,
                                   sourceName: context.l10n.homeWordOfTheDay,
-                                ),
-                                shareText: ShareService.formatWord(
-                                  word: wotd.word,
-                                  definition: wotd.snippet,
-                                  sourceName: context.l10n.homeWordOfTheDay,
-                                ),
-                                imageFilename: 'wotd',
-                                buildCard: (backdrop, style) => ShareCard.word(
-                                  eyebrow: context.l10n.homeWordOfTheDay,
-                                  word: wotd.word,
-                                  definition: wotd.snippet,
-                                  source: context.l10n.homeWordOfTheDay,
-                                  backdrop: backdrop,
-                                  style: style,
+                                  eyebrow: context.l10n.homeWordOfTheDayHeading,
+                                  imageFilename: 'word-of-the-day',
                                 ),
                               );
                             },
@@ -738,9 +716,9 @@ class StoryOfTheDaySection extends ConsumerWidget {
       data: (story) {
         if (story == null) return const SizedBox.shrink();
 
-        final snippet = story.retelling.trim().isNotEmpty
-            ? story.retelling.trim()
-            : story.keyVerse.trim();
+        final snippet = normalizeProse(story.retelling.trim().isNotEmpty
+            ? story.retelling
+            : story.keyVerse);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -766,7 +744,7 @@ class StoryOfTheDaySection extends ConsumerWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              story.ref,
+              context.referenceInLocale(story.ref),
               textAlign: TextAlign.center,
               style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.primaryColor,
@@ -800,7 +778,7 @@ class StoryOfTheDaySection extends ConsumerWidget {
                   ],
                   Text(
                     snippet,
-                    maxLines: 4,
+                    maxLines: 7,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
                       height: 1.60,
@@ -855,26 +833,19 @@ class StoryOfTheDaySection extends ConsumerWidget {
     final summary = story.retelling.trim().isNotEmpty
         ? story.retelling.trim()
         : story.keyVerse.trim();
-    final shareBody = ShareService.formatStory(
-      title: story.title,
-      summary: summary,
-      reference: story.ref,
-    );
-    showShareOptionsSheet(
+    showShareSheet(
       context: context,
-      copyText: shareBody,
-      shareText: shareBody,
-      imageFilename: 'story_of_the_day',
-      buildCard: (backdrop, style) => ShareCard.story(
-        eyebrow: context.l10n.homeStoryOfTheDay,
+      content: ShareContent.story(
         title: story.title,
-        summary: summary,
+        body: summary,
         reference: story.ref,
-        backdrop: backdrop,
-        style: style,
+        eyebrow: context.l10n.homeStoryOfTheDay,
+        keyVerse: story.keyVerse,
+        keyVerseRef: story.keyVerseRef,
         artworkPath: story.plateSlug != null
             ? 'assets/devotional/art/${story.plateSlug}.webp'
             : null,
+        imageFilename: 'story-of-the-day',
       ),
     );
   }

@@ -19,27 +19,52 @@ TextStyle dictionaryWordStyle(BuildContext context, TextStyle? base) {
 /// One bold-markup segment: `**text**` becomes bold, asterisks hidden.
 typedef BoldSegment = ({String text, bool bold});
 
-/// Splits `**bold**` markers out of plain text. Unmatched markers are kept
-/// as literal text. Shared by commentary and story surfaces.
-List<BoldSegment> splitBoldSegments(String text) {
-  final segments = <BoldSegment>[];
-  final exp = RegExp(r'\*\*(.*?)\*\*');
+/// One formatted markup segment: `**text**` is bold, `__text__` underlined.
+typedef MarkupSegment = ({String text, bool bold, bool underline});
+
+final RegExp _markupExp = RegExp(r'\*\*(.+?)\*\*|__(.+?)__');
+
+/// Splits `**bold**` and `__underline__` markers out of plain text. Unmatched
+/// markers are kept as literal text. Shared by commentary and story surfaces.
+List<MarkupSegment> splitMarkupSegments(String text) {
+  final segments = <MarkupSegment>[];
   var start = 0;
-  for (final match in exp.allMatches(text)) {
+  for (final match in _markupExp.allMatches(text)) {
     if (match.start > start) {
-      segments.add((text: text.substring(start, match.start), bold: false));
+      segments.add((
+        // Stray `**` runs come from OCR in the older content packs; strip
+        // them so they never show up mid-sentence.
+        text: text.substring(start, match.start).replaceAll('**', ''),
+        bold: false,
+        underline: false
+      ));
     }
-    segments.add((text: match.group(1) ?? '', bold: true));
+    final bold = match.group(1);
+    segments.add((
+      text: (bold ?? match.group(2)) ?? '',
+      bold: bold != null,
+      underline: bold == null,
+    ));
     start = match.end;
   }
   if (start < text.length) {
-    segments.add((text: text.substring(start), bold: false));
+    segments.add((
+      text: text.substring(start).replaceAll('**', ''),
+      bold: false,
+      underline: false
+    ));
   }
   if (segments.isEmpty) {
-    segments.add((text: text, bold: false));
+    segments.add((text: text, bold: false, underline: false));
   }
   return segments;
 }
+
+/// Bold-only view of [splitMarkupSegments], kept for callers that render
+/// underline themselves.
+List<BoldSegment> splitBoldSegments(String text) => splitMarkupSegments(text)
+    .map((segment) => (text: segment.text, bold: segment.bold))
+    .toList(growable: false);
 
 class VerseLinkText extends StatefulWidget {
   final String text;
@@ -54,6 +79,11 @@ class VerseLinkText extends StatefulWidget {
   final bool parseBold;
   final TextStyle? boldStyle;
 
+  /// When true, `**bold**` and `__underline__` are both parsed before verse
+  /// links are detected. Supersedes [parseBold].
+  final bool parseMarkup;
+  final TextStyle? underlineStyle;
+
   const VerseLinkText({
     super.key,
     required this.text,
@@ -63,6 +93,8 @@ class VerseLinkText extends StatefulWidget {
     this.textAlign = TextAlign.start,
     this.parseBold = false,
     this.boldStyle,
+    this.parseMarkup = false,
+    this.underlineStyle,
   });
 
   @override
@@ -87,7 +119,9 @@ class _VerseLinkTextState extends State<VerseLinkText> {
         oldWidget.referenceStyle != widget.referenceStyle ||
         oldWidget.numberStyle != widget.numberStyle ||
         oldWidget.parseBold != widget.parseBold ||
-        oldWidget.boldStyle != widget.boldStyle) {
+        oldWidget.boldStyle != widget.boldStyle ||
+        oldWidget.parseMarkup != widget.parseMarkup ||
+        oldWidget.underlineStyle != widget.underlineStyle) {
       _disposeRecognizers();
       _buildSpans();
     }
@@ -108,14 +142,29 @@ class _VerseLinkTextState extends State<VerseLinkText> {
 
   void _buildSpans() {
     _spans = [];
-    final segments = widget.parseBold
-        ? splitBoldSegments(widget.text)
-        : [(text: widget.text, bold: false)];
+    final List<MarkupSegment> segments;
+    if (widget.parseMarkup) {
+      segments = splitMarkupSegments(widget.text);
+    } else if (widget.parseBold) {
+      segments = splitBoldSegments(widget.text)
+          .map((s) => (text: s.text, bold: s.bold, underline: false))
+          .toList(growable: false);
+    } else {
+      segments = [(text: widget.text, bold: false, underline: false)];
+    }
     for (final segment in segments) {
-      final segmentStyle = segment.bold
-          ? (widget.boldStyle ??
-              widget.defaultStyle?.copyWith(fontWeight: FontWeight.bold))
-          : widget.defaultStyle;
+      var segmentStyle = widget.defaultStyle;
+      if (segment.bold) {
+        segmentStyle = widget.boldStyle ??
+            widget.defaultStyle?.copyWith(fontWeight: FontWeight.bold);
+      }
+      if (segment.underline) {
+        segmentStyle = widget.underlineStyle ??
+            (segmentStyle ?? const TextStyle()).copyWith(
+              decoration: TextDecoration.underline,
+              decorationStyle: TextDecorationStyle.solid,
+            );
+      }
       _spans.addAll(
         VerseLinker.parse(
           segment.text,

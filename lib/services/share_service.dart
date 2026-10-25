@@ -11,47 +11,40 @@ import 'package:share_plus/share_plus.dart';
 
 import '../data/bible_books.dart';
 import '../l10n/l10n.dart';
+import '../models/share_content.dart';
 import '../state/translation_provider.dart';
 import 'bible_database_service.dart';
+import 'gallery_service.dart';
 import '../utils/log.dart';
 
 /// A centralized service for formatting and sharing Bible content.
 ///
 /// Two text flavors:
-/// - Clipboard: clean typographic layout, no markup (renders raw
-///   everywhere, including Notes and SMS).
-/// - Share sheet: WhatsApp-aware (`_italics_` on the reference lines;
-///   WhatsApp renders them, other targets show faint underscores).
-/// Image cards are rendered from widgets (no new packages).
+/// - Clipboard plain text: no markup, renders cleanly in Notes, SMS and
+///   email.
+/// - WhatsApp: WhatsApp's own markup (bold headings, italic citations),
+///   which the target renders natively and other apps show unobtrusively.
+///
+/// Layouts live in [ShareContent]; this service keeps the historical
+/// formatter helpers, clipboard/share plumbing and image capture.
+/// Image cards and PDFs are rendered from widgets/vectors (no extra
+/// native plugins).
 class ShareService {
-  /// Strips rendering markup from verse text before sharing:
-  /// - Strong's tags `[H123]` / `[G245]` (viewer setting dependent)
-  /// - KJV supplied-word brackets `[God]` — word kept, brackets dropped
-  /// - red-letter delimiters `‹ ›` and paragraph marks `¶`
-  /// - collapsed whitespace
-  /// These exist for on-screen rendering; they must never leak into
-  /// copied or shared text.
-  static String cleanVerseText(String raw) {
-    return raw
-        // Strong's tags ship as "[H123]" or "[ G123 ]" depending on pack.
-        .replaceAll(RegExp(r'\[\s*[HG]\s*\d+\s*\]'), '')
-        .replaceAllMapped(RegExp(r'\[([^\]]*)\]'), (m) => m.group(1) ?? '')
-        .replaceAll(RegExp('[‹›¶]'), '')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
-  }
+  /// Strips rendering markup from verse text before sharing. See
+  /// [cleanShareText] for the full list of tags removed.
+  static String cleanVerseText(String raw) => cleanShareText(raw);
 
   /// Formats verses for copy/share.
   ///
   /// Plain (clipboard):
-  ///   "For God so loved the world…"
+  ///   “For God so loved the world…”
   ///
   ///   — John 3:16 (KJV)
   ///
-  /// With [secondaryTexts]/[secondaryReference]/[secondaryTag], the
-  /// second language follows in its own quoted block (italicised in
-  /// the WhatsApp flavor). Missing secondary verses are skipped
-  /// silently — primary only, no apology text.
+  /// With [secondaryTexts]/[secondaryReference]/[secondaryTag], the second
+  /// language follows in its own quoted block (italicised in the WhatsApp
+  /// flavor). Missing secondary verses are skipped silently — primary only,
+  /// no apology text.
   static String formatVerse({
     required List<String> texts,
     required String reference,
@@ -59,49 +52,26 @@ class ShareService {
     List<String>? secondaryTexts,
     String? secondaryReference,
     String? secondaryTag,
+    List<int>? verseNumbers,
     bool whatsapp = false,
   }) {
-    final cleaned =
-        texts.map(cleanVerseText).where((t) => t.isNotEmpty).toList();
-    if (cleaned.isEmpty) return '';
-    final body = cleaned.length > 1
-        ? cleaned
-            .asMap()
-            .entries
-            .map((e) => '${e.key + 1}. ${e.value}')
-            .join(' ')
-        : cleaned.first;
-
-    final refLine = '— $reference ($translationTag)';
-    final buf = StringBuffer()
-      ..writeln('"$body"')
-      ..writeln()
-      ..writeln(whatsapp ? '_${refLine}_' : refLine);
-
-    final sec = (secondaryTexts ?? [])
-        .map(cleanVerseText)
-        .where((t) => t.isNotEmpty)
-        .toList();
-    if (sec.isNotEmpty &&
-        secondaryReference != null &&
-        secondaryReference.isNotEmpty &&
-        secondaryTag != null &&
-        secondaryTag.isNotEmpty) {
-      final secBody = sec.join(' ');
-      final secRef = '— $secondaryReference ($secondaryTag)';
-      buf
-        ..writeln()
-        ..writeln(whatsapp ? '_"$secBody"_' : '"$secBody"')
-        ..writeln()
-        ..writeln(whatsapp ? '_${secRef}_' : secRef);
-    }
-    return buf.toString().trimRight();
+    return ShareContent.verse(
+      reference: reference,
+      texts: texts,
+      translationTag: translationTag,
+      verseNumbers: verseNumbers,
+      secondaryTexts: secondaryTexts ?? const [],
+      secondaryReference: secondaryReference,
+      secondaryTag: secondaryTag,
+    ).text(
+      flavor: whatsapp ? ShareFlavor.whatsapp : ShareFlavor.plain,
+    );
   }
 
   /// Formats a dictionary/WOTD word for copy/share. Headword and
   /// source render in capitals:
   ///   GRACE
-  ///   "Unmerited favour…"
+  ///   “Unmerited favour…”
   ///
   ///   — EASTON'S BIBLE DICTIONARY
   static String formatWord({
@@ -109,17 +79,19 @@ class ShareService {
     required String definition,
     required String sourceName,
     int maxDefinitionLength = 600,
+    bool whatsapp = false,
   }) {
-    var def = definition.replaceAll(RegExp(r'\s+'), ' ').trim();
-    if (def.length > maxDefinitionLength) {
-      def = '${def.substring(0, maxDefinitionLength).trimRight()}…';
-    }
-    return '${word.trim().toUpperCase()}\n"$def"\n\n— ${sourceName.trim().toUpperCase()}';
+    final def = shareExcerpt(definition, maxDefinitionLength);
+    return ShareContent.word(
+      word: word,
+      definition: def,
+      sourceName: sourceName,
+    ).text(flavor: whatsapp ? ShareFlavor.whatsapp : ShareFlavor.plain);
   }
 
   /// Formats a Bible story for copy/share:
   ///   THE CREATION OF THE WORLD
-  ///   "In the beginning..."
+  ///   “In the beginning...”
   ///
   ///   — Genesis 1:1-2:3
   static String formatStory({
@@ -127,12 +99,35 @@ class ShareService {
     required String summary,
     required String reference,
     int maxSummaryLength = 600,
+    bool whatsapp = false,
   }) {
-    var s = summary.replaceAll(RegExp(r'\s+'), ' ').trim();
-    if (s.length > maxSummaryLength) {
-      s = '${s.substring(0, maxSummaryLength).trimRight()}…';
-    }
-    return '${title.trim().toUpperCase()}\n"$s"\n\n— $reference';
+    final s = shareExcerpt(summary, maxSummaryLength);
+    return ShareContent.story(
+      title: title,
+      body: s,
+      reference: reference,
+    ).text(flavor: whatsapp ? ShareFlavor.whatsapp : ShareFlavor.plain);
+  }
+
+  /// Formats a commentary entry for copy/share:
+  ///   Genesis 1:2
+  ///
+  ///   Is it possible to imagine a time when nothing existed? …
+  ///
+  ///   — Ellen G. White, Patriarchs and Prophets
+  static String formatCommentary({
+    required String text,
+    required String reference,
+    String? source,
+    String? author,
+    bool whatsapp = false,
+  }) {
+    return ShareContent.commentary(
+      text: text,
+      reference: reference,
+      source: source,
+      author: author,
+    ).text(flavor: whatsapp ? ShareFlavor.whatsapp : ShareFlavor.plain);
   }
 
   /// Reference string for a verse selection: `John 3:16`,
@@ -240,29 +235,95 @@ class ShareService {
     }
   }
 
-  /// Captures the widget behind [boundaryKey] as a 1080-wide PNG and
-  /// shares it via the native sheet. Temp file only — nothing is added
-  /// to the bundle and the OS may purge the cache copy.
-  static Future<void> shareImageFromBoundary({
+  /// Renders the widget behind [boundaryKey] to PNG bytes at its design
+  /// size. Returns null when capture is not possible yet (widget off-screen).
+  static Future<Uint8List?> captureBoundaryPng(GlobalKey boundaryKey) async {
+    try {
+      final boundary = boundaryKey.currentContext?.findRenderObject()
+          as RenderRepaintBoundary?;
+      if (boundary == null) return null;
+      // Cards are laid out at their export size (1080 wide), so pixelRatio
+      // 1 keeps the PNG exactly at design dimensions.
+      final image = await boundary.toImage(pixelRatio: 1.0);
+      final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+      image.dispose();
+      return bytes?.buffer.asUint8List();
+    } catch (e) {
+      logDebug('Capture failed: $e');
+      return null;
+    }
+  }
+
+  /// Captures the card behind [boundaryKey] as a PNG and shares it via
+  /// the native sheet. Temp file only — nothing is added to the bundle and
+  /// the OS may purge the cache copy.
+  ///
+  /// Returns false when the capture could not be produced, so the sheet
+  /// can surface a retry instead of closing silently.
+  static Future<bool> shareImageFromBoundary({
     required GlobalKey boundaryKey,
     required String filename,
     String? caption,
   }) async {
     try {
-      final boundary = boundaryKey.currentContext?.findRenderObject()
-          as RenderRepaintBoundary?;
-      if (boundary == null) return;
-      final image = await boundary.toImage(pixelRatio: 1.0);
-      final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
-      if (bytes == null) return;
+      final bytes = await captureBoundaryPng(boundaryKey);
+      if (bytes == null) return false;
       final dir = await getTemporaryDirectory();
       final file = File(
           '${dir.path}/$filename-${DateTime.now().millisecondsSinceEpoch}.png');
-      await file.writeAsBytes(bytes.buffer.asUint8List());
-      await SharePlus.instance
-          .share(ShareParams(files: [XFile(file.path)], text: caption));
+      await file.writeAsBytes(bytes);
+      await SharePlus.instance.share(
+        ShareParams(files: [XFile(file.path)], text: caption),
+      );
+      return true;
     } catch (e) {
       logDebug('Share image failed: $e');
+      return false;
+    }
+  }
+
+  /// Captures the card and writes it to the device photo library.
+  static Future<GallerySaveResult> saveImageFromBoundary({
+    required GlobalKey boundaryKey,
+    required String filename,
+  }) async {
+    final bytes = await captureBoundaryPng(boundaryKey);
+    if (bytes == null) return GallerySaveResult.failed;
+    final now = DateTime.now();
+    String two(int v) => v.toString().padLeft(2, '0');
+    final stamp = '${now.year}${two(now.month)}${two(now.day)}-'
+        '${two(now.hour)}${two(now.minute)}${two(now.second)}';
+    return GalleryService.savePng(bytes, name: '$filename-$stamp');
+  }
+
+  /// Writes [bytes] to a temporary file and opens the native share sheet for
+  /// it. Used by the PDF exporter.
+  static Future<bool> shareFileBytes({
+    required List<int> bytes,
+    required String filename,
+    required String mimeType,
+    String? subject,
+    String? text,
+  }) async {
+    try {
+      final dir = await getTemporaryDirectory();
+      final base = filename.toLowerCase().endsWith('.pdf')
+          ? filename.substring(0, filename.length - 4)
+          : filename;
+      final file = File(
+          '${dir.path}/$base-${DateTime.now().millisecondsSinceEpoch}.pdf');
+      await file.writeAsBytes(bytes);
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path, mimeType: mimeType)],
+          subject: subject,
+          text: text,
+        ),
+      );
+      return true;
+    } catch (e) {
+      logDebug('Share file failed: $e');
+      return false;
     }
   }
 }

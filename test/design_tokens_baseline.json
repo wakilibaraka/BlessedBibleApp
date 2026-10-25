@@ -44,7 +44,11 @@
   },
   "lib/ui/widgets/share_card.dart": {
     "hexColor": 5,
-    "blackWhite": 4
+    "blackWhite": 5
+  },
+  "lib/ui/widgets/share_document_preview.dart": {
+    "hexColor": 5,
+    "fontSize": 5
   },
   "lib/ui/widgets/textured_glass_container.dart": {
     "hexColor": 1,

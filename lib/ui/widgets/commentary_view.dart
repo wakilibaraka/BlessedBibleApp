@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../theme/reading_tokens.dart';
 import '../../state/commentary_provider.dart';
+import '../../data/localized_book_names.dart';
 import '../../state/bible_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/user_data_provider.dart';
@@ -12,11 +13,14 @@ import '../../state/theme_provider.dart';
 import '../screens/read_screen.dart' show VerseActionLogic;
 
 import '../../models/commentary_entry.dart';
+import '../../models/share_content.dart';
 import '../../models/study_content_category.dart';
+import 'share_sheet.dart';
 
 import '../screens/commentary_hub_screen.dart';
 import '../../state/read_location_provider.dart';
-import 'verse_link_text.dart';
+import 'commentary_prose.dart';
+import 'prose_text.dart';
 import '../../l10n/l10n.dart';
 import '../../theme/design_tokens.dart';
 import 'state_views.dart';
@@ -139,9 +143,11 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
             (is3DTheme ? theme.colorScheme.surface : tokens.readingSurface))
         : theme.scaffoldBackgroundColor;
 
-    final referenceString = displayVerse != null
-        ? '$bookName $chapterNum:$displayVerse'
-        : '$bookName $chapterNum';
+    final referenceString = localizedReference(
+        displayVerse != null
+            ? '$bookName $chapterNum:$displayVerse'
+            : '$bookName $chapterNum',
+        Localizations.localeOf(context).languageCode);
 
     final isBookmarked = displayVerse != null
         ? ref
@@ -152,6 +158,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     String? finalVerseText = fallbackVerseText;
 
     final settings = ref.watch(readSettingsProvider);
+    ref.watch(readSettingsProvider.select((s) => s.commentaryStyle));
     final activeTransId = ref.watch(activeTranslationProvider);
 
     if (settings.syncSavedItemsLanguage &&
@@ -277,6 +284,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
             bookName,
             chapterNum,
             displayVerse,
+            referenceString,
           ),
         ),
       ],
@@ -297,7 +305,10 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     String bookName,
     int chapterNum,
     int? displayVerse,
+    String referenceString,
   ) {
+    final refined = ref.read(readSettingsProvider).commentaryStyle ==
+        CommentaryStyle.refined;
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollNotification) {
         if (widget.verse == null && verseEntries.isNotEmpty) {
@@ -340,8 +351,17 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
           if (finalVerseText != null)
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                child: GestureDetector(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: CommentaryVerseCard(
+                  reference: referenceString,
+                  verseText: finalVerseText,
+                  refined: refined,
+                  ink: tokens.readingInk,
+                  accent: tokens.readingAccent,
+                  surface: tokens.readingSurface,
+                  border: tokens.readingInkMuted.withValues(alpha: 0.15),
+                  shadow: context.palette.shadow,
+                  typography: typography,
                   onTap: () {
                     // Dismiss commentary hub back to root
                     Navigator.of(context).popUntil((route) => route.isFirst);
@@ -353,61 +373,6 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                       verse: displayVerse,
                     );
                   },
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-                    decoration: BoxDecoration(
-                      color: tokens.readingSurface,
-                      borderRadius: BorderRadius.circular(Radii.xxl),
-                      border: Border.all(
-                          color:
-                              tokens.readingInkMuted.withValues(alpha: 0.15)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: context.palette.shadow,
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        )
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '\u201c$finalVerseText\u201d',
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            height: 1.42,
-                            fontSize: typography.fontSize * 1.05,
-                            fontFamily: typography.fontFamily,
-                            fontStyle: typography.fontStyle,
-                            color: tokens.readingInk,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              context.l10n.studyTapToReadInContext,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: tokens.readingInkMuted
-                                    .withValues(alpha: 0.6),
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(
-                              Icons.open_in_new_rounded,
-                              size: 12,
-                              color:
-                                  tokens.readingInkMuted.withValues(alpha: 0.6),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
               ),
             ),
@@ -616,9 +581,15 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     );
   }
 
+  void _shareEntry(CommentaryEntry entry) => shareCommentaryEntry(
+        context,
+        entry,
+        book: widget.book,
+        chapter: widget.chapter,
+      );
+
   Widget _buildEntryContent(ThemeData theme, ReadingTokens tokens,
       CommentaryEntry entry, TypographyState typography) {
-    final paragraphs = entry.text.split('\n\n');
     final isDevotional = entry.category == StudyContentCategory.devotional;
     final isStudyNote = entry.category == StudyContentCategory.studyNote;
 
@@ -661,34 +632,62 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   color: tokens.readingInkMuted,
                 ),
               ),
+              IconButton(
+                tooltip: context.l10n.commonShare,
+                visualDensity: VisualDensity.compact,
+                iconSize: 18,
+                icon: Icon(
+                  Icons.ios_share_rounded,
+                  color: tokens.readingAccent.withValues(alpha: 0.8),
+                ),
+                onPressed: () => _shareEntry(entry),
+              ),
             ],
           ),
           const SizedBox(height: 16),
-          ...paragraphs.map((p) => Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: VerseLinkText(
-                  text: p.trim(),
-                  parseBold: true,
-                  defaultStyle: baseStyle,
-                  // Whole reference in the reading accent; numbers only
-                  // carry the solid underline (dictionary keeps its
-                  // dotted underline elsewhere — the two never collide).
-                  referenceStyle: baseStyle?.copyWith(
-                    color: tokens.readingAccent,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  numberStyle: baseStyle?.copyWith(
-                    color: tokens.readingAccent,
-                    fontWeight: FontWeight.w700,
-                    decoration: TextDecoration.underline,
-                    decorationStyle: TextDecorationStyle.solid,
-                  ),
-                ),
-              )),
+          ProseText(
+            text: entry.text,
+            typography: typography,
+            accent: tokens.readingAccent,
+            baseStyle: baseStyle,
+            refined: ref.read(readSettingsProvider).commentaryStyle ==
+                CommentaryStyle.refined,
+          ),
         ],
       ),
     );
   }
+}
+
+/// Reference shown on the share sheet for an entry's scope: verse, chapter,
+/// whole book or a free-standing study note.
+String commentaryEntryReference(CommentaryEntry entry,
+    {required String book, required int chapter}) {
+  final scope = entry.scope;
+  final verse = scope.verse;
+  if (scope.type == 'verse' && verse != null) return '$book $chapter:$verse';
+  if (scope.type == 'chapter') return '$book $chapter';
+  if (scope.type == 'book') return book;
+  return entry.source.isNotEmpty ? entry.source : book;
+}
+
+/// Opens the share sheet (text, image card or PDF) for one commentary entry.
+void shareCommentaryEntry(
+  BuildContext context,
+  CommentaryEntry entry, {
+  required String book,
+  required int chapter,
+}) {
+  showShareSheet(
+    context: context,
+    content: ShareContent.commentary(
+      text: entry.text,
+      reference: commentaryEntryReference(entry, book: book, chapter: chapter),
+      source: entry.source,
+      author: entry.author,
+      eyebrow: context.l10n.studyCommentaryEyebrow.toUpperCase(),
+    ),
+  );
 }
 
 /// Utility function to display the commentary in a compact, draggable modal bottom sheet.
