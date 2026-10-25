@@ -41,10 +41,23 @@ Get the latest release APKs directly from [GitHub Releases](https://github.com/w
 - **Curated Theological Index**: Explore 32+ foundational biblical keywords (Grace, Faith, Love, Peace, Hope, Mercy, Salvation, Righteousness, Covenant, Spirit, etc.) with exact verified KJV occurrence counts and concise theological definitions.
 - **Smart Filtering & Highlighting**: Filter results by Old Testament, New Testament, or thematic categories (*Salvation*, *Spiritual Life*, *Christian Walk*, *God & Spirit*). Matches are highlighted directly in the scripture text.
 
-### 📜 Historicist Commentary & Clean Home Cards
-- **Streamlined Home Commentary Card**: Elevated distraction-free commentary view without repetitive labels, highlighting rich historicist thoughts directly on the dashboard.
-- **Classic Theological Insights**: Verse-by-verse and chapter-level commentary for Genesis, Daniel, Hebrews, and Revelation, drawn from classic historicist authors (Uriah Smith, Ellen G. White).
-- **Inline Cross-References**: Tap directly into commentaries without losing your place in scripture.
+### 📚 Commentary Shelf & Historicist Volumes
+- **Visual Library as a Shelf of Books**: Replaces flat lists with gorgeous volume covers featuring author imprints, spines, and scripture scope (*The Desire of Ages*, *Prophets and Kings*, *Patriarchs and Prophets*, *Daniel and the Revelation*).
+- **2-Tap Chapter Navigation**: Tap any volume to view its title page, chapter index, and scope, with a canonical by-book index and fast search across authors and titles.
+- **Refined Editorial Layout**: Verse pull-quote hero cards, 1-tap filter pills, and source tags. Settings allows switching to the classic layout at any time.
+- **Prose Reflow & OCR Cleanup**: Eliminates scan noise, Gutenberg wrapper remnants, and print hard-wraps for smooth, fluid reading. Supports rich bold/underline styling and tappable inline scripture links.
+
+### 📤 Unified Share Suite, PDF Export & Gallery Save
+- **Standardized Multi-Mode Sharing**: A single, elegant share modal across verses, daily inspiration, Bible stories, and commentary entries.
+- **Typeset A4 PDF Export**: Export commentary and devotional stories as beautifully formatted, print-ready PDF documents with running heads, citations, and full multi-language font support.
+- **Multi-Ratio Graphic Cards**: Create high-resolution share cards in **Portrait (4:5)**, **Square (1:1)**, and **Story (9:16)** formats with custom backdrops.
+- **1-Tap Save to Gallery**: Save generated cards directly to the device's photo library on Android and iOS.
+- **Formatted WhatsApp & Text Sharing**: Cleanly formatted clipboard exports with bold headers, italic citations, and stripped OCR/Strong's markers.
+
+### 🌐 Full Multi-Language Localization
+- **6 Supported Languages**: English, French (`Français`), Italian (`Italiano`), Romanian (`Română`), Swahili (`Kiswahili`), and Tagalog.
+- **Complete Book Name Translation**: Bible book names follow the selected interface language everywhere — headers, book selectors, study tools, search, and reading plans.
+- **Reliable In-Context Reading**: Tapping "Read in context" resolves both book and chapter accurately with persistent verse accent highlighting.
 
 ### 📅 Redesigned Reading Plans & Plan Reader
 - **Streamlined Dashboard**: Date and reading streak hero at the top of your plans, keeping your daily goal front and center.
