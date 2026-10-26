@@ -48,3 +48,17 @@ List<String> proseParagraphs(String text) {
       .where((paragraph) => paragraph.isNotEmpty)
       .toList(growable: false);
 }
+
+/// Removes the straight or curly quotes around [text]; the content
+/// packs already quote key verses and the reader adds its own pair.
+String stripQuotes(String text) {
+  const quotes = '"“”\'‘’';
+  var out = text.trim();
+  while (out.isNotEmpty && quotes.contains(out[0])) {
+    out = out.substring(1);
+  }
+  while (out.isNotEmpty && quotes.contains(out[out.length - 1])) {
+    out = out.substring(0, out.length - 1);
+  }
+  return out.trim();
+}

@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/bible_provider.dart';
 import '../../state/typography_provider.dart';
 import '../../state/read_location_provider.dart';
-import '../../data/models/bible_model.dart';
+import '../../utils/passage.dart';
 import 'textured_glass_container.dart';
 
 class VersePreviewModal extends ConsumerWidget {
@@ -43,44 +43,23 @@ class VersePreviewModal extends ConsumerWidget {
     String verseText = context.l10n.readLoading;
 
     if (!bibleState.isLoading) {
-      final book = bibleState.books.cast<BibleBook?>().firstWhere(
-            (b) => b?.name == bookName,
-            orElse: () => null,
-          );
-
-      if (book != null && chapter > 0 && chapter <= book.chapters.length) {
-        final lastChapter =
-            (endChapter ?? chapter).clamp(chapter, book.chapters.length);
-        final texts = <String>[];
-        for (var ch = chapter; ch <= lastChapter; ch++) {
-          final chapterData = book.chapters[ch - 1];
-          final firstV = ch == chapter ? startVerse : 1;
-          final lastV = ch == lastChapter
-              ? (wholeChapter
-                  ? chapterData.verses.length
-                  : (endVerse ?? startVerse))
-              : chapterData.verses.length;
-          for (int i = firstV; i <= lastV; i++) {
-            final verse = chapterData.verses.cast<BibleVerse?>().firstWhere(
-                  (v) => v?.number == i,
-                  orElse: () => null,
-                );
-            if (verse != null) {
-              final label = lastChapter == chapter
-                  ? '${verse.number}'
-                  : '$ch:${verse.number}';
-              texts.add('$label ${verse.text}');
-            }
-          }
-        }
-
-        if (texts.isNotEmpty) {
-          verseText = texts.join('\n\n');
-        } else {
-          verseText = context.l10n.readVerseNotFound;
-        }
-      } else {
+      final verses = resolvePassage(
+        bibleState.books,
+        PassageRef(
+          bookName: bookName,
+          chapter: chapter,
+          startVerse: startVerse,
+          endVerse: endVerse,
+          endChapter: endChapter,
+          wholeChapter: wholeChapter,
+        ),
+      );
+      if (verses == null) {
         verseText = context.l10n.readBookOrChapterNotFound;
+      } else if (verses.isEmpty) {
+        verseText = context.l10n.readVerseNotFound;
+      } else {
+        verseText = verses.map((v) => '${v.label} ${v.text}').join('\n\n');
       }
     }
 

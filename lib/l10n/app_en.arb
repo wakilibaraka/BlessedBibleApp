@@ -1500,6 +1500,16 @@
   "stateErrorBody": "Please try again in a moment.",
   "commonUndo": "Undo",
   "spaceHighlightsIntro": "Verses you've marked in color.",
+  "storiesShowPassageTitle": "Show scripture in stories",
+  "storiesShowPassageSubtitle": "Print the full passage above each story. When off, tap the reference to read it.",
+  "storiesOpenPassage": "Read {reference}",
+  "@storiesOpenPassage": {
+    "placeholders": {
+      "reference": {
+        "type": "String"
+      }
+    }
+  },
   "studyCardSize": "Card size",
   "studyPosition": "Position",
   "studySizeLarge": "Large",

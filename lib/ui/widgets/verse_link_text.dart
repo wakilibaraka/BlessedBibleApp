@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import '../../utils/passage.dart';
 import '../../utils/verse_linker.dart';
 import 'verse_preview_modal.dart';
 
@@ -182,50 +183,8 @@ class _VerseLinkTextState extends State<VerseLinkText> {
     }
   }
 
-  void _handleTap(String reference) {
-    // Parse VerseLinker output: "Book C", "Book C:V", "Book C:V-V" or
-    // "Book C:V-C:V". Unparseable refs are ignored (no dead taps).
-    final match = RegExp(
-      r'(.+?)\s+(\d+)(?::(\d+)(?:-(\d+)(?::(\d+))?)?)?$',
-    ).firstMatch(reference.trim());
-    if (match == null) return;
-    final bookName = match.group(1)!;
-    final chapter = int.parse(match.group(2)!);
-    final startVerseStr = match.group(3);
-    final wholeChapter = startVerseStr == null;
-    final startVerse = startVerseStr == null ? 1 : int.parse(startVerseStr);
-    final midChapterStr = match.group(4);
-    final endVerseStr = match.group(5);
-    final int? endChapter = midChapterStr != null && endVerseStr != null
-        ? int.parse(midChapterStr)
-        : null;
-    final int? endVerse = endChapter != null
-        ? int.parse(endVerseStr!)
-        : (midChapterStr != null ? int.parse(midChapterStr) : null);
-
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (context) {
-        // Wrap in a constrained box if needed, or let the modal handle max height
-        return ConstrainedBox(
-          constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.6),
-          child: VersePreviewModal(
-            reference: reference,
-            bookName: bookName,
-            chapter: chapter,
-            startVerse: startVerse,
-            endVerse: endVerse,
-            endChapter: endChapter,
-            wholeChapter: wholeChapter,
-          ),
-        );
-      },
-    );
-  }
+  void _handleTap(String reference) =>
+      showVersePreviewSheet(context, reference);
 
   @override
   Widget build(BuildContext context) {
@@ -236,4 +195,38 @@ class _VerseLinkTextState extends State<VerseLinkText> {
       text: TextSpan(children: _spans),
     );
   }
+}
+
+/// Opens [reference] ("Book C", "Book C:V", "Book C:V-V" or "Book C:V-C:V")
+/// in the verse preview sheet. Unparseable refs are ignored (no dead taps).
+/// [heightFactor] caps the sheet's height as a share of the screen.
+void showVersePreviewSheet(
+  BuildContext context,
+  String reference, {
+  double heightFactor = 0.6,
+}) {
+  final passage = PassageRef.parse(reference);
+  if (passage == null) return;
+
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    useSafeArea: true,
+    builder: (context) {
+      return ConstrainedBox(
+        constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * heightFactor),
+        child: VersePreviewModal(
+          reference: reference,
+          bookName: passage.bookName,
+          chapter: passage.chapter,
+          startVerse: passage.startVerse,
+          endVerse: passage.endVerse,
+          endChapter: passage.endChapter,
+          wholeChapter: passage.wholeChapter,
+        ),
+      );
+    },
+  );
 }

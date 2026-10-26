@@ -2852,6 +2852,18 @@ class AppLocalizationsSw extends AppLocalizations {
   String get spaceHighlightsIntro => 'Mistari uliyoiwekea rangi.';
 
   @override
+  String get storiesShowPassageTitle => 'Onyesha maandiko katika hadithi';
+
+  @override
+  String get storiesShowPassageSubtitle =>
+      'Onyesha kifungu kizima juu ya kila hadithi. Kikizimwa, gusa rejea ili kukisoma.';
+
+  @override
+  String storiesOpenPassage(String reference) {
+    return 'Soma $reference';
+  }
+
+  @override
   String get studyCardSize => 'Ukubwa wa kadi';
 
   @override

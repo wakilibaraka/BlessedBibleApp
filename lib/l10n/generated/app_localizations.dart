@@ -4936,6 +4936,24 @@ abstract class AppLocalizations {
   /// **'Verses you\'ve marked in color.'**
   String get spaceHighlightsIntro;
 
+  /// No description provided for @storiesShowPassageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show scripture in stories'**
+  String get storiesShowPassageTitle;
+
+  /// No description provided for @storiesShowPassageSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Print the full passage above each story. When off, tap the reference to read it.'**
+  String get storiesShowPassageSubtitle;
+
+  /// No description provided for @storiesOpenPassage.
+  ///
+  /// In en, this message translates to:
+  /// **'Read {reference}'**
+  String storiesOpenPassage(String reference);
+
   /// No description provided for @studyCardSize.
   ///
   /// In en, this message translates to:

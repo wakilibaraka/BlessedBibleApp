@@ -185,3 +185,25 @@ final devotionalBooksProvider = Provider<List<DevotionalBookInfo>>((ref) {
     return true;
   }).toList(growable: false);
 });
+
+/// Whether the story reader prints the full scripture passage above the
+/// retelling. Off by default: the story comes first and the passage opens
+/// from the reference chip. On restores the previous layout.
+class StoryShowPassageNotifier extends Notifier<bool> {
+  static const String _key = 'story_show_passage';
+
+  @override
+  bool build() {
+    final prefs = ref.watch(preferencesProvider);
+    return prefs.prefs.getBool(_key) ?? false;
+  }
+
+  void set(bool value) {
+    state = value;
+    ref.read(preferencesProvider).prefs.setBool(_key, value);
+  }
+}
+
+final storyShowPassageProvider =
+    NotifierProvider<StoryShowPassageNotifier, bool>(
+        StoryShowPassageNotifier.new);

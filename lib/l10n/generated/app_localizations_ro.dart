@@ -2870,6 +2870,18 @@ class AppLocalizationsRo extends AppLocalizations {
   String get spaceHighlightsIntro => 'Versetele pe care le-ai evidențiat.';
 
   @override
+  String get storiesShowPassageTitle => 'Afișează textul biblic în povestiri';
+
+  @override
+  String get storiesShowPassageSubtitle =>
+      'Afișează pasajul complet deasupra fiecărei povestiri. Când e oprit, atinge referința pentru a-l citi.';
+
+  @override
+  String storiesOpenPassage(String reference) {
+    return 'Citește $reference';
+  }
+
+  @override
   String get studyCardSize => 'Dimensiunea cardului';
 
   @override

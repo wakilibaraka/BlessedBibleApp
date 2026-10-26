@@ -4,6 +4,7 @@ import '../../theme/design_tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
+import '../../state/devotional_provider.dart';
 import '../../state/nav_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/hints_provider.dart';
@@ -633,6 +634,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               onChanged: (val) {
                 HapticFeedback.selectionClick();
                 ref.read(readSettingsProvider.notifier).setCommentaryStyle(val);
+              },
+            );
+          }),
+        ],
+      ),
+      SettingsPillCard(
+        children: [
+          Consumer(builder: (context, ref, _) {
+            final showPassage = ref.watch(storyShowPassageProvider);
+            return SwitchListTile(
+              title: Text(context.l10n.storiesShowPassageTitle),
+              subtitle: Text(context.l10n.storiesShowPassageSubtitle),
+              value: showPassage,
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(storyShowPassageProvider.notifier).set(val);
               },
             );
           }),

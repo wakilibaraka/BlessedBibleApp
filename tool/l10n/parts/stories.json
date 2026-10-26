@@ -1,0 +1,33 @@
+{
+ "storiesShowPassageTitle": {
+  "en": "Show scripture in stories",
+  "fr": "Afficher le texte biblique dans les récits",
+  "it": "Mostra il testo biblico nei racconti",
+  "ro": "Afișează textul biblic în povestiri",
+  "sw": "Onyesha maandiko katika hadithi",
+  "tl": "Ipakita ang kasulatan sa mga kuwento"
+ },
+ "storiesShowPassageSubtitle": {
+  "en": "Print the full passage above each story. When off, tap the reference to read it.",
+  "fr": "Affiche le passage complet au-dessus de chaque récit. Désactivé : touchez la référence pour le lire.",
+  "it": "Mostra il passo completo sopra ogni racconto. Se disattivato, tocca il riferimento per leggerlo.",
+  "ro": "Afișează pasajul complet deasupra fiecărei povestiri. Când e oprit, atinge referința pentru a-l citi.",
+  "sw": "Onyesha kifungu kizima juu ya kila hadithi. Kikizimwa, gusa rejea ili kukisoma.",
+  "tl": "Ipakita ang buong talata sa itaas ng bawat kuwento. Kapag naka-off, i-tap ang reperensya para basahin ito."
+ },
+ "storiesOpenPassage": {
+  "en": "Read {reference}",
+  "fr": "Lire {reference}",
+  "it": "Leggi {reference}",
+  "ro": "Citește {reference}",
+  "sw": "Soma {reference}",
+  "tl": "Basahin ang {reference}",
+  "@": {
+   "placeholders": {
+    "reference": {
+     "type": "String"
+    }
+   }
+  }
+ }
+}

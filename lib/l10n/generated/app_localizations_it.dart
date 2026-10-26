@@ -2862,6 +2862,18 @@ class AppLocalizationsIt extends AppLocalizations {
   String get spaceHighlightsIntro => 'I versetti che hai evidenziato.';
 
   @override
+  String get storiesShowPassageTitle => 'Mostra il testo biblico nei racconti';
+
+  @override
+  String get storiesShowPassageSubtitle =>
+      'Mostra il passo completo sopra ogni racconto. Se disattivato, tocca il riferimento per leggerlo.';
+
+  @override
+  String storiesOpenPassage(String reference) {
+    return 'Leggi $reference';
+  }
+
+  @override
   String get studyCardSize => 'Dimensione scheda';
 
   @override

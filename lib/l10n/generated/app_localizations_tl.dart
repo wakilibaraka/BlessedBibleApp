@@ -2862,6 +2862,18 @@ class AppLocalizationsTl extends AppLocalizations {
   String get spaceHighlightsIntro => 'Mga talatang minarkahan mo ng kulay.';
 
   @override
+  String get storiesShowPassageTitle => 'Ipakita ang kasulatan sa mga kuwento';
+
+  @override
+  String get storiesShowPassageSubtitle =>
+      'Ipakita ang buong talata sa itaas ng bawat kuwento. Kapag naka-off, i-tap ang reperensya para basahin ito.';
+
+  @override
+  String storiesOpenPassage(String reference) {
+    return 'Basahin ang $reference';
+  }
+
+  @override
   String get studyCardSize => 'Laki ng card';
 
   @override

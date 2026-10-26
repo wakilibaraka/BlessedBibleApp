@@ -2842,6 +2842,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get spaceHighlightsIntro => 'Verses you\'ve marked in color.';
 
   @override
+  String get storiesShowPassageTitle => 'Show scripture in stories';
+
+  @override
+  String get storiesShowPassageSubtitle =>
+      'Print the full passage above each story. When off, tap the reference to read it.';
+
+  @override
+  String storiesOpenPassage(String reference) {
+    return 'Read $reference';
+  }
+
+  @override
   String get studyCardSize => 'Card size';
 
   @override

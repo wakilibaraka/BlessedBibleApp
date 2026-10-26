@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/devotional_story.dart';
 import '../../models/share_content.dart';
+import '../../state/bible_provider.dart';
 import '../../state/devotional_provider.dart';
 import '../widgets/share_sheet.dart';
 import '../widgets/prose_text.dart';
 import '../../state/typography_provider.dart';
 import '../../data/localized_book_names.dart';
+import '../../utils/passage.dart';
 import '../../utils/prose.dart';
+import '../widgets/verse_link_text.dart';
 import '../../theme/app_colors.dart';
 import 'bible_stories_screen.dart';
 import '../../l10n/l10n.dart';
@@ -107,6 +111,7 @@ class _BibleStoryReaderScreenState
     final isFavorite = favorites.contains(_story.id);
     final positionAsync = ref.watch(_positionProvider(_story.id));
     final position = positionAsync.value;
+    final showPassage = ref.watch(storyShowPassageProvider);
 
     return Scaffold(
       body: CustomScrollView(
@@ -191,15 +196,8 @@ class _BibleStoryReaderScreenState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '${_story.book} · ${_story.ref}',
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: theme.primaryColor,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.6,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
+                  _ReferenceChip(reference: _story.ref),
+                  const SizedBox(height: 12),
                   Text(
                     _story.title,
                     style: theme.textTheme.headlineSmall?.copyWith(
@@ -248,7 +246,7 @@ class _BibleStoryReaderScreenState
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '“${normalizeProse(_story.keyVerse)}”',
+                            '“${stripQuotes(normalizeProse(_story.keyVerse))}”',
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontFamily: 'Cormorant Garamond',
                               fontStyle: FontStyle.italic,
@@ -260,46 +258,43 @@ class _BibleStoryReaderScreenState
                       ),
                     ),
                   ],
-                  const SizedBox(height: 24),
-                  _PassageText(text: _story.text, typography: typography),
-                  const SizedBox(height: 28),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Divider(
-                          color: theme.dividerColor.withValues(alpha: 0.6),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(
-                          context.l10n.storiesTheStory,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.primaryColor,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.5,
+                  if (showPassage) ...[
+                    const SizedBox(height: 24),
+                    _PassageText(reference: _story.ref, typography: typography),
+                    const SizedBox(height: 28),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            color: theme.dividerColor.withValues(alpha: 0.6),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: Divider(
-                          color: theme.dividerColor.withValues(alpha: 0.6),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Text(
+                            context.l10n.storiesTheStory,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.primaryColor,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                        Expanded(
+                          child: Divider(
+                            color: theme.dividerColor.withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                   const SizedBox(height: 20),
                   ProseText(
                     text: _story.retelling,
                     typography: typography,
                     accent: theme.primaryColor,
                     paragraphGap: 20,
-                    baseStyle: theme.textTheme.bodyLarge?.copyWith(
-                      fontFamily: 'Source Serif 4',
-                      fontSize: typography.fontSize,
-                      height: 1.75,
-                      color: theme.colorScheme.onSurface,
-                    ),
+                    baseStyle: storyTextStyle(theme, typography),
                   ),
                   if (_story.plateCaption != null) ...[
                     const SizedBox(height: 24),
@@ -370,31 +365,107 @@ class _BibleStoryReaderScreenState
   }
 }
 
-/// KJV passage rendered as flowing prose.
-///
-/// The content packs arrive hard-wrapped at ~80 characters, so splitting on
-/// newlines used to break sentences into separate paragraphs. [proseParagraphs]
-/// rejoins the wraps and keeps blank lines as real paragraph breaks.
-class _PassageText extends StatelessWidget {
-  final String text;
-  final TypographyState typography;
+/// Body style for story text: the reader's chosen Read typography (family,
+/// size, line height, weight, italic), so stories read like scripture does.
+TextStyle? storyTextStyle(ThemeData theme, TypographyState typography) =>
+    theme.textTheme.bodyLarge?.copyWith(
+      fontFamily: typography.fontFamily,
+      fontSize: typography.fontSize,
+      height: typography.lineHeight,
+      fontWeight: typography.fontWeight,
+      fontStyle: typography.fontStyle,
+      color: theme.colorScheme.onSurface,
+    );
 
-  const _PassageText({required this.text, required this.typography});
+/// Tappable scripture reference under the artwork. Opens the passage in a
+/// sheet with "Open in Read", so the story stays the focus of the page.
+class _ReferenceChip extends StatelessWidget {
+  final String reference;
+
+  const _ReferenceChip({required this.reference});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final label = context.referenceInLocale(reference);
+    return Semantics(
+      button: true,
+      label: context.l10n.storiesOpenPassage(label),
+      excludeSemantics: true,
+      child: Material(
+        color: theme.primaryColor.withValues(alpha: 0.10),
+        shape: StadiumBorder(
+          side: BorderSide(color: theme.primaryColor.withValues(alpha: 0.30)),
+        ),
+        child: InkWell(
+          customBorder: const StadiumBorder(),
+          onTap: () {
+            HapticFeedback.selectionClick();
+            showVersePreviewSheet(context, reference, heightFactor: 0.85);
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.menu_book_rounded,
+                    size: 16, color: theme.primaryColor),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(Icons.chevron_right_rounded,
+                    size: 18, color: theme.primaryColor),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The story's scripture passage, read from the Bible database (KJV), shown
+/// inline when "Show scripture in stories" is on.
+class _PassageText extends ConsumerWidget {
+  final String reference;
+  final TypographyState typography;
+
+  const _PassageText({required this.reference, required this.typography});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final bible = ref.watch(bibleProvider);
+    final passage = PassageRef.parse(reference);
+    if (bible.isLoading || passage == null) return const SizedBox.shrink();
+    final verses = resolvePassage(bible.books, passage) ?? const [];
+    if (verses.isEmpty) return const SizedBox.shrink();
+    // One paragraph per chapter: labels read "13:5" on multi-chapter
+    // passages, so a new prefix starts a new paragraph.
+    final buffer = StringBuffer();
+    String? chapter;
+    for (final v in verses) {
+      final c = v.label.contains(':') ? v.label.split(':').first : null;
+      if (buffer.isNotEmpty) buffer.write(c != chapter ? '\n\n' : ' ');
+      chapter = c;
+      buffer.write(cleanShareText(v.text));
+    }
     return ProseText(
-      text: text,
+      text: buffer.toString(),
       typography: typography,
       accent: theme.primaryColor,
-      paragraphGap: 12,
-      baseStyle: theme.textTheme.bodyLarge?.copyWith(
-        fontFamily: 'Cormorant Garamond',
-        fontSize: TypeScale.titleLarge,
-        height: 1.62,
-        color: theme.colorScheme.onSurface,
-      ),
+      baseStyle: storyTextStyle(theme, typography),
     );
   }
 }
