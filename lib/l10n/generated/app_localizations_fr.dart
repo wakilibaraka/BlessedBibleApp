@@ -2885,6 +2885,15 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get storiesHighlight => 'Surligner';
+
+  @override
+  String get storiesUnderline => 'Souligner';
+
+  @override
+  String get storiesRemoveMark => 'Retirer la marque';
+
+  @override
   String get studyCardSize => 'Taille de la carte';
 
   @override

@@ -2864,6 +2864,15 @@ class AppLocalizationsSw extends AppLocalizations {
   }
 
   @override
+  String get storiesHighlight => 'Angazia';
+
+  @override
+  String get storiesUnderline => 'Pigia mstari';
+
+  @override
+  String get storiesRemoveMark => 'Ondoa alama';
+
+  @override
   String get studyCardSize => 'Ukubwa wa kadi';
 
   @override

@@ -6,12 +6,15 @@ import '../../data/models/devotional_story.dart';
 import '../../models/share_content.dart';
 import '../../state/bible_provider.dart';
 import '../../state/devotional_provider.dart';
+import '../../state/read_settings_provider.dart';
+import '../../state/user_data_provider.dart';
 import '../widgets/share_sheet.dart';
 import '../widgets/prose_text.dart';
 import '../../state/typography_provider.dart';
 import '../../data/localized_book_names.dart';
 import '../../utils/passage.dart';
 import '../../utils/prose.dart';
+import '../../utils/span_marks.dart';
 import '../widgets/verse_link_text.dart';
 import '../../theme/app_colors.dart';
 import 'bible_stories_screen.dart';
@@ -34,6 +37,9 @@ class _BibleStoryReaderScreenState
   late DevotionalStory _story;
   final ScrollController _scrollController = ScrollController();
   bool _markedRead = false;
+
+  /// Current text selection in the story, if any (plain text).
+  String? _selection;
 
   @override
   void initState() {
@@ -81,6 +87,117 @@ class _BibleStoryReaderScreenState
     });
   }
 
+  /// The current selection's range inside the rendered retelling, or null
+  /// when nothing is selected or the selection is outside the story.
+  ({int start, int end})? _selectionRange() {
+    final selection = _selection;
+    if (selection == null || selection.trim().isEmpty) return null;
+    return locateSelection(renderedProse(_story.retelling), selection);
+  }
+
+  void _markSelection(SelectableRegionState region, StoryMarkKind kind) {
+    final range = _selectionRange();
+    if (range == null) return;
+    HapticFeedback.selectionClick();
+    ref.read(storyMarksProvider.notifier).add(
+          _story.id,
+          StoryMark(
+            start: range.start,
+            end: range.end,
+            kind: kind,
+            colorIndex:
+                ref.read(readSettingsProvider).activeHighlightColorIndex,
+          ),
+        );
+    region.clearSelection();
+    region.hideToolbar();
+  }
+
+  void _unmarkSelection(SelectableRegionState region) {
+    final range = _selectionRange();
+    if (range == null) return;
+    HapticFeedback.selectionClick();
+    ref
+        .read(storyMarksProvider.notifier)
+        .removeRange(_story.id, range.start, range.end);
+    region.clearSelection();
+    region.hideToolbar();
+  }
+
+  void _shareSelection(SelectableRegionState region) {
+    final selection = _selection?.trim();
+    if (selection == null || selection.isEmpty) return;
+    region.hideToolbar();
+    showShareSheet(
+      context: context,
+      content: ShareContent.story(
+        title: _story.title,
+        body: selection,
+        reference: _story.ref,
+        eyebrow: context.l10n.storiesTitle.toUpperCase(),
+        source: _story.book,
+        imageFilename: 'story-${shareSlug(_story.title)}',
+      ),
+    );
+  }
+
+  /// System Copy / Select all, plus Highlight, Underline, Remove and Share
+  /// when the selection sits inside the story.
+  Widget _buildSelectionMenu(
+      BuildContext context, SelectableRegionState region) {
+    final items = [...region.contextMenuButtonItems];
+    final range = _selectionRange();
+    if (range != null) {
+      final marks = ref.read(storyMarksProvider)[_story.id] ?? const [];
+      final marked = marks.any((m) => m.overlaps(range.start, range.end));
+      items.addAll([
+        ContextMenuButtonItem(
+          label: context.l10n.storiesHighlight,
+          onPressed: () => _markSelection(region, StoryMarkKind.highlight),
+        ),
+        ContextMenuButtonItem(
+          label: context.l10n.storiesUnderline,
+          onPressed: () => _markSelection(region, StoryMarkKind.underline),
+        ),
+        if (marked)
+          ContextMenuButtonItem(
+            label: context.l10n.storiesRemoveMark,
+            onPressed: () => _unmarkSelection(region),
+          ),
+      ]);
+    }
+    items.add(ContextMenuButtonItem(
+      label: context.l10n.commonShare,
+      onPressed: () => _shareSelection(region),
+    ));
+    return AdaptiveTextSelectionToolbar.buttonItems(
+      anchors: region.contextMenuAnchors,
+      buttonItems: items,
+    );
+  }
+
+  List<SpanMark> _spanMarks(ThemeData theme, List<StoryMark> marks) => [
+        for (final m in marks)
+          (
+            start: m.start,
+            end: m.end,
+            style: m.kind == StoryMarkKind.highlight
+                ? TextStyle(
+                    backgroundColor: AppColors.getRenderedHighlightColor(
+                      highlightPalette[
+                          m.colorIndex.clamp(0, highlightPalette.length - 1)],
+                      theme.brightness,
+                      theme.scaffoldBackgroundColor,
+                    ),
+                  )
+                : TextStyle(
+                    decoration: TextDecoration.underline,
+                    decorationColor: theme.primaryColor,
+                    decorationThickness: 2,
+                  ),
+          ),
+      ];
+
   /// Share this story as text, an image card or a PDF with the full
   /// retelling, key verse and reference.
   void _shareStory() {
@@ -113,6 +230,7 @@ class _BibleStoryReaderScreenState
     final positionAsync = ref.watch(_positionProvider(_story.id));
     final position = positionAsync.value;
     final showPassage = ref.watch(storyShowPassageProvider);
+    final marks = ref.watch(storyMarksProvider)[_story.id] ?? const [];
 
     return Scaffold(
       body: CustomScrollView(
@@ -192,126 +310,133 @@ class _BibleStoryReaderScreenState
             ),
           ),
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _ReferenceChip(reference: _story.ref),
-                  const SizedBox(height: 12),
-                  Text(
-                    _story.title,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontFamily: 'Playfair Display',
-                      fontWeight: FontWeight.w700,
-                      height: 1.2,
-                    ),
-                  ),
-                  if (position != null) ...[
-                    const SizedBox(height: 6),
+            child: SelectionArea(
+              onSelectionChanged: (content) => _selection = content?.plainText,
+              contextMenuBuilder: _buildSelectionMenu,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _ReferenceChip(reference: _story.ref),
+                    const SizedBox(height: 12),
                     Text(
-                      context.l10n.storiesPosition(
-                        position.index,
-                        position.total,
-                        context.bookNameInLocale(position.book),
-                      ),
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      _story.title,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontFamily: 'Playfair Display',
+                        fontWeight: FontWeight.w700,
+                        height: 1.2,
                       ),
                     ),
-                  ],
-                  if (_story.keyVerse.isNotEmpty) ...[
-                    const SizedBox(height: 20),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: theme.primaryColor.withValues(alpha: 0.06),
-                        borderRadius: BorderRadius.circular(Radii.lg),
-                        border: Border.all(
-                          color: theme.primaryColor.withValues(alpha: 0.25),
+                    if (position != null) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        context.l10n.storiesPosition(
+                          position.index,
+                          position.total,
+                          context.bookNameInLocale(position.book),
+                        ),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.5),
                         ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    ],
+                    if (_story.keyVerse.isNotEmpty) ...[
+                      const SizedBox(height: 20),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor.withValues(alpha: 0.06),
+                          borderRadius: BorderRadius.circular(Radii.lg),
+                          border: Border.all(
+                            color: theme.primaryColor.withValues(alpha: 0.25),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              context.l10n.storiesKeyVerse(
+                                  _story.keyVerseRef.toUpperCase()),
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.primaryColor,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '“${stripQuotes(normalizeProse(_story.keyVerse))}”',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontFamily: 'Cormorant Garamond',
+                                fontStyle: FontStyle.italic,
+                                fontWeight: FontWeight.w600,
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    if (showPassage) ...[
+                      const SizedBox(height: 24),
+                      _PassageText(
+                          reference: _story.ref, typography: typography),
+                      const SizedBox(height: 28),
+                      Row(
                         children: [
-                          Text(
-                            context.l10n.storiesKeyVerse(
-                                _story.keyVerseRef.toUpperCase()),
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.primaryColor,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.2,
+                          Expanded(
+                            child: Divider(
+                              color: theme.dividerColor.withValues(alpha: 0.6),
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '“${stripQuotes(normalizeProse(_story.keyVerse))}”',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontFamily: 'Cormorant Garamond',
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.w600,
-                              height: 1.4,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              context.l10n.storiesTheStory,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.primaryColor,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Divider(
+                              color: theme.dividerColor.withValues(alpha: 0.6),
                             ),
                           ),
                         ],
                       ),
+                    ],
+                    const SizedBox(height: 20),
+                    ProseText(
+                      text: _story.retelling,
+                      typography: typography,
+                      accent: theme.primaryColor,
+                      paragraphGap: 20,
+                      baseStyle: storyTextStyle(theme, typography),
+                      marks: _spanMarks(theme, marks),
                     ),
-                  ],
-                  if (showPassage) ...[
-                    const SizedBox(height: 24),
-                    _PassageText(reference: _story.ref, typography: typography),
-                    const SizedBox(height: 28),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            color: theme.dividerColor.withValues(alpha: 0.6),
-                          ),
+                    if (_story.plateCaption != null) ...[
+                      const SizedBox(height: 24),
+                      Text(
+                        context.l10n
+                            .storiesArtworkCaption(_story.plateCaption!),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.45),
+                          fontStyle: FontStyle.italic,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Text(
-                            context.l10n.storiesTheStory,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.primaryColor,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.5,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Divider(
-                            color: theme.dividerColor.withValues(alpha: 0.6),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                  const SizedBox(height: 20),
-                  ProseText(
-                    text: _story.retelling,
-                    typography: typography,
-                    accent: theme.primaryColor,
-                    paragraphGap: 20,
-                    baseStyle: storyTextStyle(theme, typography),
-                  ),
-                  if (_story.plateCaption != null) ...[
-                    const SizedBox(height: 24),
-                    Text(
-                      context.l10n.storiesArtworkCaption(_story.plateCaption!),
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.45),
-                        fontStyle: FontStyle.italic,
                       ),
-                    ),
+                    ],
+                    const SizedBox(height: 16),
+                    const DevotionalAttribution(),
+                    const SizedBox(height: 100),
                   ],
-                  const SizedBox(height: 16),
-                  const DevotionalAttribution(),
-                  const SizedBox(height: 100),
-                ],
+                ),
               ),
             ),
           ),

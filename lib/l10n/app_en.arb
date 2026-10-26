@@ -1510,6 +1510,9 @@
       }
     }
   },
+  "storiesHighlight": "Highlight",
+  "storiesUnderline": "Underline",
+  "storiesRemoveMark": "Remove mark",
   "studyCardSize": "Card size",
   "studyPosition": "Position",
   "studySizeLarge": "Large",

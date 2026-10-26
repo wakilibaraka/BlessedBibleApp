@@ -4954,6 +4954,24 @@ abstract class AppLocalizations {
   /// **'Read {reference}'**
   String storiesOpenPassage(String reference);
 
+  /// No description provided for @storiesHighlight.
+  ///
+  /// In en, this message translates to:
+  /// **'Highlight'**
+  String get storiesHighlight;
+
+  /// No description provided for @storiesUnderline.
+  ///
+  /// In en, this message translates to:
+  /// **'Underline'**
+  String get storiesUnderline;
+
+  /// No description provided for @storiesRemoveMark.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove mark'**
+  String get storiesRemoveMark;
+
   /// No description provided for @studyCardSize.
   ///
   /// In en, this message translates to:

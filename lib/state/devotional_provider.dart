@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/models/devotional_story.dart';
@@ -207,3 +209,121 @@ class StoryShowPassageNotifier extends Notifier<bool> {
 final storyShowPassageProvider =
     NotifierProvider<StoryShowPassageNotifier, bool>(
         StoryShowPassageNotifier.new);
+
+/// How a story mark is drawn.
+enum StoryMarkKind { highlight, underline }
+
+/// A highlight or underline on a story's retelling. [start]/[end] count
+/// characters of the rendered retelling (see `renderedProse`), so marks
+/// survive layout and font changes. [colorIndex] indexes `highlightPalette`.
+class StoryMark {
+  final int start;
+  final int end;
+  final StoryMarkKind kind;
+  final int colorIndex;
+
+  const StoryMark({
+    required this.start,
+    required this.end,
+    required this.kind,
+    this.colorIndex = 0,
+  });
+
+  bool overlaps(int s, int e) => start < e && end > s;
+
+  Map<String, dynamic> toJson() => {
+        's': start,
+        'e': end,
+        'k': kind.name,
+        'c': colorIndex,
+      };
+
+  static StoryMark? fromJson(Object? json) {
+    if (json is! Map) return null;
+    final s = json['s'], e = json['e'];
+    if (s is! int || e is! int || e <= s) return null;
+    return StoryMark(
+      start: s,
+      end: e,
+      kind: json['k'] == StoryMarkKind.underline.name
+          ? StoryMarkKind.underline
+          : StoryMarkKind.highlight,
+      colorIndex: json['c'] is int ? json['c'] as int : 0,
+    );
+  }
+}
+
+/// Highlights and underlines per story id, saved on the device.
+class StoryMarksNotifier extends Notifier<Map<String, List<StoryMark>>> {
+  static const String _key = 'story_marks';
+
+  @override
+  Map<String, List<StoryMark>> build() {
+    final raw = ref.watch(preferencesProvider).prefs.getString(_key);
+    if (raw == null) return const {};
+    try {
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      return {
+        for (final entry in decoded.entries)
+          entry.key: [
+            for (final m in entry.value as List<dynamic>)
+              if (StoryMark.fromJson(m) case final mark?) mark,
+          ],
+      }..removeWhere((_, marks) => marks.isEmpty);
+    } catch (_) {
+      return const {};
+    }
+  }
+
+  void _save() {
+    ref.read(preferencesProvider).prefs.setString(
+          _key,
+          jsonEncode({
+            for (final e in state.entries)
+              e.key: [for (final m in e.value) m.toJson()],
+          }),
+        );
+  }
+
+  /// Adds [mark], replacing marks of the same kind it overlaps.
+  void add(String storyId, StoryMark mark) {
+    final current = state[storyId] ?? const <StoryMark>[];
+    final kept = [
+      for (final m in current)
+        if (m.kind != mark.kind || !m.overlaps(mark.start, mark.end)) m,
+    ];
+    state = {
+      ...state,
+      storyId: [...kept, mark]..sort((a, b) => a.start.compareTo(b.start)),
+    };
+    _save();
+  }
+
+  /// Removes every mark overlapping [start, end).
+  void removeRange(String storyId, int start, int end) {
+    final current = state[storyId];
+    if (current == null) return;
+    final kept = [
+      for (final m in current)
+        if (!m.overlaps(start, end)) m
+    ];
+    state = {...state, storyId: kept}..removeWhere((_, v) => v.isEmpty);
+    _save();
+  }
+}
+
+final storyMarksProvider =
+    NotifierProvider<StoryMarksNotifier, Map<String, List<StoryMark>>>(
+        StoryMarksNotifier.new);
+
+/// Finds [selection] in [rendered], ignoring differences in whitespace
+/// (a selection across paragraphs may join them with any line break).
+/// Returns the first match's range, or null.
+({int start, int end})? locateSelection(String rendered, String selection) {
+  final words = selection.trim().split(RegExp(r'\s+'));
+  if (words.isEmpty || words.first.isEmpty) return null;
+  final pattern = RegExp(words.map(RegExp.escape).join(r'\s+'));
+  final match = pattern.firstMatch(rendered);
+  if (match == null) return null;
+  return (start: match.start, end: match.end);
+}

@@ -2882,6 +2882,15 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
+  String get storiesHighlight => 'Evidențiază';
+
+  @override
+  String get storiesUnderline => 'Subliniază';
+
+  @override
+  String get storiesRemoveMark => 'Elimină marcajul';
+
+  @override
   String get studyCardSize => 'Dimensiunea cardului';
 
   @override

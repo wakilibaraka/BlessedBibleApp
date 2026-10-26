@@ -2854,6 +2854,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get storiesHighlight => 'Highlight';
+
+  @override
+  String get storiesUnderline => 'Underline';
+
+  @override
+  String get storiesRemoveMark => 'Remove mark';
+
+  @override
   String get studyCardSize => 'Card size';
 
   @override

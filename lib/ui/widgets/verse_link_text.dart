@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '../../utils/passage.dart';
+import '../../utils/span_marks.dart';
 import '../../utils/verse_linker.dart';
 import 'verse_preview_modal.dart';
 
@@ -85,6 +86,10 @@ class VerseLinkText extends StatefulWidget {
   final bool parseMarkup;
   final TextStyle? underlineStyle;
 
+  /// Styled ranges (highlights, underlines) over the rendered text, i.e.
+  /// after markup is stripped. See [applySpanMarks].
+  final List<SpanMark> marks;
+
   const VerseLinkText({
     super.key,
     required this.text,
@@ -96,6 +101,7 @@ class VerseLinkText extends StatefulWidget {
     this.boldStyle,
     this.parseMarkup = false,
     this.underlineStyle,
+    this.marks = const [],
   });
 
   @override
@@ -192,7 +198,11 @@ class _VerseLinkTextState extends State<VerseLinkText> {
       textAlign: widget.textAlign,
       // RichText ignores the system text size unless told otherwise.
       textScaler: MediaQuery.textScalerOf(context),
-      text: TextSpan(children: _spans),
+      // Selectable inside a SelectionArea; no effect elsewhere.
+      selectionRegistrar: SelectionContainer.maybeOf(context),
+      selectionColor: DefaultSelectionStyle.of(context).selectionColor ??
+          DefaultSelectionStyle.defaultColor,
+      text: TextSpan(children: applySpanMarks(_spans, widget.marks)),
     );
   }
 }

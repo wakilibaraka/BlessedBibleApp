@@ -29,5 +29,29 @@
     }
    }
   }
+ },
+ "storiesHighlight": {
+  "en": "Highlight",
+  "fr": "Surligner",
+  "it": "Evidenzia",
+  "ro": "Evidențiază",
+  "sw": "Angazia",
+  "tl": "I-highlight"
+ },
+ "storiesUnderline": {
+  "en": "Underline",
+  "fr": "Souligner",
+  "it": "Sottolinea",
+  "ro": "Subliniază",
+  "sw": "Pigia mstari",
+  "tl": "Salungguhitan"
+ },
+ "storiesRemoveMark": {
+  "en": "Remove mark",
+  "fr": "Retirer la marque",
+  "it": "Rimuovi segno",
+  "ro": "Elimină marcajul",
+  "sw": "Ondoa alama",
+  "tl": "Alisin ang marka"
  }
 }

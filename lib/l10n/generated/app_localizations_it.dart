@@ -2874,6 +2874,15 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get storiesHighlight => 'Evidenzia';
+
+  @override
+  String get storiesUnderline => 'Sottolinea';
+
+  @override
+  String get storiesRemoveMark => 'Rimuovi segno';
+
+  @override
   String get studyCardSize => 'Dimensione scheda';
 
   @override

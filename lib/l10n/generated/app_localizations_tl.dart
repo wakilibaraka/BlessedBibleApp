@@ -2874,6 +2874,15 @@ class AppLocalizationsTl extends AppLocalizations {
   }
 
   @override
+  String get storiesHighlight => 'I-highlight';
+
+  @override
+  String get storiesUnderline => 'Salungguhitan';
+
+  @override
+  String get storiesRemoveMark => 'Alisin ang marka';
+
+  @override
   String get studyCardSize => 'Laki ng card';
 
   @override
