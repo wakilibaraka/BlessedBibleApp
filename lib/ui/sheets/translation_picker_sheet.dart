@@ -72,15 +72,17 @@ class _TranslationPickerSheetState
     final availableTranslations = ref.watch(availableTranslationsProvider);
 
     return FractionallySizedBox(
-      heightFactor: 0.75,
+      heightFactor: 0.85,
       child: TexturedGlassContainer(
         borderRadius:
             const BorderRadius.vertical(top: Radius.circular(Radii.xxxl)),
+        // One inset on both sides so the header, layout selector and list
+        // share the same left and right edges.
         padding: EdgeInsets.only(
-          top: 24,
-          bottom: MediaQuery.of(context).padding.bottom + 24,
-          left: 20,
-          right: 20,
+          top: Space.md,
+          bottom: MediaQuery.of(context).padding.bottom + Space.lg,
+          left: Space.xl,
+          right: Space.xl,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -96,16 +98,22 @@ class _TranslationPickerSheetState
                     ),
                   ),
                 ),
-                IconButton(
-                  tooltip: context.l10n.commonClose,
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close_rounded),
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                // Nudged right so the icon's edge lines up with the content
+                // below while keeping the full touch target.
+                Transform.translate(
+                  offset: const Offset(Space.md, 0),
+                  child: IconButton(
+                    tooltip: context.l10n.commonClose,
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close_rounded),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: Space.xs),
             AnimatedSegmentedTile<ReadingLayout>(
+              padding: EdgeInsets.zero,
               title: context.l10n.readLayoutTitle,
               subtitle: () {
                 switch (readingLayout) {
@@ -133,7 +141,7 @@ class _TranslationPickerSheetState
                 ref.read(readSettingsProvider.notifier).setReadingLayout(val);
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: Space.md),
             if (readingLayout != ReadingLayout.single) ...[
               Container(
                 decoration: BoxDecoration(
@@ -165,7 +173,7 @@ class _TranslationPickerSheetState
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: Space.md),
             ],
             Expanded(
               child: SingleChildScrollView(
