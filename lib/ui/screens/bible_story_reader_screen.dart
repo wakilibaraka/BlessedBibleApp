@@ -88,8 +88,9 @@ class _BibleStoryReaderScreenState
       context: context,
       content: ShareContent.story(
         title: _story.title,
-        body:
-            _story.retelling.trim().isNotEmpty ? _story.retelling : _story.text,
+        body: _story.retelling.trim().isNotEmpty
+            ? _story.retelling
+            : _story.keyVerse,
         reference: _story.ref,
         eyebrow: context.l10n.storiesTitle.toUpperCase(),
         keyVerse: _story.keyVerse,

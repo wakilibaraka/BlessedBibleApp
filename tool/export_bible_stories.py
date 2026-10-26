@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
-"""Export The Graham Bible story data (KJV text + narrative retellings) for BlessedBibleApp.
+"""Export The Graham Bible story data (narrative retellings) for BlessedBibleApp.
 
 Fetches all 500 devotional spreads from graham-devotional's public Supabase REST
 endpoint and writes:
   assets/devotional/stories/index.json        - light story index (all 500)
-  assets/devotional/stories/<BOOK>.json       - full text per book (66 files)
+  assets/devotional/stories/<BOOK>.json       - stories per book (66 files)
   tool/data/export_manifest.json             - build report
 
 Text rights: KJV is public domain. Narrative summaries are included per the
-project owner's decision; attribution is embedded in each book file.
+project owner's decision; attribution is embedded in each book file. The
+KJV passage itself is not exported: the app reads it from the Bible database
+by the story's reference, so the packs never duplicate scripture.
 Run:  python3 tool/export_bible_stories.py
 """
 
@@ -38,7 +40,6 @@ FIELDS = ",".join(
         "end_verse",
         "title",
         "kjv_passage_ref",
-        "kjv_passage_text",
         "kjv_key_verse_ref",
         "kjv_key_verse_text",
         "paraphrase_text",
@@ -47,14 +48,6 @@ FIELDS = ",".join(
 
 # Group books into per-file buckets keyed by spread prefix (66 expected, GSP merged none)
 FILES = {}
-
-
-def normalize_verse_text(text: str) -> str:
-    """KJV passage text arrives newline-separated per verse."""
-    if not text:
-        return ""
-    lines = [ln.strip() for ln in text.replace("\r", "\n").split("\n")]
-    return "\n".join(ln for ln in lines if ln)
 
 
 def clean_key_verse(text: str) -> str:
@@ -111,7 +104,6 @@ def main() -> None:
                     "verse": (r.get("start_chapter"), r.get("start_verse")),
                     "keyVerseRef": (r.get("kjv_key_verse_ref") or "").strip(),
                     "keyVerse": clean_key_verse(r.get("kjv_key_verse_text") or ""),
-                    "text": normalize_verse_text(r.get("kjv_passage_text") or ""),
                     "retelling": para,
                 }
             )

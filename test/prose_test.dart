@@ -10,6 +10,7 @@ import 'package:the_blessed_bible/state/typography_provider.dart';
 import 'package:the_blessed_bible/ui/widgets/commentary_prose.dart';
 import 'package:the_blessed_bible/ui/widgets/prose_text.dart';
 import 'package:the_blessed_bible/ui/widgets/verse_link_text.dart';
+import 'package:the_blessed_bible/utils/passage.dart';
 import 'package:the_blessed_bible/utils/prose.dart';
 
 void main() {
@@ -107,13 +108,12 @@ void main() {
   });
 
   group('content packs', () {
-    test('story passages rejoin source wraps without stray breaks', () {
+    test('story retellings rejoin source wraps without stray breaks', () {
       final raw = File('assets/devotional/stories/1CH.json').readAsStringSync();
       final stories =
           (jsonDecode(raw) as Map<String, dynamic>)['stories'] as List<dynamic>;
-      final text = (stories.first as Map<String, dynamic>)['text'] as String;
-      expect(text.contains('\n'), isTrue,
-          reason: 'fixture is expected to be hard-wrapped');
+      final text =
+          (stories.first as Map<String, dynamic>)['retelling'] as String;
 
       final paragraphs = proseParagraphs(text);
       expect(paragraphs, isNotEmpty);
@@ -121,8 +121,25 @@ void main() {
         expect(paragraph.contains('\n'), isFalse, reason: paragraph);
         expect(paragraph.contains('  '), isFalse, reason: paragraph);
       }
-      // Wrapped lines are joined, not lost.
       expect(paragraphs.first.split(' ').length, greaterThan(2));
+    });
+
+    test('story packs do not duplicate the KJV passage', () {
+      // The reader resolves each story's reference against the Bible
+      // database, so the packs must not carry the passage text again.
+      for (final file in Directory('assets/devotional/stories')
+          .listSync()
+          .whereType<File>()
+          .where((f) => !f.path.endsWith('index.json'))) {
+        final pack =
+            jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
+        for (final story in pack['stories'] as List<dynamic>) {
+          final s = story as Map<String, dynamic>;
+          expect(s.containsKey('text'), isFalse, reason: '${s['id']}');
+          expect(PassageRef.parse(s['ref'] as String), isNotNull,
+              reason: '${s['id']}: ${s['ref']}');
+        }
+      }
     });
 
     test('commentary markers are parsed away from rendered text', () {

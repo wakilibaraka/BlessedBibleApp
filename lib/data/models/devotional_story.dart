@@ -9,7 +9,8 @@ class DevotionalStory {
   final String ref; // e.g. "Genesis 1:1-2:3"
   final String keyVerseRef;
   final String keyVerse;
-  final String text; // full KJV passage, newline-separated verses
+  // The KJV passage is not stored here: readers resolve [ref] against the
+  // Bible database (lib/utils/passage.dart).
   final String retelling; // narrative summary
 
   // Enriched at load time by DevotionalService.
@@ -28,7 +29,6 @@ class DevotionalStory {
     required this.ref,
     required this.keyVerseRef,
     required this.keyVerse,
-    required this.text,
     required this.retelling,
     required this.book,
     required this.prefix,
@@ -58,7 +58,6 @@ class DevotionalStory {
       ref: ref,
       keyVerseRef: keyVerseRef,
       keyVerse: keyVerse,
-      text: text,
       retelling: retelling,
       book: book,
       prefix: prefix,
@@ -85,7 +84,6 @@ class DevotionalStory {
       ref: (json['ref'] as String?) ?? '',
       keyVerseRef: (json['keyVerseRef'] as String?) ?? '',
       keyVerse: (json['keyVerse'] as String?) ?? '',
-      text: (json['text'] as String?) ?? '',
       retelling: (json['retelling'] as String?) ?? '',
       book: book,
       prefix: prefix,
