@@ -10,14 +10,17 @@ import 'user_data_provider.dart';
 export 'package:blessed_account/blessed_account.dart'
     show
         AccountUser,
+        SharedProfile,
         SignInCancelledException,
         SignInFailedException,
         SignInResult,
         SignInStatus,
+        accountFirestoreProvider,
         accountServiceProvider,
         accountUserProvider,
         appleSignInAvailableProvider,
-        authGatewayProvider;
+        authGatewayProvider,
+        sharedProfileProvider;
 
 /// The Bible app's account actions, on top of the shared `blessed_account`
 /// package (same account as Blessed Arcade).
@@ -34,6 +37,23 @@ class AuthActions {
 
   Future<SignInResult> signInWithApple() async =>
       _rememberSignIn(await _account.signInWithApple());
+
+  /// Updates the user's chosen display name: on-device for a guest,
+  /// and synced to the cloud profile when signed in.
+  Future<void> updateDisplayName(String name) async {
+    final trimmed = name.trim();
+    final prefs = ref.read(preferencesProvider);
+    final user = ref.read(accountUserProvider).value;
+    if (user != null) {
+      if (trimmed.isNotEmpty) {
+        try {
+          await _account.profiles.update(user.uid, displayName: trimmed);
+        } catch (_) {}
+      }
+    } else {
+      await prefs.setGuestDisplayName(trimmed);
+    }
+  }
 
   /// A deliberate sign-out; keeps the "welcome back" prompt from nagging.
   Future<void> signOut() async {

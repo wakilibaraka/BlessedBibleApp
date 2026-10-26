@@ -121,7 +121,8 @@ void main() {
     // Signed out: guest header + sign-in rows. Apple sign-in is offered
     // only where it works (iOS/macOS), so not on this Android-like device.
     expect(find.text('Guest'), findsOneWidget);
-    expect(find.text('Account'), findsOneWidget);
+    // "ACCOUNT" appears as the eyebrow label inside the hero card.
+    expect(find.text('ACCOUNT'), findsOneWidget);
     expect(find.text('Settings'), findsOneWidget);
     expect(find.text('Back up data'), findsOneWidget);
     expect(find.text('Restore data'), findsOneWidget);

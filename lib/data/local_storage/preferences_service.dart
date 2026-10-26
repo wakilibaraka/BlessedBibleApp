@@ -65,6 +65,18 @@ class PreferencesService {
   static const String _customWeeklyMinuteKey = 'custom_weekly_minute';
 
   static const String _verseVisitsKey = 'verse_visits';
+  static const String _guestDisplayNameKey = 'guest_display_name';
+
+  String? getGuestDisplayName() => prefs.getString(_guestDisplayNameKey);
+
+  Future<void> setGuestDisplayName(String name) async {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) {
+      await prefs.remove(_guestDisplayNameKey);
+    } else {
+      await prefs.setString(_guestDisplayNameKey, trimmed);
+    }
+  }
 
   void saveSearchHistory(List<SearchResult> history) {
     final jsonList = history.map((e) => e.toJson()).toList();

@@ -2488,6 +2488,21 @@ class AppLocalizationsRo extends AppLocalizations {
   String get accountSignInToSync => 'Conectează-te pentru sincronizare';
 
   @override
+  String get accountEditName => 'Edit display name';
+
+  @override
+  String get accountChooseName => 'Choose display name';
+
+  @override
+  String get accountNameHint => 'Your display name';
+
+  @override
+  String get accountSave => 'Save';
+
+  @override
+  String get accountNameUpdated => 'Display name updated.';
+
+  @override
   String get accountAccount => 'Cont';
 
   @override
@@ -2987,10 +3002,16 @@ class AppLocalizationsRo extends AppLocalizations {
   String get studyVerseOfTheDay => 'Versetul zilei';
 
   @override
+  String get studyVerseOfTheDayHistory => 'Verse of the day history';
+
+  @override
   String get studyRecentVerses => 'Versete recente';
 
   @override
   String get studyWordLookUp => 'Caută';
+
+  @override
+  String get studyRecentWords => 'Recent words';
 
   @override
   String get studyConcordanceClear => 'Șterge';
@@ -3142,6 +3163,9 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get studyWordOfTheDay => 'Cuvântul zilei';
+
+  @override
+  String get studyWordOfTheDayHistory => 'Word of the day history';
 
   @override
   String get studyArchiveLink => 'Arhivă →';

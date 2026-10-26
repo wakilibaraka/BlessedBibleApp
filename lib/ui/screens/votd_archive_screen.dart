@@ -54,7 +54,7 @@ class VotdArchiveScreen extends ConsumerWidget {
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
               title: Text(
-                context.l10n.plansDailyVerses,
+                context.l10n.studyVerseOfTheDayHistory,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.primaryColor,

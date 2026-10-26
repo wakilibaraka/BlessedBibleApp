@@ -31,8 +31,12 @@ class AccountAvatar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final user = ref.watch(accountUserProvider).value;
+    final guestName =
+        ref.watch(preferencesProvider).getGuestDisplayName()?.trim() ?? '';
+    final name = (user?.displayName?.trim().isNotEmpty ?? false)
+        ? user!.displayName!.trim()
+        : guestName;
     Widget fallback;
-    final name = user?.displayName?.trim() ?? '';
     if (name.isNotEmpty) {
       fallback = CircleAvatar(
         radius: size / 2,
@@ -128,9 +132,6 @@ class _AccountMenuBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final user = ref.watch(accountUserProvider).value;
-    final name = user?.displayName?.trim() ?? '';
-    final email = user?.email?.trim() ?? '';
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,48 +147,9 @@ class _AccountMenuBody extends ConsumerWidget {
             ),
           ),
         ),
-        // ── Header ────────────────────────────────
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-          child: Row(
-            children: [
-              const AccountAvatar(size: 48),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name.isNotEmpty ? name : context.l10n.accountGuest,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      email.isNotEmpty
-                          ? email
-                          : context.l10n.accountSignInToSync,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+        // ── Unified Hero Account Card ──────────────
+        const _AccountHeroCard(),
         const Divider(height: 1, indent: 16, endIndent: 16),
-        _MenuTile(
-          icon: Icons.person_outline_rounded,
-          label: context.l10n.accountAccount,
-          onTap: () {
-            Navigator.of(context).pop();
-            _showAccountSheet(context);
-          },
-        ),
         _MenuTile(
           icon: Icons.settings_outlined,
           label: context.l10n.accountSettings,
@@ -215,27 +177,6 @@ class _AccountMenuBody extends ConsumerWidget {
             _showRestoreDialog(context, ref);
           },
         ),
-        if (user == null) ...[
-          _MenuTile(
-            icon: Icons.account_circle_outlined,
-            label: context.l10n.accountSignInGoogle,
-            onTap: () => _signIn(context, ref, google: true),
-          ),
-          if (ref.watch(appleSignInAvailableProvider))
-            _MenuTile(
-              icon: Icons.apple,
-              label: context.l10n.accountSignInApple,
-              onTap: () => _signIn(context, ref, google: false),
-            ),
-        ] else ...[
-          const _SyncTile(),
-          _MenuTile(
-            icon: Icons.logout_rounded,
-            label: context.l10n.accountSignOut,
-            destructive: true,
-            onTap: () => _signOut(context, ref),
-          ),
-        ],
         _MenuTile(
           icon: Icons.delete_sweep_outlined,
           label: context.l10n.accountResetApp,
@@ -245,6 +186,306 @@ class _AccountMenuBody extends ConsumerWidget {
         ),
       ],
     );
+  }
+}
+
+class _AccountHeroCard extends ConsumerStatefulWidget {
+  const _AccountHeroCard();
+
+  @override
+  ConsumerState<_AccountHeroCard> createState() => _AccountHeroCardState();
+}
+
+class _AccountHeroCardState extends ConsumerState<_AccountHeroCard> {
+  bool _isSigningIn = false;
+
+  Future<void> _handleSignIn({required bool google}) async {
+    if (_isSigningIn) return;
+    setState(() => _isSigningIn = true);
+    try {
+      final success = await runSignIn(context, ref, google: google);
+      if (success && mounted) {
+        Navigator.of(context).pop();
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSigningIn = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final user = ref.watch(accountUserProvider).value;
+    final guestName =
+        ref.watch(preferencesProvider).getGuestDisplayName()?.trim() ?? '';
+    final name = (user?.displayName?.trim().isNotEmpty ?? false)
+        ? user!.displayName!.trim()
+        : (guestName.isNotEmpty ? guestName : context.l10n.accountGuest);
+    final email = user?.email?.trim() ?? '';
+    final appleAvailable = ref.watch(appleSignInAvailableProvider);
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color:
+            theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
+        borderRadius: BorderRadius.circular(Radii.xl),
+        border: Border.all(
+          color: theme.dividerColor.withValues(alpha: 0.15),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                context.l10n.accountAccount.toUpperCase(),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.1,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => _showEditDisplayNameDialog(context, ref),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.edit_outlined,
+                          size: 14, color: theme.colorScheme.primary),
+                      const SizedBox(width: 4),
+                      Text(
+                        context.l10n.accountEditName,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              const AccountAvatar(size: 46),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      email.isNotEmpty
+                          ? email
+                          : context.l10n.accountSignInToSync,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          if (user == null) ...[
+            SizedBox(
+              width: double.infinity,
+              height: 44,
+              child: OutlinedButton.icon(
+                icon: _isSigningIn
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.account_circle_outlined, size: 20),
+                label: Text(context.l10n.accountSignInGoogle),
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(Radii.lg),
+                  ),
+                ),
+                onPressed:
+                    _isSigningIn ? null : () => _handleSignIn(google: true),
+              ),
+            ),
+            if (appleAvailable) ...[
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                height: 44,
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.apple, size: 20),
+                  label: Text(context.l10n.accountSignInApple),
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(Radii.lg),
+                    ),
+                  ),
+                  onPressed:
+                      _isSigningIn ? null : () => _handleSignIn(google: false),
+                ),
+              ),
+            ],
+          ] else ...[
+            const _SyncSection(),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.logout_rounded, size: 18),
+                    label: Text(context.l10n.accountSignOut),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: theme.colorScheme.error,
+                      side: BorderSide(
+                        color:
+                            theme.colorScheme.error.withValues(alpha: 0.35),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(Radii.lg),
+                      ),
+                    ),
+                    onPressed: () => _signOut(context, ref),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  tooltip: context.l10n.accountDeleteAccount,
+                  icon: Icon(Icons.delete_outline_rounded,
+                      color: theme.colorScheme.error.withValues(alpha: 0.7)),
+                  onPressed: () => _confirmDeleteAccount(context, ref),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+void _showEditDisplayNameDialog(BuildContext context, WidgetRef ref) {
+  final user = ref.read(accountUserProvider).value;
+  final guestName = ref.read(preferencesProvider).getGuestDisplayName() ?? '';
+  final initialName = (user?.displayName?.trim().isNotEmpty ?? false)
+      ? user!.displayName!.trim()
+      : guestName;
+
+  final controller = TextEditingController(text: initialName);
+
+  showDialog<void>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(user != null
+          ? context.l10n.accountEditName
+          : context.l10n.accountChooseName),
+      content: TextField(
+        controller: controller,
+        autofocus: true,
+        textCapitalization: TextCapitalization.words,
+        maxLength: 30,
+        decoration: InputDecoration(
+          hintText: context.l10n.accountNameHint,
+          border: const OutlineInputBorder(),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(),
+          child: Text(context.l10n.commonCancel),
+        ),
+        FilledButton(
+          onPressed: () async {
+            final newName = controller.text.trim();
+            Navigator.of(ctx).pop();
+            await ref.read(authActionsProvider).updateDisplayName(newName);
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(context.l10n.accountNameUpdated),
+                  behavior: SnackBarBehavior.floating,
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            }
+          },
+          child: Text(context.l10n.accountSave),
+        ),
+      ],
+    ),
+  );
+}
+
+Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
+  final confirm = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(context.l10n.accountDeleteAccountTitle),
+      content: Text(context.l10n.accountDeleteAccountBody),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: Text(context.l10n.commonCancel),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          child: Text(
+            context.l10n.commonDelete,
+            style: TextStyle(color: ctx.palette.danger),
+          ),
+        ),
+      ],
+    ),
+  );
+
+  if (confirm == true && context.mounted) {
+    try {
+      await ref.read(authActionsProvider).deleteAccount();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.accountDeleted)),
+        );
+      }
+    } on SignInCancelledException {
+      // Dismissed re-authentication
+    } on SignInFailedException catch (e) {
+      reportNonFatal('Re-authentication failed: ${e.failure.name}',
+          code: e.code);
+      if (!context.mounted) return;
+      _showError(
+          context,
+          context.l10n.accountReauthFailed(
+              SignInResult.failed(e.failure).message));
+    } catch (e) {
+      reportNonFatal('delete account', code: e.runtimeType.toString());
+      if (!context.mounted) return;
+      _showError(context, context.l10n.accountDeleteFailed);
+    }
   }
 }
 
@@ -288,150 +529,101 @@ class _MenuTile extends StatelessWidget {
   }
 }
 
-/// Account sheet: sign in, or the signed-in account with sign-out and
-/// delete-account.
-void _showAccountSheet(BuildContext context) {
-  showModalBottomSheet<void>(
-    context: context,
-    backgroundColor: Colors.transparent,
-    builder: (BuildContext context) {
-      return Consumer(
-        builder: (context, ref, child) {
-          final user = ref.watch(accountUserProvider).value;
-          return SafeArea(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: Radii.sheet,
-              ),
-              padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
+class _SyncSection extends ConsumerWidget {
+  const _SyncSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final status = ref.watch(syncControllerProvider);
+    final (icon, label, subtitle) = switch (status.phase) {
+      SyncPhase.syncing => (
+          Icons.sync_rounded,
+          context.l10n.accountSyncing,
+          null
+        ),
+      SyncPhase.error => (
+          Icons.sync_problem_rounded,
+          context.l10n.accountSyncFailed,
+          context.l10n.accountTapToRetry
+        ),
+      SyncPhase.needsAccountChoice => (
+          Icons.sync_problem_rounded,
+          context.l10n.accountSyncPaused,
+          context.l10n.accountSyncChoose
+        ),
+      _ => (
+          Icons.cloud_done_outlined,
+          context.l10n.accountSyncNow,
+          syncedLabel(status.lastSyncedAt, DateTime.now(), context.l10n)
+        ),
+    };
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(Radii.lg),
+      onTap: () {
+        HapticFeedback.selectionClick();
+        final sync = ref.read(syncControllerProvider.notifier);
+        if (status.phase == SyncPhase.needsAccountChoice) {
+          _askAccountChoice(context, ref);
+        } else {
+          sync.syncNow();
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(Radii.lg),
+          border: Border.all(
+            color: theme.dividerColor.withValues(alpha: 0.15),
+          ),
+        ),
+        child: Row(
+          children: [
+            status.phase == SyncPhase.syncing
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: theme.primaryColor,
+                    ),
+                  )
+                : Icon(icon, color: theme.primaryColor, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      user != null
-                          ? context.l10n.accountAccount
-                          : context.l10n.accountSignIn,
-                      style: const TextStyle(
-                          fontSize: TypeScale.titleLarge,
-                          fontWeight: FontWeight.bold),
+                  Text(
+                    label,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  if (user == null) ...[
-                    ListTile(
-                      leading: const Icon(Icons.account_circle),
-                      title: Text(context.l10n.accountSignInGoogle),
-                      onTap: () => _signIn(context, ref, google: true),
-                    ),
-                    if (ref.watch(appleSignInAvailableProvider))
-                      ListTile(
-                        leading: const Icon(Icons.apple),
-                        title: Text(context.l10n.accountSignInApple),
-                        onTap: () => _signIn(context, ref, google: false),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 1),
+                    Text(
+                      subtitle,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
-                  ] else ...[
-                    ListTile(
-                      leading: CircleAvatar(
-                        radius: 12,
-                        backgroundImage: user.photoUrl != null
-                            ? NetworkImage(user.photoUrl!)
-                            : null,
-                        child: user.photoUrl == null
-                            ? const Icon(Icons.person, size: 16)
-                            : null,
-                      ),
-                      title: Text(
-                          user.displayName ?? context.l10n.accountSignedIn),
-                      subtitle: user.email == null ? null : Text(user.email!),
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.logout, color: Colors.orange),
-                      title: Text(context.l10n.accountSignOut,
-                          style: TextStyle(color: Colors.orange)),
-                      onTap: () => _signOut(context, ref),
-                    ),
-                    ListTile(
-                      leading:
-                          const Icon(Icons.delete_forever, color: Colors.red),
-                      title: Text(context.l10n.accountDeleteAccount,
-                          style: TextStyle(color: Colors.red)),
-                      onTap: () async {
-                        Navigator.pop(context);
-                        final confirm = await showDialog<bool>(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                            title: Text(context.l10n.accountDeleteAccountTitle),
-                            content:
-                                Text(context.l10n.accountDeleteAccountBody),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(ctx, false),
-                                child: Text(context.l10n.commonCancel),
-                              ),
-                              TextButton(
-                                onPressed: () => Navigator.pop(ctx, true),
-                                child: Text(context.l10n.commonDelete,
-                                    style:
-                                        TextStyle(color: ctx.palette.danger)),
-                              ),
-                            ],
-                          ),
-                        );
-
-                        if (confirm == true && context.mounted) {
-                          try {
-                            await ref.read(authActionsProvider).deleteAccount();
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content: Text(context.l10n.accountDeleted)),
-                              );
-                            }
-                          } on SignInCancelledException {
-                            // The user dismissed re-authentication; nothing
-                            // was deleted.
-                          } on SignInFailedException catch (e) {
-                            reportNonFatal(
-                                'Re-authentication failed: ${e.failure.name}',
-                                code: e.code);
-                            if (!context.mounted) return;
-                            _showError(
-                                context,
-                                context.l10n.accountReauthFailed(
-                                    SignInResult.failed(e.failure).message));
-                          } catch (e) {
-                            reportNonFatal('delete account',
-                                code: e.runtimeType.toString());
-                            if (!context.mounted) return;
-                            _showError(
-                                context, context.l10n.accountDeleteFailed);
-                          }
-                        }
-                      },
                     ),
                   ],
                 ],
               ),
             ),
-          );
-        },
-      );
-    },
-  );
-}
-
-/// Runs a sign-in from a sheet: closes it on success, explains a failure,
-/// and stays quiet when the user cancels.
-Future<void> _signIn(
-  BuildContext sheetContext,
-  WidgetRef ref, {
-  required bool google,
-}) async {
-  if (await runSignIn(sheetContext, ref, google: google) &&
-      sheetContext.mounted) {
-    Navigator.of(sheetContext).pop();
+            Icon(
+              Icons.chevron_right_rounded,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.35),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -524,52 +716,6 @@ Future<void> _signOut(BuildContext context, WidgetRef ref) async {
   await ref.read(authActionsProvider).signOut();
   if (remove) await sync.clearLocalData();
   if (context.mounted) Navigator.of(context).pop();
-}
-
-/// Sync status for the signed-in account; tap to sync now (or, after
-/// signing in to a different account, to choose what to do).
-class _SyncTile extends ConsumerWidget {
-  const _SyncTile();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final status = ref.watch(syncControllerProvider);
-    final (icon, label, subtitle) = switch (status.phase) {
-      SyncPhase.syncing => (
-          Icons.sync_rounded,
-          context.l10n.accountSyncing,
-          null
-        ),
-      SyncPhase.error => (
-          Icons.sync_problem_rounded,
-          context.l10n.accountSyncFailed,
-          context.l10n.accountTapToRetry
-        ),
-      SyncPhase.needsAccountChoice => (
-          Icons.sync_problem_rounded,
-          context.l10n.accountSyncPaused,
-          context.l10n.accountSyncChoose
-        ),
-      _ => (
-          Icons.cloud_done_outlined,
-          context.l10n.accountSyncNow,
-          syncedLabel(status.lastSyncedAt, DateTime.now(), context.l10n)
-        ),
-    };
-    return _MenuTile(
-      icon: icon,
-      label: label,
-      subtitle: subtitle,
-      onTap: () {
-        final sync = ref.read(syncControllerProvider.notifier);
-        if (status.phase == SyncPhase.needsAccountChoice) {
-          _askAccountChoice(context, ref);
-        } else {
-          sync.syncNow();
-        }
-      },
-    );
-  }
 }
 
 /// "Synced just now", "Synced 5 min ago", ...

@@ -2470,6 +2470,21 @@ class AppLocalizationsSw extends AppLocalizations {
   String get accountSignInToSync => 'Ingia ili kusawazisha vifaa';
 
   @override
+  String get accountEditName => 'Edit display name';
+
+  @override
+  String get accountChooseName => 'Choose display name';
+
+  @override
+  String get accountNameHint => 'Your display name';
+
+  @override
+  String get accountSave => 'Save';
+
+  @override
+  String get accountNameUpdated => 'Display name updated.';
+
+  @override
   String get accountAccount => 'Akaunti';
 
   @override
@@ -2970,10 +2985,16 @@ class AppLocalizationsSw extends AppLocalizations {
   String get studyVerseOfTheDay => 'Aya ya siku';
 
   @override
+  String get studyVerseOfTheDayHistory => 'Verse of the day history';
+
+  @override
   String get studyRecentVerses => 'Aya za hivi karibuni';
 
   @override
   String get studyWordLookUp => 'Tafuta';
+
+  @override
+  String get studyRecentWords => 'Recent words';
 
   @override
   String get studyConcordanceClear => 'Futa';
@@ -3123,6 +3144,9 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get studyWordOfTheDay => 'Neno la siku';
+
+  @override
+  String get studyWordOfTheDayHistory => 'Word of the day history';
 
   @override
   String get studyArchiveLink => 'Kumbukumbu →';

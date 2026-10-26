@@ -4246,6 +4246,36 @@ abstract class AppLocalizations {
   /// **'Sign in to sync across devices'**
   String get accountSignInToSync;
 
+  /// No description provided for @accountEditName.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit display name'**
+  String get accountEditName;
+
+  /// No description provided for @accountChooseName.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose display name'**
+  String get accountChooseName;
+
+  /// No description provided for @accountNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your display name'**
+  String get accountNameHint;
+
+  /// No description provided for @accountSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get accountSave;
+
+  /// No description provided for @accountNameUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name updated.'**
+  String get accountNameUpdated;
+
   /// No description provided for @accountAccount.
   ///
   /// In en, this message translates to:
@@ -5152,6 +5182,12 @@ abstract class AppLocalizations {
   /// **'Verse of the day'**
   String get studyVerseOfTheDay;
 
+  /// No description provided for @studyVerseOfTheDayHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Verse of the day history'**
+  String get studyVerseOfTheDayHistory;
+
   /// No description provided for @studyRecentVerses.
   ///
   /// In en, this message translates to:
@@ -5163,6 +5199,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Look up'**
   String get studyWordLookUp;
+
+  /// No description provided for @studyRecentWords.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent words'**
+  String get studyRecentWords;
 
   /// No description provided for @studyConcordanceClear.
   ///
@@ -5439,6 +5481,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Word of the day'**
   String get studyWordOfTheDay;
+
+  /// No description provided for @studyWordOfTheDayHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Word of the day history'**
+  String get studyWordOfTheDayHistory;
 
   /// No description provided for @studyArchiveLink.
   ///

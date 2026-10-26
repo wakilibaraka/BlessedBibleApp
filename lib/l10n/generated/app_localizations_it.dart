@@ -2478,6 +2478,21 @@ class AppLocalizationsIt extends AppLocalizations {
   String get accountSignInToSync => 'Accedi per sincronizzare i dispositivi';
 
   @override
+  String get accountEditName => 'Edit display name';
+
+  @override
+  String get accountChooseName => 'Choose display name';
+
+  @override
+  String get accountNameHint => 'Your display name';
+
+  @override
+  String get accountSave => 'Save';
+
+  @override
+  String get accountNameUpdated => 'Display name updated.';
+
+  @override
   String get accountAccount => 'Account';
 
   @override
@@ -2979,10 +2994,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get studyVerseOfTheDay => 'Versetto del giorno';
 
   @override
+  String get studyVerseOfTheDayHistory => 'Verse of the day history';
+
+  @override
   String get studyRecentVerses => 'Versetti recenti';
 
   @override
   String get studyWordLookUp => 'Cerca';
+
+  @override
+  String get studyRecentWords => 'Recent words';
 
   @override
   String get studyConcordanceClear => 'Cancella';
@@ -3133,6 +3154,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get studyWordOfTheDay => 'Parola del giorno';
+
+  @override
+  String get studyWordOfTheDayHistory => 'Word of the day history';
 
   @override
   String get studyArchiveLink => 'Archivio →';
