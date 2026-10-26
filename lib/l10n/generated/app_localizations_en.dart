@@ -2863,6 +2863,60 @@ class AppLocalizationsEn extends AppLocalizations {
   String get storiesRemoveMark => 'Remove mark';
 
   @override
+  String storiesNextUp(String title) {
+    return 'Next: $title';
+  }
+
+  @override
+  String storiesInBook(String book) {
+    return 'Stories in $book';
+  }
+
+  @override
+  String get storiesMarkAsUnread => 'Mark as unread';
+
+  @override
+  String get storiesMarkedRead => 'Marked as read';
+
+  @override
+  String get storiesMarkedUnread => 'Marked as unread';
+
+  @override
+  String get storiesSavedToSpace => 'Saved to Your Space';
+
+  @override
+  String get storiesRemovedFromSaved => 'Removed from saved stories';
+
+  @override
+  String get storiesRemoveFromSaved => 'Remove from saved';
+
+  @override
+  String get spaceTabStories => 'Stories';
+
+  @override
+  String get spaceSavedStories => 'Saved stories';
+
+  @override
+  String get spaceStoryMarks => 'Highlights and underlines';
+
+  @override
+  String get spaceNoStories =>
+      'No saved stories yet. Tap the bookmark on a story, or select its text to highlight it, and it will show up here.';
+
+  @override
+  String get storyOfTheDayOrderTitle => 'Story of the Day order';
+
+  @override
+  String get storyOfTheDayOrderSubtitle =>
+      'Shuffled goes through all 500 stories without repeats. In order follows the Bible. Stories you have read are skipped.';
+
+  @override
+  String get storyOfTheDayOrderShuffled => 'Shuffled';
+
+  @override
+  String get storyOfTheDayOrderInOrder => 'In order';
+
+  @override
   String get studyCardSize => 'Card size';
 
   @override
@@ -3316,7 +3370,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get storiesFavorites => 'Favorites';
+  String get storiesFavorites => 'Saved';
 
   @override
   String get storiesUnread => 'Unread';
@@ -3334,7 +3388,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get storiesNoMatch => 'No stories match these filters.';
 
   @override
-  String get storiesNoFavorites => 'No favorites yet.';
+  String get storiesNoFavorites => 'No saved stories yet.';
 
   @override
   String get storiesBrowseAll => 'Browse all stories';
@@ -3349,7 +3403,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get storiesClearFilters => 'Clear filters';
 
   @override
-  String get storiesFavoritesHint => 'Tap ♥ on any story to save it here.';
+  String get storiesFavoritesHint =>
+      'Tap the bookmark on any story to save it here and in Your Space.';
 
   @override
   String get storiesAttribution =>
@@ -3362,7 +3417,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get storiesFirstStory => 'This is the first story.';
 
   @override
-  String get storiesFavorite => 'Favorite';
+  String get storiesFavorite => 'Save story';
 
   @override
   String get storiesMarkAsRead => 'Mark as read';

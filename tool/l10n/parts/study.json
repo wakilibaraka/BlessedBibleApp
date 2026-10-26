@@ -1152,12 +1152,12 @@
   }
  },
  "storiesFavorites": {
-  "en": "Favorites",
-  "fr": "Favoris",
-  "it": "Preferiti",
-  "ro": "Favorite",
-  "sw": "Vipendwa",
-  "tl": "Mga paborito"
+  "en": "Saved",
+  "fr": "Enregistrés",
+  "it": "Salvati",
+  "ro": "Salvate",
+  "sw": "Zilizohifadhiwa",
+  "tl": "Naka-save"
  },
  "storiesUnread": {
   "en": "Unread",
@@ -1200,12 +1200,12 @@
   "tl": "Walang kuwentong tugma sa mga filter."
  },
  "storiesNoFavorites": {
-  "en": "No favorites yet.",
-  "fr": "Aucun favori pour l'instant.",
-  "it": "Ancora nessun preferito.",
-  "ro": "Încă nicio favorită.",
-  "sw": "Bado hakuna vipendwa.",
-  "tl": "Wala pang paborito."
+  "en": "No saved stories yet.",
+  "fr": "Aucune histoire enregistrée pour l'instant.",
+  "it": "Ancora nessuna storia salvata.",
+  "ro": "Încă nicio povestire salvată.",
+  "sw": "Bado hakuna hadithi zilizohifadhiwa.",
+  "tl": "Wala pang naka-save na kuwento."
  },
  "storiesBrowseAll": {
   "en": "Browse all stories",
@@ -1240,12 +1240,12 @@
   "tl": "I-clear ang mga filter"
  },
  "storiesFavoritesHint": {
-  "en": "Tap ♥ on any story to save it here.",
-  "fr": "Touchez ♥ sur une histoire pour l'enregistrer ici.",
-  "it": "Tocca ♥ su una storia per salvarla qui.",
-  "ro": "Atinge ♥ pe o povestire ca s-o salvezi aici.",
-  "sw": "Gusa ♥ kwenye hadithi yoyote kuihifadhi hapa.",
-  "tl": "I-tap ang ♥ sa kuwento para i-save ito rito."
+  "en": "Tap the bookmark on any story to save it here and in Your Space.",
+  "fr": "Touchez le signet d'une histoire pour l'enregistrer ici et dans Votre espace.",
+  "it": "Tocca il segnalibro di una storia per salvarla qui e nel tuo spazio.",
+  "ro": "Atinge semnul de carte al unei povestiri ca s-o salvezi aici și în Spațiul tău.",
+  "sw": "Gusa alama ya kitabu kwenye hadithi kuihifadhi hapa na katika Nafasi Yako.",
+  "tl": "I-tap ang bookmark sa kuwento para i-save ito rito at sa Iyong Espasyo."
  },
  "storiesAttribution": {
   "en": "Scripture from the King James Version (public domain). Narrative summaries adapted from The Graham Bible (grahambible.com), AI-assisted and human reviewed. Artwork: Gustave Doré (1832–1883), public domain, via Wikimedia Commons.",
@@ -1272,12 +1272,12 @@
   "tl": "Ito ang unang kuwento."
  },
  "storiesFavorite": {
-  "en": "Favorite",
-  "fr": "Favori",
-  "it": "Preferito",
-  "ro": "Favorită",
-  "sw": "Kipendwa",
-  "tl": "Paborito"
+  "en": "Save story",
+  "fr": "Enregistrer l'histoire",
+  "it": "Salva storia",
+  "ro": "Salvează povestirea",
+  "sw": "Hifadhi hadithi",
+  "tl": "I-save ang kuwento"
  },
  "storiesMarkAsRead": {
   "en": "Mark as read",

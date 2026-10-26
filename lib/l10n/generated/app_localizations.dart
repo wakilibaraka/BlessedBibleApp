@@ -4972,6 +4972,102 @@ abstract class AppLocalizations {
   /// **'Remove mark'**
   String get storiesRemoveMark;
 
+  /// No description provided for @storiesNextUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {title}'**
+  String storiesNextUp(String title);
+
+  /// No description provided for @storiesInBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Stories in {book}'**
+  String storiesInBook(String book);
+
+  /// No description provided for @storiesMarkAsUnread.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as unread'**
+  String get storiesMarkAsUnread;
+
+  /// No description provided for @storiesMarkedRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked as read'**
+  String get storiesMarkedRead;
+
+  /// No description provided for @storiesMarkedUnread.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked as unread'**
+  String get storiesMarkedUnread;
+
+  /// No description provided for @storiesSavedToSpace.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to Your Space'**
+  String get storiesSavedToSpace;
+
+  /// No description provided for @storiesRemovedFromSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed from saved stories'**
+  String get storiesRemovedFromSaved;
+
+  /// No description provided for @storiesRemoveFromSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from saved'**
+  String get storiesRemoveFromSaved;
+
+  /// No description provided for @spaceTabStories.
+  ///
+  /// In en, this message translates to:
+  /// **'Stories'**
+  String get spaceTabStories;
+
+  /// No description provided for @spaceSavedStories.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved stories'**
+  String get spaceSavedStories;
+
+  /// No description provided for @spaceStoryMarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Highlights and underlines'**
+  String get spaceStoryMarks;
+
+  /// No description provided for @spaceNoStories.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved stories yet. Tap the bookmark on a story, or select its text to highlight it, and it will show up here.'**
+  String get spaceNoStories;
+
+  /// No description provided for @storyOfTheDayOrderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Story of the Day order'**
+  String get storyOfTheDayOrderTitle;
+
+  /// No description provided for @storyOfTheDayOrderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shuffled goes through all 500 stories without repeats. In order follows the Bible. Stories you have read are skipped.'**
+  String get storyOfTheDayOrderSubtitle;
+
+  /// No description provided for @storyOfTheDayOrderShuffled.
+  ///
+  /// In en, this message translates to:
+  /// **'Shuffled'**
+  String get storyOfTheDayOrderShuffled;
+
+  /// No description provided for @storyOfTheDayOrderInOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'In order'**
+  String get storyOfTheDayOrderInOrder;
+
   /// No description provided for @studyCardSize.
   ///
   /// In en, this message translates to:
@@ -5743,7 +5839,7 @@ abstract class AppLocalizations {
   /// No description provided for @storiesFavorites.
   ///
   /// In en, this message translates to:
-  /// **'Favorites'**
+  /// **'Saved'**
   String get storiesFavorites;
 
   /// No description provided for @storiesUnread.
@@ -5779,7 +5875,7 @@ abstract class AppLocalizations {
   /// No description provided for @storiesNoFavorites.
   ///
   /// In en, this message translates to:
-  /// **'No favorites yet.'**
+  /// **'No saved stories yet.'**
   String get storiesNoFavorites;
 
   /// No description provided for @storiesBrowseAll.
@@ -5809,7 +5905,7 @@ abstract class AppLocalizations {
   /// No description provided for @storiesFavoritesHint.
   ///
   /// In en, this message translates to:
-  /// **'Tap ♥ on any story to save it here.'**
+  /// **'Tap the bookmark on any story to save it here and in Your Space.'**
   String get storiesFavoritesHint;
 
   /// No description provided for @storiesAttribution.
@@ -5833,7 +5929,7 @@ abstract class AppLocalizations {
   /// No description provided for @storiesFavorite.
   ///
   /// In en, this message translates to:
-  /// **'Favorite'**
+  /// **'Save story'**
   String get storiesFavorite;
 
   /// No description provided for @storiesMarkAsRead.

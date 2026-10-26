@@ -185,7 +185,7 @@ class _BibleStoriesScreenState extends ConsumerState<BibleStoriesScreen> {
                       const Spacer(),
                       _filterToggleButton(
                         context,
-                        icon: Icons.favorite_rounded,
+                        icon: Icons.bookmark_rounded,
                         label: context.l10n.storiesFavorites,
                         active: filter.favoritesOnly,
                         onTap: () => ref
@@ -509,7 +509,7 @@ class _EmptyStories extends ConsumerWidget {
     final noFavorites = filter.favoritesOnly && favorites.isEmpty;
     return EmptyState(
       icon: noFavorites
-          ? Icons.favorite_outline_rounded
+          ? Icons.bookmark_outline_rounded
           : Icons.search_off_rounded,
       title: title,
       message: noFavorites ? l10n.storiesFavoritesHint : null,

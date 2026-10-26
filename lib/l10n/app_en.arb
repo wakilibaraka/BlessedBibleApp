@@ -1513,6 +1513,36 @@
   "storiesHighlight": "Highlight",
   "storiesUnderline": "Underline",
   "storiesRemoveMark": "Remove mark",
+  "storiesNextUp": "Next: {title}",
+  "@storiesNextUp": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "storiesInBook": "Stories in {book}",
+  "@storiesInBook": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      }
+    }
+  },
+  "storiesMarkAsUnread": "Mark as unread",
+  "storiesMarkedRead": "Marked as read",
+  "storiesMarkedUnread": "Marked as unread",
+  "storiesSavedToSpace": "Saved to Your Space",
+  "storiesRemovedFromSaved": "Removed from saved stories",
+  "storiesRemoveFromSaved": "Remove from saved",
+  "spaceTabStories": "Stories",
+  "spaceSavedStories": "Saved stories",
+  "spaceStoryMarks": "Highlights and underlines",
+  "spaceNoStories": "No saved stories yet. Tap the bookmark on a story, or select its text to highlight it, and it will show up here.",
+  "storyOfTheDayOrderTitle": "Story of the Day order",
+  "storyOfTheDayOrderSubtitle": "Shuffled goes through all 500 stories without repeats. In order follows the Bible. Stories you have read are skipped.",
+  "storyOfTheDayOrderShuffled": "Shuffled",
+  "storyOfTheDayOrderInOrder": "In order",
   "studyCardSize": "Card size",
   "studyPosition": "Position",
   "studySizeLarge": "Large",
@@ -1769,22 +1799,22 @@
       }
     }
   },
-  "storiesFavorites": "Favorites",
+  "storiesFavorites": "Saved",
   "storiesUnread": "Unread",
   "storiesBooks": "Books",
   "storiesSearchBooks": "Search books…",
   "storiesAllBooks": "All books",
   "storiesNoMatch": "No stories match these filters.",
-  "storiesNoFavorites": "No favorites yet.",
+  "storiesNoFavorites": "No saved stories yet.",
   "storiesBrowseAll": "Browse all stories",
   "storiesAllCaughtUp": "You're all caught up.",
   "storiesShowRead": "Show read stories",
   "storiesClearFilters": "Clear filters",
-  "storiesFavoritesHint": "Tap ♥ on any story to save it here.",
+  "storiesFavoritesHint": "Tap the bookmark on any story to save it here and in Your Space.",
   "storiesAttribution": "Scripture from the King James Version (public domain). Narrative summaries adapted from The Graham Bible (grahambible.com), AI-assisted and human reviewed. Artwork: Gustave Doré (1832–1883), public domain, via Wikimedia Commons.",
   "storiesReachedEnd": "You have reached the end.",
   "storiesFirstStory": "This is the first story.",
-  "storiesFavorite": "Favorite",
+  "storiesFavorite": "Save story",
   "storiesMarkAsRead": "Mark as read",
   "storiesKeyVerse": "KEY VERSE · {reference}",
   "@storiesKeyVerse": {

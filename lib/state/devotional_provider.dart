@@ -128,6 +128,19 @@ class DevotionalReadNotifier extends Notifier<Set<String>> {
     ref.read(preferencesProvider).prefs.setStringList(_key, state.toList());
   }
 
+  void markUnread(String id) {
+    if (!state.contains(id)) return;
+    state = {...state}..remove(id);
+    ref.read(preferencesProvider).prefs.setStringList(_key, state.toList());
+  }
+
+  /// Flips [id] between read and unread; returns the new read state.
+  bool toggle(String id) {
+    final read = !state.contains(id);
+    read ? markRead(id) : markUnread(id);
+    return read;
+  }
+
   bool isRead(String id) => state.contains(id);
 }
 

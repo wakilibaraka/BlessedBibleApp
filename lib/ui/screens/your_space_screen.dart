@@ -17,6 +17,7 @@ import '../../state/translation_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../data/models/bookmark_model.dart';
 import '../widgets/journal_segment.dart';
+import '../widgets/stories_space_segment.dart';
 import '../widgets/item_context_sheet.dart';
 import '../../models/share_content.dart';
 import '../widgets/share_sheet.dart';
@@ -25,7 +26,8 @@ import '../../data/models/home_data.dart';
 import '../../theme/design_tokens.dart';
 
 class YourSpaceScreen extends ConsumerStatefulWidget {
-  final int initialTab; // 0=Highlights, 1=Bookmarks, 2=Notes
+  final int
+      initialTab; // 0=Highlights, 1=Bookmarks, 2=Notes, 3=Journal, 4=Stories
   const YourSpaceScreen({super.key, this.initialTab = 0});
 
   @override
@@ -151,6 +153,14 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
                             theme: theme,
                           ),
                         ),
+                        Expanded(
+                          child: _SegmentTab(
+                            label: context.l10n.spaceTabStories,
+                            isSelected: _selectedIndex == 4,
+                            onTap: () => _onTabTapped(4),
+                            theme: theme,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -173,6 +183,7 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
                         _BookmarksSegment(theme: theme),
                         _NotesSegment(theme: theme),
                         JournalSegment(theme: theme),
+                        StoriesSpaceSegment(theme: theme),
                       ],
                     ),
                   ),
@@ -226,13 +237,17 @@ class _SegmentTab extends StatelessWidget {
                     : Colors.transparent,
               ),
             ),
-            child: Text(
-              label,
-              style: theme.textTheme.labelMedium?.copyWith(
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                color: isSelected
-                    ? theme.primaryColor
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                maxLines: 1,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                  color: isSelected
+                      ? theme.primaryColor
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
               ),
             ),
           ),

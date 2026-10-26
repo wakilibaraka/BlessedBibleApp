@@ -36,7 +36,9 @@ class _BibleStoryReaderScreenState
     extends ConsumerState<BibleStoryReaderScreen> {
   late DevotionalStory _story;
   final ScrollController _scrollController = ScrollController();
-  bool _markedRead = false;
+
+  /// How far through the page the reader is, 0 to 1 (bottom bar line).
+  final ValueNotifier<double> _progress = ValueNotifier(0);
 
   /// Current text selection in the story, if any (plain text).
   String? _selection;
@@ -45,20 +47,28 @@ class _BibleStoryReaderScreenState
   void initState() {
     super.initState();
     _story = widget.initialStory;
-    // Mark as read shortly after opening (matches the web app's behavior of
-    // recording a read once the story is viewed).
-    Future.delayed(const Duration(milliseconds: 800), () {
-      if (mounted) {
-        ref.read(devotionalReadProvider.notifier).markRead(_story.id);
-        setState(() => _markedRead = true);
-      }
-    });
+    _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onScroll());
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    _progress.dispose();
     super.dispose();
+  }
+
+  /// Tracks reading progress and marks the story read once its end is on
+  /// screen, instead of the moment it opens.
+  void _onScroll() {
+    if (!mounted || !_scrollController.hasClients) return;
+    final position = _scrollController.position;
+    final max = position.maxScrollExtent;
+    _progress.value = max <= 0 ? 1 : (position.pixels / max).clamp(0.0, 1.0);
+    if (position.pixels >= max - 160) {
+      ref.read(devotionalReadProvider.notifier).markRead(_story.id);
+    }
   }
 
   Future<void> _goNeighbor({required bool next}) async {
@@ -74,17 +84,66 @@ class _BibleStoryReaderScreenState
       ));
       return;
     }
-    setState(() {
-      _story = neighbor;
-      _markedRead = false;
-    });
+    _openStory(neighbor);
+  }
+
+  void _openStory(DevotionalStory story) {
+    HapticFeedback.selectionClick();
+    setState(() => _story = story);
     _scrollController.jumpTo(0);
-    Future.delayed(const Duration(milliseconds: 800), () {
-      if (mounted) {
-        ref.read(devotionalReadProvider.notifier).markRead(_story.id);
-        setState(() => _markedRead = true);
-      }
-    });
+    _progress.value = 0;
+  }
+
+  void _toggleSaved() {
+    HapticFeedback.selectionClick();
+    final notifier = ref.read(devotionalFavoritesProvider.notifier);
+    notifier.toggle(_story.id);
+    final saved = notifier.isFavorite(_story.id);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        content: Text(saved
+            ? context.l10n.storiesSavedToSpace
+            : context.l10n.storiesRemovedFromSaved),
+        duration: const Duration(seconds: 2),
+      ));
+  }
+
+  void _toggleRead() {
+    HapticFeedback.selectionClick();
+    final read = ref.read(devotionalReadProvider.notifier).toggle(_story.id);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        content: Text(read
+            ? context.l10n.storiesMarkedRead
+            : context.l10n.storiesMarkedUnread),
+        duration: const Duration(seconds: 2),
+      ));
+  }
+
+  /// Lists every story in the current book so the reader can jump.
+  Future<void> _showBookStories() async {
+    final all = await ref.read(devotionalStoriesProvider.future);
+    if (!mounted) return;
+    final inBook = [
+      for (final s in all)
+        if (s.prefix == _story.prefix) s
+    ];
+    final picked = await showModalBottomSheet<DevotionalStory>(
+      context: context,
+      useSafeArea: true,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) => _BookStoriesSheet(
+        stories: inBook,
+        current: _story,
+        book: sheetContext.bookNameInLocale(_story.book),
+      ),
+    );
+    if (picked != null && mounted && picked.id != _story.id) {
+      _openStory(picked);
+    }
   }
 
   /// The current selection's range inside the rendered retelling, or null
@@ -227,6 +286,7 @@ class _BibleStoryReaderScreenState
     final typography = ref.watch(typographyProvider);
     final favorites = ref.watch(devotionalFavoritesProvider);
     final isFavorite = favorites.contains(_story.id);
+    final isRead = ref.watch(devotionalReadProvider).contains(_story.id);
     final positionAsync = ref.watch(_positionProvider(_story.id));
     final position = positionAsync.value;
     final showPassage = ref.watch(storyShowPassageProvider);
@@ -248,27 +308,26 @@ class _BibleStoryReaderScreenState
               IconButton(
                 icon: Icon(
                   isFavorite
-                      ? Icons.favorite_rounded
-                      : Icons.favorite_outline_rounded,
+                      ? Icons.bookmark_rounded
+                      : Icons.bookmark_outline_rounded,
                   color: isFavorite ? AppColors.goldAccent : null,
                 ),
-                tooltip: context.l10n.storiesFavorite,
-                onPressed: () => ref
-                    .read(devotionalFavoritesProvider.notifier)
-                    .toggle(_story.id),
+                tooltip: isFavorite
+                    ? context.l10n.storiesRemoveFromSaved
+                    : context.l10n.storiesFavorite,
+                onPressed: _toggleSaved,
               ),
               IconButton(
                 icon: Icon(
-                  _markedRead
+                  isRead
                       ? Icons.check_circle_rounded
                       : Icons.check_circle_outline_rounded,
-                  color: _markedRead ? AppColors.goldAccent : null,
+                  color: isRead ? AppColors.goldAccent : null,
                 ),
-                tooltip: context.l10n.storiesMarkAsRead,
-                onPressed: () {
-                  ref.read(devotionalReadProvider.notifier).markRead(_story.id);
-                  setState(() => _markedRead = true);
-                },
+                tooltip: isRead
+                    ? context.l10n.storiesMarkAsUnread
+                    : context.l10n.storiesMarkAsRead,
+                onPressed: _toggleRead,
               ),
               IconButton(
                 icon: const Icon(Icons.ios_share_rounded),
@@ -328,20 +387,6 @@ class _BibleStoryReaderScreenState
                         height: 1.2,
                       ),
                     ),
-                    if (position != null) ...[
-                      const SizedBox(height: 6),
-                      Text(
-                        context.l10n.storiesPosition(
-                          position.index,
-                          position.total,
-                          context.bookNameInLocale(position.book),
-                        ),
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.5),
-                        ),
-                      ),
-                    ],
                     if (_story.keyVerse.isNotEmpty) ...[
                       const SizedBox(height: 20),
                       Container(
@@ -442,11 +487,10 @@ class _BibleStoryReaderScreenState
           ),
         ],
       ),
-      // Prev/next navigation
+      // Prev/next navigation, what comes next, and reading progress.
       bottomNavigationBar: SafeArea(
         child: Container(
           margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(Radii.xl),
@@ -460,16 +504,103 @@ class _BibleStoryReaderScreenState
               ),
             ],
           ),
-          child: Row(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(Radii.xl),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ValueListenableBuilder<double>(
+                  valueListenable: _progress,
+                  builder: (context, value, _) => LinearProgressIndicator(
+                    value: value,
+                    minHeight: 3,
+                    backgroundColor: Colors.transparent,
+                    color: theme.primaryColor,
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => _goNeighbor(next: false),
+                        icon: const Icon(Icons.chevron_left_rounded),
+                        tooltip: context.l10n.storiesPrevious,
+                      ),
+                      Expanded(
+                        child: _NextUpLabel(
+                          story: _story,
+                          position: position,
+                          onTap: _showBookStories,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => _goNeighbor(next: true),
+                        icon: const Icon(Icons.chevron_right_rounded),
+                        tooltip: context.l10n.storiesNext,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Centre of the bottom bar: the next story's title and where this one sits
+/// in its book. Tapping opens the list of the book's stories.
+class _NextUpLabel extends ConsumerWidget {
+  final DevotionalStory story;
+  final StoryPosition? position;
+  final VoidCallback onTap;
+
+  const _NextUpLabel({
+    required this.story,
+    required this.position,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final next = ref.watch(_nextStoryProvider(story.id)).value;
+    final position = this.position;
+    final title = next == null
+        ? context.l10n.storiesReachedEnd
+        : context.l10n.storiesNextUp(next.title);
+    final subtitle = position == null
+        ? null
+        : context.l10n.storiesPosition(position.index, position.total,
+            context.bookNameInLocale(position.book));
+    return Semantics(
+      button: true,
+      label: subtitle == null ? title : '$title, $subtitle',
+      excludeSemantics: true,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(Radii.md),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              IconButton(
-                onPressed: () => _goNeighbor(next: false),
-                icon: const Icon(Icons.chevron_left_rounded),
-                tooltip: context.l10n.storiesPrevious,
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              Expanded(
-                child: Text(
-                  '${_story.id} · ${_story.book}',
+              if (subtitle != null)
+                Text(
+                  subtitle,
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -477,15 +608,76 @@ class _BibleStoryReaderScreenState
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
-              ),
-              IconButton(
-                onPressed: () => _goNeighbor(next: true),
-                icon: const Icon(Icons.chevron_right_rounded),
-                tooltip: context.l10n.storiesNext,
-              ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// The stories of one book, with read state; tapping one opens it.
+class _BookStoriesSheet extends ConsumerWidget {
+  final List<DevotionalStory> stories;
+  final DevotionalStory current;
+  final String book;
+
+  const _BookStoriesSheet({
+    required this.stories,
+    required this.current,
+    required this.book,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final read = ref.watch(devotionalReadProvider);
+    final saved = ref.watch(devotionalFavoritesProvider);
+    return ConstrainedBox(
+      constraints:
+          BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.7),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+            child: Text(
+              context.l10n.storiesInBook(book),
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w700),
+            ),
+          ),
+          Flexible(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: stories.length,
+              itemBuilder: (context, i) {
+                final s = stories[i];
+                final isCurrent = s.id == current.id;
+                return ListTile(
+                  selected: isCurrent,
+                  leading: Icon(
+                    read.contains(s.id)
+                        ? Icons.check_circle_rounded
+                        : Icons.circle_outlined,
+                    color: read.contains(s.id) ? AppColors.goldAccent : null,
+                    semanticLabel: read.contains(s.id)
+                        ? context.l10n.a11yRead
+                        : context.l10n.storiesUnread,
+                  ),
+                  title: Text(s.title),
+                  subtitle: Text(context.referenceInLocale(s.ref)),
+                  trailing: saved.contains(s.id)
+                      ? const Icon(Icons.bookmark_rounded,
+                          color: AppColors.goldAccent)
+                      : null,
+                  onTap: () => Navigator.of(context).pop(s),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -614,4 +806,12 @@ final _positionProvider =
     total: bookStories,
     book: story.book,
   );
+});
+
+final _nextStoryProvider =
+    FutureProvider.family<DevotionalStory?, String>((ref, id) async {
+  final all = await ref.watch(devotionalStoriesProvider.future);
+  final i = all.indexWhere((s) => s.id == id);
+  if (i == -1 || i + 1 >= all.length) return null;
+  return all[i + 1];
 });

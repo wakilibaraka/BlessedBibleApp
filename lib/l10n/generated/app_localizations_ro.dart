@@ -2891,6 +2891,60 @@ class AppLocalizationsRo extends AppLocalizations {
   String get storiesRemoveMark => 'Elimină marcajul';
 
   @override
+  String storiesNextUp(String title) {
+    return 'Următoarea: $title';
+  }
+
+  @override
+  String storiesInBook(String book) {
+    return 'Povestiri din $book';
+  }
+
+  @override
+  String get storiesMarkAsUnread => 'Marchează ca necitit';
+
+  @override
+  String get storiesMarkedRead => 'Marcat ca citit';
+
+  @override
+  String get storiesMarkedUnread => 'Marcat ca necitit';
+
+  @override
+  String get storiesSavedToSpace => 'Salvat în Spațiul tău';
+
+  @override
+  String get storiesRemovedFromSaved => 'Eliminat din povestirile salvate';
+
+  @override
+  String get storiesRemoveFromSaved => 'Elimină din salvate';
+
+  @override
+  String get spaceTabStories => 'Povestiri';
+
+  @override
+  String get spaceSavedStories => 'Povestiri salvate';
+
+  @override
+  String get spaceStoryMarks => 'Evidențieri și sublinieri';
+
+  @override
+  String get spaceNoStories =>
+      'Încă nicio povestire salvată. Atinge semnul de carte al unei povestiri sau selectează textul ca să-l evidențiezi și va apărea aici.';
+
+  @override
+  String get storyOfTheDayOrderTitle => 'Ordinea povestirii zilei';
+
+  @override
+  String get storyOfTheDayOrderSubtitle =>
+      'Amestecat parcurge toate cele 500 de povestiri fără repetări. În ordine urmează Biblia. Povestirile citite sunt sărite.';
+
+  @override
+  String get storyOfTheDayOrderShuffled => 'Amestecat';
+
+  @override
+  String get storyOfTheDayOrderInOrder => 'În ordine';
+
+  @override
   String get studyCardSize => 'Dimensiunea cardului';
 
   @override
@@ -3360,7 +3414,7 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
-  String get storiesFavorites => 'Favorite';
+  String get storiesFavorites => 'Salvate';
 
   @override
   String get storiesUnread => 'Necitite';
@@ -3378,7 +3432,7 @@ class AppLocalizationsRo extends AppLocalizations {
   String get storiesNoMatch => 'Nicio povestire nu corespunde filtrelor.';
 
   @override
-  String get storiesNoFavorites => 'Încă nicio favorită.';
+  String get storiesNoFavorites => 'Încă nicio povestire salvată.';
 
   @override
   String get storiesBrowseAll => 'Răsfoiește toate povestirile';
@@ -3394,7 +3448,7 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get storiesFavoritesHint =>
-      'Atinge ♥ pe o povestire ca s-o salvezi aici.';
+      'Atinge semnul de carte al unei povestiri ca s-o salvezi aici și în Spațiul tău.';
 
   @override
   String get storiesAttribution =>
@@ -3407,7 +3461,7 @@ class AppLocalizationsRo extends AppLocalizations {
   String get storiesFirstStory => 'Aceasta este prima povestire.';
 
   @override
-  String get storiesFavorite => 'Favorită';
+  String get storiesFavorite => 'Salvează povestirea';
 
   @override
   String get storiesMarkAsRead => 'Marchează ca citită';

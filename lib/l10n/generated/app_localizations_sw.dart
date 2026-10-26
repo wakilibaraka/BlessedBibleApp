@@ -2873,6 +2873,61 @@ class AppLocalizationsSw extends AppLocalizations {
   String get storiesRemoveMark => 'Ondoa alama';
 
   @override
+  String storiesNextUp(String title) {
+    return 'Inayofuata: $title';
+  }
+
+  @override
+  String storiesInBook(String book) {
+    return 'Hadithi za $book';
+  }
+
+  @override
+  String get storiesMarkAsUnread => 'Weka kama haijasomwa';
+
+  @override
+  String get storiesMarkedRead => 'Imewekwa kama imesomwa';
+
+  @override
+  String get storiesMarkedUnread => 'Imewekwa kama haijasomwa';
+
+  @override
+  String get storiesSavedToSpace => 'Imehifadhiwa katika Nafasi Yako';
+
+  @override
+  String get storiesRemovedFromSaved =>
+      'Imeondolewa kwenye hadithi zilizohifadhiwa';
+
+  @override
+  String get storiesRemoveFromSaved => 'Ondoa kwenye zilizohifadhiwa';
+
+  @override
+  String get spaceTabStories => 'Hadithi';
+
+  @override
+  String get spaceSavedStories => 'Hadithi zilizohifadhiwa';
+
+  @override
+  String get spaceStoryMarks => 'Vionyesho na mistari';
+
+  @override
+  String get spaceNoStories =>
+      'Bado hakuna hadithi zilizohifadhiwa. Gusa alama ya kitabu kwenye hadithi, au chagua maandishi yake kuyaangazia, nayo itaonekana hapa.';
+
+  @override
+  String get storyOfTheDayOrderTitle => 'Mpangilio wa Hadithi ya Siku';
+
+  @override
+  String get storyOfTheDayOrderSubtitle =>
+      'Mchanganyiko hupitia hadithi zote 500 bila kurudia. Kwa mpangilio hufuata Biblia. Hadithi ulizosoma zinarukwa.';
+
+  @override
+  String get storyOfTheDayOrderShuffled => 'Mchanganyiko';
+
+  @override
+  String get storyOfTheDayOrderInOrder => 'Kwa mpangilio';
+
+  @override
   String get studyCardSize => 'Ukubwa wa kadi';
 
   @override
@@ -3327,7 +3382,7 @@ class AppLocalizationsSw extends AppLocalizations {
   }
 
   @override
-  String get storiesFavorites => 'Vipendwa';
+  String get storiesFavorites => 'Zilizohifadhiwa';
 
   @override
   String get storiesUnread => 'Hazijasomwa';
@@ -3345,7 +3400,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get storiesNoMatch => 'Hakuna hadithi inayolingana na vichujio hivi.';
 
   @override
-  String get storiesNoFavorites => 'Bado hakuna vipendwa.';
+  String get storiesNoFavorites => 'Bado hakuna hadithi zilizohifadhiwa.';
 
   @override
   String get storiesBrowseAll => 'Vinjari hadithi zote';
@@ -3361,7 +3416,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get storiesFavoritesHint =>
-      'Gusa ♥ kwenye hadithi yoyote kuihifadhi hapa.';
+      'Gusa alama ya kitabu kwenye hadithi kuihifadhi hapa na katika Nafasi Yako.';
 
   @override
   String get storiesAttribution =>
@@ -3374,7 +3429,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get storiesFirstStory => 'Hii ni hadithi ya kwanza.';
 
   @override
-  String get storiesFavorite => 'Kipendwa';
+  String get storiesFavorite => 'Hifadhi hadithi';
 
   @override
   String get storiesMarkAsRead => 'Weka kuwa imesomwa';

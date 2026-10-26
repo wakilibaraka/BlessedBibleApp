@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import '../../state/devotional_provider.dart';
+import '../../state/story_of_the_day_provider.dart';
 import '../../state/nav_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/hints_provider.dart';
@@ -650,6 +651,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               onChanged: (val) {
                 HapticFeedback.selectionClick();
                 ref.read(storyShowPassageProvider.notifier).set(val);
+              },
+            );
+          }),
+        ],
+      ),
+      SettingsPillCard(
+        children: [
+          Consumer(builder: (context, ref, _) {
+            final mode = ref.watch(storySelectionModeProvider);
+            return AnimatedSegmentedTile<StorySelectionMode>(
+              title: context.l10n.storyOfTheDayOrderTitle,
+              subtitle: context.l10n.storyOfTheDayOrderSubtitle,
+              selectedValue: mode,
+              options: [
+                MapEntry(StorySelectionMode.randomized,
+                    context.l10n.storyOfTheDayOrderShuffled),
+                MapEntry(StorySelectionMode.chronological,
+                    context.l10n.storyOfTheDayOrderInOrder),
+              ],
+              onChanged: (val) {
+                HapticFeedback.selectionClick();
+                ref.read(storySelectionModeProvider.notifier).setMode(val);
               },
             );
           }),

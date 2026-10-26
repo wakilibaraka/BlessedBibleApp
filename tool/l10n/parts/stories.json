@@ -53,5 +53,147 @@
   "ro": "Elimină marcajul",
   "sw": "Ondoa alama",
   "tl": "Alisin ang marka"
+ },
+ "storiesNextUp": {
+  "en": "Next: {title}",
+  "fr": "Suivant : {title}",
+  "it": "Prossimo: {title}",
+  "ro": "Următoarea: {title}",
+  "sw": "Inayofuata: {title}",
+  "tl": "Susunod: {title}",
+  "@": {
+   "placeholders": {
+    "title": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "storiesInBook": {
+  "en": "Stories in {book}",
+  "fr": "Récits de {book}",
+  "it": "Racconti di {book}",
+  "ro": "Povestiri din {book}",
+  "sw": "Hadithi za {book}",
+  "tl": "Mga kuwento sa {book}",
+  "@": {
+   "placeholders": {
+    "book": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "storiesMarkAsUnread": {
+  "en": "Mark as unread",
+  "fr": "Marquer comme non lu",
+  "it": "Segna come non letto",
+  "ro": "Marchează ca necitit",
+  "sw": "Weka kama haijasomwa",
+  "tl": "Markahan bilang hindi pa nababasa"
+ },
+ "storiesMarkedRead": {
+  "en": "Marked as read",
+  "fr": "Marqué comme lu",
+  "it": "Segnato come letto",
+  "ro": "Marcat ca citit",
+  "sw": "Imewekwa kama imesomwa",
+  "tl": "Namarkahang nabasa na"
+ },
+ "storiesMarkedUnread": {
+  "en": "Marked as unread",
+  "fr": "Marqué comme non lu",
+  "it": "Segnato come non letto",
+  "ro": "Marcat ca necitit",
+  "sw": "Imewekwa kama haijasomwa",
+  "tl": "Namarkahang hindi pa nababasa"
+ },
+ "storiesSavedToSpace": {
+  "en": "Saved to Your Space",
+  "fr": "Enregistré dans Votre espace",
+  "it": "Salvato nel tuo spazio",
+  "ro": "Salvat în Spațiul tău",
+  "sw": "Imehifadhiwa katika Nafasi Yako",
+  "tl": "Na-save sa Iyong Espasyo"
+ },
+ "storiesRemovedFromSaved": {
+  "en": "Removed from saved stories",
+  "fr": "Retiré des histoires enregistrées",
+  "it": "Rimosso dalle storie salvate",
+  "ro": "Eliminat din povestirile salvate",
+  "sw": "Imeondolewa kwenye hadithi zilizohifadhiwa",
+  "tl": "Inalis sa mga naka-save na kuwento"
+ },
+ "storiesRemoveFromSaved": {
+  "en": "Remove from saved",
+  "fr": "Retirer des enregistrés",
+  "it": "Rimuovi dai salvati",
+  "ro": "Elimină din salvate",
+  "sw": "Ondoa kwenye zilizohifadhiwa",
+  "tl": "Alisin sa naka-save"
+ },
+ "spaceTabStories": {
+  "en": "Stories",
+  "fr": "Récits",
+  "it": "Racconti",
+  "ro": "Povestiri",
+  "sw": "Hadithi",
+  "tl": "Kuwento"
+ },
+ "spaceSavedStories": {
+  "en": "Saved stories",
+  "fr": "Récits enregistrés",
+  "it": "Racconti salvati",
+  "ro": "Povestiri salvate",
+  "sw": "Hadithi zilizohifadhiwa",
+  "tl": "Mga naka-save na kuwento"
+ },
+ "spaceStoryMarks": {
+  "en": "Highlights and underlines",
+  "fr": "Surlignages et soulignements",
+  "it": "Evidenziazioni e sottolineature",
+  "ro": "Evidențieri și sublinieri",
+  "sw": "Vionyesho na mistari",
+  "tl": "Mga highlight at salungguhit"
+ },
+ "spaceNoStories": {
+  "en": "No saved stories yet. Tap the bookmark on a story, or select its text to highlight it, and it will show up here.",
+  "fr": "Aucun récit enregistré. Touchez le signet d'un récit ou sélectionnez son texte pour le surligner, et il apparaîtra ici.",
+  "it": "Nessun racconto salvato. Tocca il segnalibro di un racconto o selezionane il testo per evidenziarlo, e apparirà qui.",
+  "ro": "Încă nicio povestire salvată. Atinge semnul de carte al unei povestiri sau selectează textul ca să-l evidențiezi și va apărea aici.",
+  "sw": "Bado hakuna hadithi zilizohifadhiwa. Gusa alama ya kitabu kwenye hadithi, au chagua maandishi yake kuyaangazia, nayo itaonekana hapa.",
+  "tl": "Wala pang naka-save na kuwento. I-tap ang bookmark sa kuwento, o piliin ang teksto nito para i-highlight, at lalabas ito rito."
+ },
+ "storyOfTheDayOrderTitle": {
+  "en": "Story of the Day order",
+  "fr": "Ordre du récit du jour",
+  "it": "Ordine del racconto del giorno",
+  "ro": "Ordinea povestirii zilei",
+  "sw": "Mpangilio wa Hadithi ya Siku",
+  "tl": "Ayos ng Kuwento ng Araw"
+ },
+ "storyOfTheDayOrderSubtitle": {
+  "en": "Shuffled goes through all 500 stories without repeats. In order follows the Bible. Stories you have read are skipped.",
+  "fr": "Mélangé parcourt les 500 récits sans répétition. Dans l'ordre suit la Bible. Les récits déjà lus sont ignorés.",
+  "it": "Casuale percorre tutti i 500 racconti senza ripetizioni. In ordine segue la Bibbia. I racconti già letti vengono saltati.",
+  "ro": "Amestecat parcurge toate cele 500 de povestiri fără repetări. În ordine urmează Biblia. Povestirile citite sunt sărite.",
+  "sw": "Mchanganyiko hupitia hadithi zote 500 bila kurudia. Kwa mpangilio hufuata Biblia. Hadithi ulizosoma zinarukwa.",
+  "tl": "Halo-halo: dadaan sa lahat ng 500 kuwento nang walang ulit. Sunod-sunod: ayon sa Bibliya. Nilalaktawan ang mga nabasa na."
+ },
+ "storyOfTheDayOrderShuffled": {
+  "en": "Shuffled",
+  "fr": "Mélangé",
+  "it": "Casuale",
+  "ro": "Amestecat",
+  "sw": "Mchanganyiko",
+  "tl": "Halo-halo"
+ },
+ "storyOfTheDayOrderInOrder": {
+  "en": "In order",
+  "fr": "Dans l'ordre",
+  "it": "In ordine",
+  "ro": "În ordine",
+  "sw": "Kwa mpangilio",
+  "tl": "Sunod-sunod"
  }
 }

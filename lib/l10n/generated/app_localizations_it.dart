@@ -2883,6 +2883,60 @@ class AppLocalizationsIt extends AppLocalizations {
   String get storiesRemoveMark => 'Rimuovi segno';
 
   @override
+  String storiesNextUp(String title) {
+    return 'Prossimo: $title';
+  }
+
+  @override
+  String storiesInBook(String book) {
+    return 'Racconti di $book';
+  }
+
+  @override
+  String get storiesMarkAsUnread => 'Segna come non letto';
+
+  @override
+  String get storiesMarkedRead => 'Segnato come letto';
+
+  @override
+  String get storiesMarkedUnread => 'Segnato come non letto';
+
+  @override
+  String get storiesSavedToSpace => 'Salvato nel tuo spazio';
+
+  @override
+  String get storiesRemovedFromSaved => 'Rimosso dalle storie salvate';
+
+  @override
+  String get storiesRemoveFromSaved => 'Rimuovi dai salvati';
+
+  @override
+  String get spaceTabStories => 'Racconti';
+
+  @override
+  String get spaceSavedStories => 'Racconti salvati';
+
+  @override
+  String get spaceStoryMarks => 'Evidenziazioni e sottolineature';
+
+  @override
+  String get spaceNoStories =>
+      'Nessun racconto salvato. Tocca il segnalibro di un racconto o selezionane il testo per evidenziarlo, e apparirà qui.';
+
+  @override
+  String get storyOfTheDayOrderTitle => 'Ordine del racconto del giorno';
+
+  @override
+  String get storyOfTheDayOrderSubtitle =>
+      'Casuale percorre tutti i 500 racconti senza ripetizioni. In ordine segue la Bibbia. I racconti già letti vengono saltati.';
+
+  @override
+  String get storyOfTheDayOrderShuffled => 'Casuale';
+
+  @override
+  String get storyOfTheDayOrderInOrder => 'In ordine';
+
+  @override
   String get studyCardSize => 'Dimensione scheda';
 
   @override
@@ -3344,7 +3398,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get storiesFavorites => 'Preferiti';
+  String get storiesFavorites => 'Salvati';
 
   @override
   String get storiesUnread => 'Non lette';
@@ -3362,7 +3416,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get storiesNoMatch => 'Nessuna storia corrisponde ai filtri.';
 
   @override
-  String get storiesNoFavorites => 'Ancora nessun preferito.';
+  String get storiesNoFavorites => 'Ancora nessuna storia salvata.';
 
   @override
   String get storiesBrowseAll => 'Sfoglia tutte le storie';
@@ -3377,7 +3431,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get storiesClearFilters => 'Cancella filtri';
 
   @override
-  String get storiesFavoritesHint => 'Tocca ♥ su una storia per salvarla qui.';
+  String get storiesFavoritesHint =>
+      'Tocca il segnalibro di una storia per salvarla qui e nel tuo spazio.';
 
   @override
   String get storiesAttribution =>
@@ -3390,7 +3445,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get storiesFirstStory => 'Questa è la prima storia.';
 
   @override
-  String get storiesFavorite => 'Preferito';
+  String get storiesFavorite => 'Salva storia';
 
   @override
   String get storiesMarkAsRead => 'Segna come letta';

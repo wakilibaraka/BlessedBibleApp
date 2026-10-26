@@ -2883,6 +2883,60 @@ class AppLocalizationsTl extends AppLocalizations {
   String get storiesRemoveMark => 'Alisin ang marka';
 
   @override
+  String storiesNextUp(String title) {
+    return 'Susunod: $title';
+  }
+
+  @override
+  String storiesInBook(String book) {
+    return 'Mga kuwento sa $book';
+  }
+
+  @override
+  String get storiesMarkAsUnread => 'Markahan bilang hindi pa nababasa';
+
+  @override
+  String get storiesMarkedRead => 'Namarkahang nabasa na';
+
+  @override
+  String get storiesMarkedUnread => 'Namarkahang hindi pa nababasa';
+
+  @override
+  String get storiesSavedToSpace => 'Na-save sa Iyong Espasyo';
+
+  @override
+  String get storiesRemovedFromSaved => 'Inalis sa mga naka-save na kuwento';
+
+  @override
+  String get storiesRemoveFromSaved => 'Alisin sa naka-save';
+
+  @override
+  String get spaceTabStories => 'Kuwento';
+
+  @override
+  String get spaceSavedStories => 'Mga naka-save na kuwento';
+
+  @override
+  String get spaceStoryMarks => 'Mga highlight at salungguhit';
+
+  @override
+  String get spaceNoStories =>
+      'Wala pang naka-save na kuwento. I-tap ang bookmark sa kuwento, o piliin ang teksto nito para i-highlight, at lalabas ito rito.';
+
+  @override
+  String get storyOfTheDayOrderTitle => 'Ayos ng Kuwento ng Araw';
+
+  @override
+  String get storyOfTheDayOrderSubtitle =>
+      'Halo-halo: dadaan sa lahat ng 500 kuwento nang walang ulit. Sunod-sunod: ayon sa Bibliya. Nilalaktawan ang mga nabasa na.';
+
+  @override
+  String get storyOfTheDayOrderShuffled => 'Halo-halo';
+
+  @override
+  String get storyOfTheDayOrderInOrder => 'Sunod-sunod';
+
+  @override
   String get studyCardSize => 'Laki ng card';
 
   @override
@@ -3338,7 +3392,7 @@ class AppLocalizationsTl extends AppLocalizations {
   }
 
   @override
-  String get storiesFavorites => 'Mga paborito';
+  String get storiesFavorites => 'Naka-save';
 
   @override
   String get storiesUnread => 'Hindi pa nabasa';
@@ -3356,7 +3410,7 @@ class AppLocalizationsTl extends AppLocalizations {
   String get storiesNoMatch => 'Walang kuwentong tugma sa mga filter.';
 
   @override
-  String get storiesNoFavorites => 'Wala pang paborito.';
+  String get storiesNoFavorites => 'Wala pang naka-save na kuwento.';
 
   @override
   String get storiesBrowseAll => 'Tingnan ang lahat ng kuwento';
@@ -3372,7 +3426,7 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get storiesFavoritesHint =>
-      'I-tap ang ♥ sa kuwento para i-save ito rito.';
+      'I-tap ang bookmark sa kuwento para i-save ito rito at sa Iyong Espasyo.';
 
   @override
   String get storiesAttribution =>
@@ -3385,7 +3439,7 @@ class AppLocalizationsTl extends AppLocalizations {
   String get storiesFirstStory => 'Ito ang unang kuwento.';
 
   @override
-  String get storiesFavorite => 'Paborito';
+  String get storiesFavorite => 'I-save ang kuwento';
 
   @override
   String get storiesMarkAsRead => 'Markahang nabasa';
