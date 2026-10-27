@@ -47,6 +47,137 @@ class AppLocalizationsSw extends AppLocalizations {
   String get a11yRead => 'Imesomwa';
 
   @override
+  String get accountEditName => 'Badilisha jina linaloonyeshwa';
+
+  @override
+  String get accountChooseName => 'Chagua jina la kuonyesha';
+
+  @override
+  String get accountNameHint => 'Jina lako la kuonyesha';
+
+  @override
+  String get accountSave => 'Hifadhi';
+
+  @override
+  String get accountNameUpdated => 'Jina la kuonyesha limesasishwa.';
+
+  @override
+  String get studyVerseOfTheDayHistory => 'Historia ya mstari wa siku';
+
+  @override
+  String get studyWordOfTheDayHistory => 'Historia ya neno la siku';
+
+  @override
+  String get studyRecentWords => 'Maneno ya hivi karibuni';
+
+  @override
+  String get accountAddName => 'Ongeza jina lako';
+
+  @override
+  String get accountNameSaveFailed =>
+      'Imeshindwa kuhifadhi jina lako. Angalia muunganisho wako na ujaribu tena.';
+
+  @override
+  String get accountSignOutSheetBody =>
+      'Data yako iko salama kwenye akaunti yako. Chagua kifaa hiki kibaki na nini.';
+
+  @override
+  String get accountKeepStudyData =>
+      'Weka data yangu ya kujifunza kwenye kifaa hiki';
+
+  @override
+  String get accountKeepStudyDataSubtitle =>
+      'Alamisho, vivutio, maelezo, mipango na maendeleo';
+
+  @override
+  String get accountKeepName => 'Weka jina langu kwenye kifaa hiki';
+
+  @override
+  String accountKeepNameSubtitle(String name) {
+    return 'Utaonekana kama \"$name\" badala ya \"Mgeni\"';
+  }
+
+  @override
+  String get accountSigningOut => 'Inatoka…';
+
+  @override
+  String accountSignedOutAs(String name) {
+    return 'Umetoka. Unatumia programu kama $name.';
+  }
+
+  @override
+  String get accountSignedOutGuest => 'Umetoka. Unatumia programu kama mgeni.';
+
+  @override
+  String get accountResetDevice => 'Weka upya kifaa hiki';
+
+  @override
+  String get accountResetDeviceSubtitle =>
+      'Futa data ya kujifunza kwenye kifaa hiki pekee';
+
+  @override
+  String get accountResetErases => 'Inafuta kwenye kifaa hiki:';
+
+  @override
+  String get accountResetEraseItems =>
+      '• Alamisho, vivutio, maelezo na shajara\n• Mipango ya kusoma, maendeleo na mfululizo\n• Tafsiri zilizopakuliwa';
+
+  @override
+  String get accountResetStays =>
+      'Vinabaki: mipangilio, mandhari, jina lako, Biblia ya nje ya mtandao na data ya akaunti yako kwenye wingu.';
+
+  @override
+  String get accountResetSignOutOption => 'Toka na uweke upya';
+
+  @override
+  String get accountResetSignOutOptionSubtitle =>
+      'Data yako inabaki kwenye akaunti yako. Ingia tena kuirudisha.';
+
+  @override
+  String get accountResetStayOption => 'Endelea kuingia na upakue upya';
+
+  @override
+  String get accountResetStayOptionSubtitle =>
+      'Inafuta kifaa hiki, kisha inapakua nakala mpya kutoka kwenye akaunti yako.';
+
+  @override
+  String get accountResetDeleteCloud => 'Futa pia data yangu ya wingu';
+
+  @override
+  String get accountResetDeleteCloudSubtitle =>
+      'Inaondoa kabisa alamisho, vivutio, maelezo na mipango ya programu hii kwenye akaunti yako. Akaunti yako na Blessed Arcade vinabaki.';
+
+  @override
+  String get accountResetAndDeleteCloud => 'Weka upya na ufute data ya wingu';
+
+  @override
+  String get accountDeleteCloudTitle => 'Futa data yako ya wingu?';
+
+  @override
+  String get accountDeleteCloudWord => 'FUTA';
+
+  @override
+  String accountDeleteCloudBody(String word) {
+    return 'Hii inaondoa kabisa data iliyosawazishwa ya programu hii kwenye akaunti yako, kwenye kila kifaa. Haiwezi kutenduliwa.\n\nAndika $word kuthibitisha.';
+  }
+
+  @override
+  String get accountDeleteCloudAction => 'Futa data ya wingu';
+
+  @override
+  String get accountResetting => 'Inaweka upya…';
+
+  @override
+  String get accountResetDeviceDone => 'Kifaa hiki kimewekwa upya.';
+
+  @override
+  String get accountCloudDeleteFailed =>
+      'Imeshindwa kufuta data yako ya wingu, hivyo hakuna kilichofutwa. Angalia muunganisho wako na ujaribu tena.';
+
+  @override
+  String get accountDeletingAccount => 'Inafuta akaunti…';
+
+  @override
   String get appTitle => 'The Blessed Bible';
 
   @override

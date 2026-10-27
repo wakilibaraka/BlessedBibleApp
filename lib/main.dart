@@ -15,6 +15,8 @@ import 'ui/screens/splash_loading_screen.dart';
 import 'state/bible_provider.dart';
 import 'ui/screens/onboarding_screen.dart';
 import 'ui/widgets/restore_prompt.dart';
+import 'state/profile_provider.dart';
+import 'theme/design_tokens.dart';
 
 import 'package:flutter/foundation.dart';
 import 'ui/widgets/app_error_fallback.dart';
@@ -124,7 +126,7 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
           : darkBase.applyPaperlike();
     }
 
-    final hasCompletedOnboarding = prefsService.hasCompletedOnboarding();
+    final hasCompletedOnboarding = ref.watch(onboardingCompleteProvider);
 
     final locale = ref.watch(appLocaleProvider);
 
@@ -160,11 +162,18 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
       },
       theme: lightBase,
       darkTheme: darkBase,
-      home: !hasCompletedOnboarding
-          ? const OnboardingScreen()
-          : (isBibleLoading
-              ? const SplashLoadingScreen()
-              : const RestorePromptHost(child: MainNavScreen())),
+      // One gate for the whole app: onboarding, then the splash until the
+      // offline Bible is ready, then home. Screens flip these states
+      // instead of replacing the root route, so there is always a page.
+      home: AnimatedSwitcher(
+        duration: Motion.of(context, Motion.slow),
+        child: !hasCompletedOnboarding
+            ? const OnboardingScreen(key: ValueKey('onboarding'))
+            : (isBibleLoading
+                ? const SplashLoadingScreen(key: ValueKey('splash'))
+                : const RestorePromptHost(
+                    key: ValueKey('home'), child: MainNavScreen())),
+      ),
     );
   }
 }

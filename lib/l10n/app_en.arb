@@ -17,6 +17,65 @@
   "a11yPreviousWeek": "Previous week",
   "a11yNextWeek": "Next week",
   "a11yRead": "Read",
+  "accountEditName": "Edit display name",
+  "accountChooseName": "Choose display name",
+  "accountNameHint": "Your display name",
+  "accountSave": "Save",
+  "accountNameUpdated": "Display name updated.",
+  "studyVerseOfTheDayHistory": "Verse of the day history",
+  "studyWordOfTheDayHistory": "Word of the day history",
+  "studyRecentWords": "Recent words",
+  "accountAddName": "Add your name",
+  "accountNameSaveFailed": "Couldn't save your name. Check your connection and try again.",
+  "accountSignOutSheetBody": "Your data stays safe in your account. Choose what this device keeps.",
+  "accountKeepStudyData": "Keep my study data on this device",
+  "accountKeepStudyDataSubtitle": "Bookmarks, highlights, notes, plans and progress",
+  "accountKeepName": "Keep my name on this device",
+  "accountKeepNameSubtitle": "You'll show as \"{name}\" instead of \"Guest\"",
+  "@accountKeepNameSubtitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSigningOut": "Signing out…",
+  "accountSignedOutAs": "Signed out. You're using the app as {name}.",
+  "@accountSignedOutAs": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSignedOutGuest": "Signed out. You're using the app as a guest.",
+  "accountResetDevice": "Reset this device",
+  "accountResetDeviceSubtitle": "Erase study data on this device only",
+  "accountResetErases": "Erases on this device:",
+  "accountResetEraseItems": "• Bookmarks, highlights, notes and journal\n• Reading plans, progress and streaks\n• Downloaded translations",
+  "accountResetStays": "Stays: settings, theme, your name, the offline Bible and your account's cloud data.",
+  "accountResetSignOutOption": "Sign out and reset",
+  "accountResetSignOutOptionSubtitle": "Your data stays in your account. Sign in again to bring it back.",
+  "accountResetStayOption": "Stay signed in and re-download",
+  "accountResetStayOptionSubtitle": "Clears this device, then downloads a fresh copy from your account.",
+  "accountResetDeleteCloud": "Also delete my cloud data",
+  "accountResetDeleteCloudSubtitle": "Removes this app's bookmarks, highlights, notes and plans from your account for good. Your account and Blessed Arcade stay.",
+  "accountResetAndDeleteCloud": "Reset and delete cloud data",
+  "accountDeleteCloudTitle": "Delete your cloud data?",
+  "accountDeleteCloudWord": "DELETE",
+  "accountDeleteCloudBody": "This permanently removes this app's synced data from your account, on every device. It can't be undone.\n\nType {word} to confirm.",
+  "@accountDeleteCloudBody": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "accountDeleteCloudAction": "Delete cloud data",
+  "accountResetting": "Resetting…",
+  "accountResetDeviceDone": "This device has been reset.",
+  "accountCloudDeleteFailed": "Couldn't delete your cloud data, so nothing was erased. Check your connection and try again.",
+  "accountDeletingAccount": "Deleting account…",
   "appTitle": "The Blessed Bible",
   "commonCancel": "Cancel",
   "commonContinue": "Continue",

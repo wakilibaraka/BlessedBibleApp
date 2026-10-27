@@ -13,6 +13,7 @@ import '../../state/study_layout_provider.dart';
 import '../../state/wotd_provider.dart';
 import 'today_screen.dart';
 import 'votd_archive_screen.dart';
+import 'wotd_archive_screen.dart';
 import '../../data/study_greetings.dart';
 import '../../state/user_data_provider.dart'
     show bookmarksProvider, highlightsProvider;
@@ -33,7 +34,6 @@ import '../../data/curated_plans.dart';
 import '../../l10n/l10n.dart';
 import '../../state/home_provider.dart';
 import '../../theme/design_tokens.dart';
-import '../widgets/dictionary_entry_sheet.dart';
 
 /// Redesigned Study hub (V2): Large by default, every card the same
 /// size.
@@ -1120,14 +1120,7 @@ class _WotdCard extends ConsumerWidget {
     final wotdAsync = ref.watch(wordOfTheDayProvider);
     const iconBox = 34.0;
 
-    void openDefinition(String normalized) {
-      showModalBottomSheet<void>(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (_) => DictionaryEntrySheet(normalizedWord: normalized),
-      );
-    }
+    void openArchive() => onOpen(const WotdArchiveScreen());
 
     Widget content(String word, String? snippet, String? normalized) {
       return Column(
@@ -1148,7 +1141,7 @@ class _WotdCard extends ConsumerWidget {
                 size: 18, color: theme.primaryColor),
           ),
           const SizedBox(height: 8),
-          V2Eyebrow(l10n.studyWordOfTheDay),
+          V2Eyebrow(l10n.studyWordOfTheDayHistory),
           const SizedBox(height: 2),
           Text(word,
               maxLines: 2,
@@ -1169,7 +1162,7 @@ class _WotdCard extends ConsumerWidget {
                 )),
           ],
           const SizedBox(height: 6),
-          Text(context.l10n.studyCtaArrow(l10n.studyWordLookUp),
+          Text(context.l10n.studyCtaArrow(l10n.studyRecentWords),
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w800,
                 color: theme.primaryColor,
@@ -1184,15 +1177,15 @@ class _WotdCard extends ConsumerWidget {
           return V2Card(
             textured: true,
             featured: span == CardSpan.full,
-            onTap: () => onOpen(const DictionaryV2Screen()),
+            onTap: openArchive,
             padding: const EdgeInsets.all(15),
-            child: content(l10n.studyWordOfTheDay, null, null),
+            child: content(l10n.studyWordOfTheDayHistory, null, null),
           );
         }
         return V2Card(
           textured: true,
           featured: span == CardSpan.full,
-          onTap: () => openDefinition(wotd.normalized),
+          onTap: openArchive,
           padding: const EdgeInsets.all(15),
           child: content(wotd.word, wotd.snippet, wotd.normalized),
         );
@@ -1209,9 +1202,10 @@ class _WotdCard extends ConsumerWidget {
       error: (_, __) => V2Card(
         textured: true,
         featured: span == CardSpan.full,
-        onTap: () => onOpen(const DictionaryV2Screen()),
+        onTap: openArchive,
         padding: const EdgeInsets.all(15),
-        child: content(l10n.studyWordOfTheDay, l10n.studyUnavailableNow, null),
+        child: content(
+            l10n.studyWordOfTheDayHistory, l10n.studyUnavailableNow, null),
       ),
     );
   }
@@ -1265,7 +1259,7 @@ class _VotdCard extends ConsumerWidget {
                 size: 18, color: theme.primaryColor),
           ),
           const SizedBox(height: 8),
-          V2Eyebrow(l10n.studyVerseOfTheDay),
+          V2Eyebrow(l10n.studyVerseOfTheDayHistory),
           const SizedBox(height: 2),
           Text(votdEntry?.reference ?? l10n.studyVerseOfTheDay,
               maxLines: 2,

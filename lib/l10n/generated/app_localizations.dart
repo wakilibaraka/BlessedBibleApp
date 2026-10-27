@@ -166,6 +166,234 @@ abstract class AppLocalizations {
   /// **'Read'**
   String get a11yRead;
 
+  /// No description provided for @accountEditName.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit display name'**
+  String get accountEditName;
+
+  /// No description provided for @accountChooseName.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose display name'**
+  String get accountChooseName;
+
+  /// No description provided for @accountNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your display name'**
+  String get accountNameHint;
+
+  /// No description provided for @accountSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get accountSave;
+
+  /// No description provided for @accountNameUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name updated.'**
+  String get accountNameUpdated;
+
+  /// No description provided for @studyVerseOfTheDayHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Verse of the day history'**
+  String get studyVerseOfTheDayHistory;
+
+  /// No description provided for @studyWordOfTheDayHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Word of the day history'**
+  String get studyWordOfTheDayHistory;
+
+  /// No description provided for @studyRecentWords.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent words'**
+  String get studyRecentWords;
+
+  /// No description provided for @accountAddName.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your name'**
+  String get accountAddName;
+
+  /// No description provided for @accountNameSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save your name. Check your connection and try again.'**
+  String get accountNameSaveFailed;
+
+  /// No description provided for @accountSignOutSheetBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data stays safe in your account. Choose what this device keeps.'**
+  String get accountSignOutSheetBody;
+
+  /// No description provided for @accountKeepStudyData.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep my study data on this device'**
+  String get accountKeepStudyData;
+
+  /// No description provided for @accountKeepStudyDataSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmarks, highlights, notes, plans and progress'**
+  String get accountKeepStudyDataSubtitle;
+
+  /// No description provided for @accountKeepName.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep my name on this device'**
+  String get accountKeepName;
+
+  /// No description provided for @accountKeepNameSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll show as \"{name}\" instead of \"Guest\"'**
+  String accountKeepNameSubtitle(String name);
+
+  /// No description provided for @accountSigningOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing out…'**
+  String get accountSigningOut;
+
+  /// No description provided for @accountSignedOutAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed out. You\'re using the app as {name}.'**
+  String accountSignedOutAs(String name);
+
+  /// No description provided for @accountSignedOutGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed out. You\'re using the app as a guest.'**
+  String get accountSignedOutGuest;
+
+  /// No description provided for @accountResetDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset this device'**
+  String get accountResetDevice;
+
+  /// No description provided for @accountResetDeviceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Erase study data on this device only'**
+  String get accountResetDeviceSubtitle;
+
+  /// No description provided for @accountResetErases.
+  ///
+  /// In en, this message translates to:
+  /// **'Erases on this device:'**
+  String get accountResetErases;
+
+  /// No description provided for @accountResetEraseItems.
+  ///
+  /// In en, this message translates to:
+  /// **'• Bookmarks, highlights, notes and journal\n• Reading plans, progress and streaks\n• Downloaded translations'**
+  String get accountResetEraseItems;
+
+  /// No description provided for @accountResetStays.
+  ///
+  /// In en, this message translates to:
+  /// **'Stays: settings, theme, your name, the offline Bible and your account\'s cloud data.'**
+  String get accountResetStays;
+
+  /// No description provided for @accountResetSignOutOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out and reset'**
+  String get accountResetSignOutOption;
+
+  /// No description provided for @accountResetSignOutOptionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data stays in your account. Sign in again to bring it back.'**
+  String get accountResetSignOutOptionSubtitle;
+
+  /// No description provided for @accountResetStayOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay signed in and re-download'**
+  String get accountResetStayOption;
+
+  /// No description provided for @accountResetStayOptionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clears this device, then downloads a fresh copy from your account.'**
+  String get accountResetStayOptionSubtitle;
+
+  /// No description provided for @accountResetDeleteCloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Also delete my cloud data'**
+  String get accountResetDeleteCloud;
+
+  /// No description provided for @accountResetDeleteCloudSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Removes this app\'s bookmarks, highlights, notes and plans from your account for good. Your account and Blessed Arcade stay.'**
+  String get accountResetDeleteCloudSubtitle;
+
+  /// No description provided for @accountResetAndDeleteCloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset and delete cloud data'**
+  String get accountResetAndDeleteCloud;
+
+  /// No description provided for @accountDeleteCloudTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your cloud data?'**
+  String get accountDeleteCloudTitle;
+
+  /// No description provided for @accountDeleteCloudWord.
+  ///
+  /// In en, this message translates to:
+  /// **'DELETE'**
+  String get accountDeleteCloudWord;
+
+  /// No description provided for @accountDeleteCloudBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently removes this app\'s synced data from your account, on every device. It can\'t be undone.\n\nType {word} to confirm.'**
+  String accountDeleteCloudBody(String word);
+
+  /// No description provided for @accountDeleteCloudAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete cloud data'**
+  String get accountDeleteCloudAction;
+
+  /// No description provided for @accountResetting.
+  ///
+  /// In en, this message translates to:
+  /// **'Resetting…'**
+  String get accountResetting;
+
+  /// No description provided for @accountResetDeviceDone.
+  ///
+  /// In en, this message translates to:
+  /// **'This device has been reset.'**
+  String get accountResetDeviceDone;
+
+  /// No description provided for @accountCloudDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t delete your cloud data, so nothing was erased. Check your connection and try again.'**
+  String get accountCloudDeleteFailed;
+
+  /// No description provided for @accountDeletingAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting account…'**
+  String get accountDeletingAccount;
+
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:

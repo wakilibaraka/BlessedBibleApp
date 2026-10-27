@@ -35,7 +35,7 @@ class StudyCardConfig {
         'id': id,
         'size': size.name,
         'span': span.name,
-        'version': 5,
+        'version': 6,
       };
 
   factory StudyCardConfig.fromJson(Map<String, dynamic> json) {
@@ -110,12 +110,12 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
             .map((e) => StudyCardConfig.fromJson(e as Map<String, dynamic>))
             .toList();
 
-        // Version 5: reset to the default view once (order + sizes:
-        // stories+dictionary pair, commentary full, votd+streak pair).
-        // Recomputed idempotently on every launch until a v5 save lands,
+        // Version 6: reset to the default view once (all cards Full by default
+        // except wotd + votd_archive pair at the bottom).
+        // Recomputed idempotently on every launch until a v6 save lands,
         // so no write is needed here. Unknown future ids are preserved.
         final needsReset = decoded.any(
-            (e) => ((e as Map<String, dynamic>)['version'] as int? ?? 1) < 5);
+            (e) => ((e as Map<String, dynamic>)['version'] as int? ?? 1) < 6);
         if (needsReset) {
           final byId = {for (final c in loaded) c.id: c};
           final defaults = {for (final d in defaultLayoutV2()) d.id: d};
@@ -208,27 +208,27 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
     _save();
   }
 
-  /// Layout-v2 default order and sizes: full-width banners up top,
-  /// stories + dictionary share a row, commentary full, then the
-  /// word of the day + verse of the day pair, followed by streak.
+  /// Layout-v2 default order and sizes: all cards Full by default,
+  /// with Word of the Day History and Verse of the Day History
+  /// side by side as Halves at the bottom.
   static List<StudyCardConfig> defaultLayoutV2() => [
         StudyCardConfig(
             id: 'your_space', size: CardSize.large, span: CardSpan.full),
         StudyCardConfig(
             id: 'plans_live', size: CardSize.large, span: CardSpan.full),
         StudyCardConfig(
-            id: 'bible_stories', size: CardSize.medium, span: CardSpan.half),
+            id: 'bible_stories', size: CardSize.large, span: CardSpan.full),
         StudyCardConfig(
-            id: 'dictionary', size: CardSize.medium, span: CardSpan.half),
+            id: 'dictionary', size: CardSize.large, span: CardSpan.full),
         StudyCardConfig(
             id: 'concordance', size: CardSize.large, span: CardSpan.full),
         StudyCardConfig(
             id: 'commentary', size: CardSize.large, span: CardSpan.full),
+        StudyCardConfig(
+            id: 'streak', size: CardSize.large, span: CardSpan.full),
         StudyCardConfig(id: 'wotd', size: CardSize.medium, span: CardSpan.half),
         StudyCardConfig(
             id: 'votd_archive', size: CardSize.medium, span: CardSpan.half),
-        StudyCardConfig(
-            id: 'streak', size: CardSize.medium, span: CardSpan.half),
       ];
 }
 

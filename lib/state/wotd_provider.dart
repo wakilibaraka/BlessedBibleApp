@@ -15,16 +15,16 @@ class WordOfTheDay {
       : normalized = normalized ?? word.toLowerCase();
 }
 
-final wordOfTheDayProvider = FutureProvider<WordOfTheDay?>((ref) async {
+final wordForDateProvider =
+    FutureProvider.family<WordOfTheDay?, DateTime>((ref, date) async {
   final allWords = await ref.watch(dictionaryIndexProvider.future);
   if (allWords.isEmpty) {
-    logDebug('wordOfTheDayProvider: dictionary index is empty');
+    logDebug('wordForDateProvider: dictionary index is empty');
     return null;
   }
 
   // Deterministic random based on date
-  final now = DateTime.now();
-  final dayIndex = DateTime(now.year, now.month, now.day)
+  final dayIndex = DateTime(date.year, date.month, date.day)
       .difference(DateTime(2026, 1, 1))
       .inDays;
 
@@ -36,7 +36,7 @@ final wordOfTheDayProvider = FutureProvider<WordOfTheDay?>((ref) async {
       .watch(dictionaryDefinitionProvider(headword.normalizedWord).future);
   if (defs.isEmpty) {
     logDebug(
-        'wordOfTheDayProvider: no definition for "${headword.normalizedWord}"');
+        'wordForDateProvider: no definition for "${headword.normalizedWord}"');
     return null;
   }
 
@@ -49,4 +49,24 @@ final wordOfTheDayProvider = FutureProvider<WordOfTheDay?>((ref) async {
 
   return WordOfTheDay(def.displayHeadword, snippet,
       normalized: headword.normalizedWord);
+});
+
+final wordOfTheDayProvider = FutureProvider<WordOfTheDay?>((ref) async {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  return ref.watch(wordForDateProvider(today).future);
+});
+
+/// Last 7 days of words of the day (today down to 6 days ago).
+final pastWordsOfTheDayProvider =
+    FutureProvider<List<(DateTime, WordOfTheDay?)>>((ref) async {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final dates = List.generate(7, (i) => today.subtract(Duration(days: i)));
+  final results = <(DateTime, WordOfTheDay?)>[];
+  for (final date in dates) {
+    final wotd = await ref.watch(wordForDateProvider(date).future);
+    results.add((date, wotd));
+  }
+  return results;
 });

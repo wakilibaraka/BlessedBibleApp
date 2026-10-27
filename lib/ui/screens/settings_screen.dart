@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../../state/devotional_provider.dart';
 import '../../state/story_of_the_day_provider.dart';
 import '../../state/nav_provider.dart';
+import '../../state/profile_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/hints_provider.dart';
 import '../../state/bible_nav_settings_provider.dart';
@@ -29,7 +30,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'credits_screen.dart';
 import 'privacy_policy_screen.dart';
 import 'storage_screen.dart';
-import 'onboarding_screen.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../sheets/widget_settings_sheet.dart';
 
@@ -721,14 +721,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                       TextButton(
                         onPressed: () {
                           Navigator.of(ctx).pop();
+                          // Back to the root page, which then shows
+                          // onboarding; removing the root route instead
+                          // could leave an empty (black) navigator.
+                          Navigator.of(context)
+                              .popUntil((route) => route.isFirst);
                           ref
-                              .read(preferencesProvider)
-                              .setOnboardingComplete(false);
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute<void>(
-                                builder: (_) => const OnboardingScreen()),
-                            (route) => false,
-                          );
+                              .read(onboardingCompleteProvider.notifier)
+                              .set(false);
                         },
                         child: Text(context.l10n.settingsRestart,
                             style: TextStyle(

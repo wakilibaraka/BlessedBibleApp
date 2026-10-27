@@ -291,6 +291,7 @@ class SyncController extends Notifier<SyncStatus> {
   bool _applyingRemote = false;
   Future<void>? _running;
   Completer<void>? _userSeen;
+  int _paused = 0;
 
   SharedPreferences get _prefs => ref.read(preferencesProvider).prefs;
 
@@ -417,9 +418,30 @@ class SyncController extends Notifier<SyncStatus> {
     if (forget) await _prefs.remove(lastUidKey);
   }
 
+  /// Runs [task] with sync paused: local changes aren't recorded and
+  /// nothing uploads. Used while wiping this device, so a reset can never
+  /// delete anything in the account.
+  Future<T> whilePaused<T>(Future<T> Function() task) async {
+    _timer?.cancel();
+    _paused++;
+    try {
+      await _running; // Let a sync already in flight finish first.
+      return await task();
+    } finally {
+      // Providers invalidated by [task] notify their listeners on a later
+      // microtask; keep sync paused until they have.
+      await Future<void>.delayed(Duration.zero);
+      _paused--;
+    }
+  }
+
   void _onLocalChange() {
     final uid = _uid;
-    if (uid == null || state.phase == SyncPhase.needsAccountChoice) return;
+    if (uid == null ||
+        _paused > 0 ||
+        state.phase == SyncPhase.needsAccountChoice) {
+      return;
+    }
     // Timestamp the change now (the next sync would otherwise date it),
     // upload a little later (batched). Changes made while a sync is
     // applying remote data are dated by the follow-up sync.
@@ -440,7 +462,11 @@ class SyncController extends Notifier<SyncStatus> {
 
   Future<void> _sync() async {
     final uid = _uid;
-    if (uid == null || state.phase == SyncPhase.needsAccountChoice) return;
+    if (uid == null ||
+        _paused > 0 ||
+        state.phase == SyncPhase.needsAccountChoice) {
+      return;
+    }
     _timer?.cancel();
     state = SyncStatus(SyncPhase.syncing, lastSyncedAt: state.lastSyncedAt);
     try {

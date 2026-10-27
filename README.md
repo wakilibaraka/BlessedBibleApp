@@ -2,7 +2,7 @@
 
 [![Release](https://img.shields.io/github/v/release/wakilibaraka/BlessedBibleApp?include_prereleases&style=flat-square&color=blue)](https://github.com/wakilibaraka/BlessedBibleApp/releases)
 [![CI Status](https://img.shields.io/github/actions/workflow/status/wakilibaraka/BlessedBibleApp/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/wakilibaraka/BlessedBibleApp/actions)
-[![Flutter](https://img.shields.io/badge/Flutter-3.44.9%2B-02569B?style=flat-square&logo=flutter)](https://flutter.dev)
+[![Flutter](https://img.shields.io/badge/Flutter-3.47.8%2B-02569B?style=flat-square&logo=flutter)](https://flutter.dev)
 [![License](https://img.shields.io/badge/License-Proprietary-red?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20(in%20progress)-green?style=flat-square)](https://github.com/wakilibaraka/BlessedBibleApp)
 
@@ -96,7 +96,7 @@ Get the latest release APKs directly from [GitHub Releases](https://github.com/w
 ## 🚀 Developer Setup
 
 ### Prerequisites
-- [Flutter SDK](https://docs.flutter.dev/get-started/install) (pinned to **3.44.9** via `.fvmrc`)
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) (pinned to **3.47.8** via `.fvmrc`)
 - Android Studio / Android SDK (Platform 34+)
 - Xcode 15+ (for iOS development)
 - Git LFS (`git lfs install`)

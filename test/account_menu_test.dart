@@ -121,11 +121,12 @@ void main() {
     // Signed out: guest header + sign-in rows. Apple sign-in is offered
     // only where it works (iOS/macOS), so not on this Android-like device.
     expect(find.text('Guest'), findsOneWidget);
-    expect(find.text('Account'), findsOneWidget);
+    // "ACCOUNT" appears as the eyebrow label inside the hero card.
+    expect(find.text('ACCOUNT'), findsOneWidget);
     expect(find.text('Settings'), findsOneWidget);
     expect(find.text('Back up data'), findsOneWidget);
     expect(find.text('Restore data'), findsOneWidget);
-    expect(find.text('Reset app'), findsOneWidget);
+    expect(find.text('Reset this device'), findsOneWidget);
     expect(find.text('Sign in with Google'), findsOneWidget);
     expect(find.text('Sign in with Apple'), findsNothing);
   });
@@ -157,8 +158,29 @@ void main() {
     expect(find.text('Sign out'), findsOneWidget);
   });
 
-  testWidgets('sign-out asks whether to keep data, then signs out',
-      (tester) async {
+  Future<void> signOutWith(WidgetTester tester, {bool keepName = true}) async {
+    await tester.ensureVisible(find.text('Sign out'));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.text('Sign out'));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(milliseconds: 500));
+    // One sheet, two choices, both ticked by default.
+    expect(find.text('Keep my study data on this device'), findsOneWidget);
+    expect(find.text('Keep my name on this device'), findsOneWidget);
+    if (!keepName) {
+      await tester.tap(find.text('Keep my name on this device'));
+      await tester.pump();
+    }
+    await tester.tap(find.widgetWithText(FilledButton, 'Sign out'));
+    await tester.pump(const Duration(milliseconds: 300));
+    // Pending uploads finish behind a progress dialog, never a frozen sheet.
+    await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 200)));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(milliseconds: 500));
+  }
+
+  testWidgets('sign-out keeps the name and becomes a guest', (tester) async {
     final gateway = FakeAuthGateway(
         user: const AccountUser(uid: 'u1', displayName: 'Ruth'));
     await pumpHub(tester, gateway: gateway);
@@ -170,16 +192,42 @@ void main() {
         isTrue,
         reason: 'signed-in menu shows the sync row');
 
-    await tester.ensureVisible(find.text('Sign out'));
-    await tester.pump(const Duration(milliseconds: 300));
-    await tester.tap(find.text('Sign out'));
-    await tester.pump(const Duration(milliseconds: 500));
-    expect(find.text('Sign out?'), findsOneWidget);
-    await tester.tap(find.text('Keep on device'));
-    await tester.runAsync(
-        () => Future<void>.delayed(const Duration(milliseconds: 100)));
-    await tester.pump(const Duration(milliseconds: 500));
+    await signOutWith(tester);
     expect(gateway.calls, contains('signOut'));
+    expect(
+        find.text("Signed out. You're using the app as Ruth."), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+
+    // Back in the menu as a guest who kept their name.
+    await openMenu(tester);
+    expect(find.text('Ruth'), findsOneWidget);
+    expect(find.text('Sign in with Google'), findsOneWidget);
+  });
+
+  testWidgets('sign-out can drop the name', (tester) async {
+    final gateway = FakeAuthGateway(
+        user: const AccountUser(uid: 'u1', displayName: 'Ruth'));
+    await pumpHub(tester, gateway: gateway);
+    await tester.pump();
+    await openMenu(tester);
+    await signOutWith(tester, keepName: false);
+    expect(find.text("Signed out. You're using the app as a guest."),
+        findsOneWidget);
+    await openMenu(tester);
+    expect(find.text('Guest'), findsOneWidget);
+    expect(find.text('Add your name'), findsOneWidget);
+  });
+
+  testWidgets('a guest can name themselves', (tester) async {
+    await pumpHub(tester);
+    await openMenu(tester);
+    await tester.tap(find.text('Add your name'));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.enterText(find.byType(TextField), '  Hadassah ');
+    await tester.tap(find.text('Save'));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Hadassah'), findsOneWidget);
+    expect(find.text('Guest'), findsNothing);
   });
 
   testWidgets('failed sign-in explains why and keeps the menu open',
@@ -212,24 +260,69 @@ void main() {
     expect(find.text('Sign in with Google'), findsNothing);
   });
 
-  testWidgets('reset row asks for confirmation', (tester) async {
-    await pumpHub(tester);
-
-    await tester.tap(find.byType(AccountAvatar));
-    await tester.pump(const Duration(milliseconds: 500));
-    await tester.pump(const Duration(milliseconds: 500));
-
+  Future<void> openReset(WidgetTester tester) async {
+    await openMenu(tester);
     // The sheet scrolls on short viewports: bring the row into view.
     await tester.dragUntilVisible(
-      find.text('Reset app'),
+      find.text('Reset this device'),
       find.byType(SingleChildScrollView).first,
       const Offset(0, -200),
     );
     await tester.pump(const Duration(milliseconds: 300));
-    await tester.tap(find.text('Reset app'));
+    await tester.tap(find.text('Reset this device'));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(milliseconds: 500));
+  }
+
+  testWidgets('guest reset erases this device only', (tester) async {
+    await pumpHub(tester);
+    await openReset(tester);
+
+    expect(find.text('Erases on this device:'), findsOneWidget);
+    expect(find.text('Cancel'), findsOneWidget);
+    // Nothing in the cloud to offer deleting while signed out.
+    expect(find.text('Also delete my cloud data'), findsNothing);
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Reset this device'));
+    // The wipe touches real storage: give it real time, frame by frame.
+    for (var i = 0;
+        i < 80 && find.text('This device has been reset.').evaluate().isEmpty;
+        i++) {
+      await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 100)));
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.text('This device has been reset.'), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+  });
+
+  testWidgets('cloud delete is a separate switch that needs DELETE typed',
+      (tester) async {
+    await pumpHub(tester,
+        gateway: FakeAuthGateway(
+            user: const AccountUser(uid: 'u1', displayName: 'Ruth')));
+    await tester.pump();
+    await openReset(tester);
+
+    expect(find.text('Sign out and reset'), findsOneWidget);
+    expect(find.text('Stay signed in and re-download'), findsOneWidget);
+    final cloud = tester.widget<SwitchListTile>(find.byType(SwitchListTile));
+    expect(cloud.value, isFalse, reason: 'cloud delete is off by default');
+
+    await tester.ensureVisible(find.byType(SwitchListTile));
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pump();
+    expect(find.text('Reset and delete cloud data'), findsOneWidget);
+    await tester.tap(find.text('Reset and delete cloud data'));
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.text('Reset app?'), findsOneWidget);
-    expect(find.text('Cancel'), findsOneWidget);
+    expect(find.text('Delete your cloud data?'), findsOneWidget);
+    FilledButton confirm() => tester.widget<FilledButton>(
+        find.widgetWithText(FilledButton, 'Delete cloud data'));
+    expect(confirm().onPressed, isNull);
+    await tester.enterText(find.byType(TextField), 'delete');
+    await tester.pump();
+    expect(confirm().onPressed, isNotNull);
   });
 }

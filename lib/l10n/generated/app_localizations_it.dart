@@ -47,6 +47,139 @@ class AppLocalizationsIt extends AppLocalizations {
   String get a11yRead => 'Letto';
 
   @override
+  String get accountEditName => 'Modifica nome visualizzato';
+
+  @override
+  String get accountChooseName => 'Scegli un nome visualizzato';
+
+  @override
+  String get accountNameHint => 'Il tuo nome visualizzato';
+
+  @override
+  String get accountSave => 'Salva';
+
+  @override
+  String get accountNameUpdated => 'Nome visualizzato aggiornato.';
+
+  @override
+  String get studyVerseOfTheDayHistory => 'Cronologia dei versetti del giorno';
+
+  @override
+  String get studyWordOfTheDayHistory => 'Cronologia delle parole del giorno';
+
+  @override
+  String get studyRecentWords => 'Parole recenti';
+
+  @override
+  String get accountAddName => 'Aggiungi il tuo nome';
+
+  @override
+  String get accountNameSaveFailed =>
+      'Impossibile salvare il nome. Controlla la connessione e riprova.';
+
+  @override
+  String get accountSignOutSheetBody =>
+      'I tuoi dati restano al sicuro nel tuo account. Scegli cosa tenere su questo dispositivo.';
+
+  @override
+  String get accountKeepStudyData =>
+      'Tieni i miei dati di studio su questo dispositivo';
+
+  @override
+  String get accountKeepStudyDataSubtitle =>
+      'Segnalibri, evidenziazioni, note, piani e progressi';
+
+  @override
+  String get accountKeepName => 'Tieni il mio nome su questo dispositivo';
+
+  @override
+  String accountKeepNameSubtitle(String name) {
+    return 'Comparirai come \"$name\" invece di \"Ospite\"';
+  }
+
+  @override
+  String get accountSigningOut => 'Disconnessione…';
+
+  @override
+  String accountSignedOutAs(String name) {
+    return 'Disconnesso. Stai usando l\'app come $name.';
+  }
+
+  @override
+  String get accountSignedOutGuest =>
+      'Disconnesso. Stai usando l\'app come ospite.';
+
+  @override
+  String get accountResetDevice => 'Reimposta questo dispositivo';
+
+  @override
+  String get accountResetDeviceSubtitle =>
+      'Cancella i dati di studio solo su questo dispositivo';
+
+  @override
+  String get accountResetErases => 'Cancella su questo dispositivo:';
+
+  @override
+  String get accountResetEraseItems =>
+      '• Segnalibri, evidenziazioni, note e diario\n• Piani di lettura, progressi e serie\n• Traduzioni scaricate';
+
+  @override
+  String get accountResetStays =>
+      'Resta: impostazioni, tema, il tuo nome, la Bibbia offline e i dati cloud del tuo account.';
+
+  @override
+  String get accountResetSignOutOption => 'Esci e reimposta';
+
+  @override
+  String get accountResetSignOutOptionSubtitle =>
+      'I tuoi dati restano nel tuo account. Accedi di nuovo per recuperarli.';
+
+  @override
+  String get accountResetStayOption => 'Resta connesso e scarica di nuovo';
+
+  @override
+  String get accountResetStayOptionSubtitle =>
+      'Svuota questo dispositivo, poi scarica una copia aggiornata dal tuo account.';
+
+  @override
+  String get accountResetDeleteCloud => 'Elimina anche i miei dati cloud';
+
+  @override
+  String get accountResetDeleteCloudSubtitle =>
+      'Rimuove per sempre dal tuo account segnalibri, evidenziazioni, note e piani di questa app. Il tuo account e Blessed Arcade restano.';
+
+  @override
+  String get accountResetAndDeleteCloud => 'Reimposta ed elimina i dati cloud';
+
+  @override
+  String get accountDeleteCloudTitle => 'Eliminare i tuoi dati cloud?';
+
+  @override
+  String get accountDeleteCloudWord => 'ELIMINA';
+
+  @override
+  String accountDeleteCloudBody(String word) {
+    return 'Questo rimuove per sempre i dati sincronizzati di questa app dal tuo account, su ogni dispositivo. Non si può annullare.\n\nScrivi $word per confermare.';
+  }
+
+  @override
+  String get accountDeleteCloudAction => 'Elimina i dati cloud';
+
+  @override
+  String get accountResetting => 'Reimpostazione…';
+
+  @override
+  String get accountResetDeviceDone =>
+      'Questo dispositivo è stato reimpostato.';
+
+  @override
+  String get accountCloudDeleteFailed =>
+      'Impossibile eliminare i dati cloud, quindi non è stato cancellato nulla. Controlla la connessione e riprova.';
+
+  @override
+  String get accountDeletingAccount => 'Eliminazione dell\'account…';
+
+  @override
   String get appTitle => 'The Blessed Bible';
 
   @override
