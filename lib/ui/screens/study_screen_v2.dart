@@ -10,10 +10,8 @@ import '../../state/notes_provider.dart';
 import '../../state/reading_plan_provider.dart';
 import '../../state/streak_provider.dart';
 import '../../state/study_layout_provider.dart';
-import '../../state/wotd_provider.dart';
 import 'today_screen.dart';
 import 'votd_archive_screen.dart';
-import 'wotd_archive_screen.dart';
 import '../../data/study_greetings.dart';
 import '../../state/user_data_provider.dart'
     show bookmarksProvider, highlightsProvider;
@@ -63,7 +61,6 @@ const _v2CardIds = [
   'dictionary',
   'concordance',
   'commentary',
-  'wotd',
   'votd_archive',
   'streak',
 ];
@@ -469,8 +466,6 @@ class _CardBody extends ConsumerWidget {
         );
       case 'concordance':
         return _ConcordanceCard(span: span, onOpen: onOpen);
-      case 'wotd':
-        return _WotdCard(span: span, onOpen: onOpen);
       case 'votd_archive':
         return _VotdCard(span: span, onOpen: onOpen);
       case 'streak':
@@ -800,8 +795,6 @@ class _PlanProgressHeader extends ConsumerWidget {
               const SizedBox(height: 2),
               Text(
                 title(planId),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -887,8 +880,6 @@ class _PlanSummaryHalf extends ConsumerWidget {
         const SizedBox(height: 10),
         Text(
           title(planId),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.bold,
             height: 1.2,
@@ -978,8 +969,6 @@ class _PlanStack extends ConsumerWidget {
                         children: [
                           Text(
                             title(id),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -1085,8 +1074,6 @@ class _ToolCard extends StatelessWidget {
           if (span == CardSpan.full) ...[
             const SizedBox(height: 4),
             Text(snippet,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontStyle: FontStyle.italic,
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -1104,114 +1091,6 @@ class _ToolCard extends StatelessWidget {
   }
 }
 
-/// Word-of-the-day card: today's word with definition and dictionary entry point.
-class _WotdCard extends ConsumerWidget {
-  final CardSpan span;
-  final void Function(Widget page) onOpen;
-  const _WotdCard({
-    required this.span,
-    required this.onOpen,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final l10n = context.l10n;
-    final wotdAsync = ref.watch(wordOfTheDayProvider);
-    const iconBox = 34.0;
-
-    void openArchive() => onOpen(const WotdArchiveScreen());
-
-    Widget content(String word, String? snippet, String? normalized) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: iconBox,
-            height: iconBox,
-            decoration: BoxDecoration(
-              color: theme.primaryColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(Radii.md),
-              border: Border.all(
-                color: theme.primaryColor.withValues(alpha: 0.3),
-              ),
-            ),
-            child: Icon(Icons.spellcheck_rounded,
-                size: 18, color: theme.primaryColor),
-          ),
-          const SizedBox(height: 8),
-          V2Eyebrow(l10n.studyWordOfTheDayHistory),
-          const SizedBox(height: 2),
-          Text(word,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              )),
-          if (span == CardSpan.full &&
-              snippet != null &&
-              snippet.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(snippet,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontStyle: FontStyle.italic,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                )),
-          ],
-          const SizedBox(height: 6),
-          Text(context.l10n.studyCtaArrow(l10n.studyRecentWords),
-              style: theme.textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: theme.primaryColor,
-              )),
-        ],
-      );
-    }
-
-    return wotdAsync.when(
-      data: (wotd) {
-        if (wotd == null) {
-          return V2Card(
-            textured: true,
-            featured: span == CardSpan.full,
-            onTap: openArchive,
-            padding: const EdgeInsets.all(15),
-            child: content(l10n.studyWordOfTheDayHistory, null, null),
-          );
-        }
-        return V2Card(
-          textured: true,
-          featured: span == CardSpan.full,
-          onTap: openArchive,
-          padding: const EdgeInsets.all(15),
-          child: content(wotd.word, wotd.snippet, wotd.normalized),
-        );
-      },
-      loading: () => V2Card(
-        textured: true,
-        featured: span == CardSpan.full,
-        padding: const EdgeInsets.all(15),
-        child: Text(l10n.studyLoading,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-            )),
-      ),
-      error: (_, __) => V2Card(
-        textured: true,
-        featured: span == CardSpan.full,
-        onTap: openArchive,
-        padding: const EdgeInsets.all(15),
-        child: content(
-            l10n.studyWordOfTheDayHistory, l10n.studyUnavailableNow, null),
-      ),
-    );
-  }
-}
-
-/// Verse-of-the-day card: today's scripture anchor with recent VOTDs archive entry.
 class _VotdCard extends ConsumerWidget {
   final CardSpan span;
   final void Function(Widget page) onOpen;
@@ -1262,16 +1141,12 @@ class _VotdCard extends ConsumerWidget {
           V2Eyebrow(l10n.studyVerseOfTheDayHistory),
           const SizedBox(height: 2),
           Text(votdEntry?.reference ?? l10n.studyVerseOfTheDay,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               )),
           if (span == CardSpan.full && votdEntry != null) ...[
             const SizedBox(height: 4),
             Text(votdEntry.text,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontStyle: FontStyle.italic,
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -1344,8 +1219,6 @@ class _ConcordanceCard extends StatelessWidget {
           if (span == CardSpan.full) ...[
             const SizedBox(height: 4),
             Text(l10n.studyConcordanceSnippet,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontStyle: FontStyle.italic,
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -1451,8 +1324,6 @@ class _StreakCard extends ConsumerWidget {
                 count > 0
                     ? context.l10n.studyStreakGrow
                     : context.l10n.studyStreakStart,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontStyle: FontStyle.italic,
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.6),

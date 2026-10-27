@@ -200,8 +200,6 @@ class PlanTodayPanel extends ConsumerWidget {
       children: [
         Text(
           eyebrow.toUpperCase(),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
           style: theme.textTheme.labelSmall?.copyWith(
             fontWeight: FontWeight.w800,
             letterSpacing: 1.2,
@@ -211,8 +209,6 @@ class PlanTodayPanel extends ConsumerWidget {
         const SizedBox(height: 4),
         Text(
           body,
-          maxLines: compact ? 2 : 3,
-          overflow: TextOverflow.ellipsis,
           style: (compact
                   ? theme.textTheme.bodyMedium
                   : theme.textTheme.titleMedium)
@@ -222,8 +218,6 @@ class PlanTodayPanel extends ConsumerWidget {
           const SizedBox(height: 2),
           Text(
             caption!,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
             style: theme.textTheme.labelSmall?.copyWith(
               color: palette.textMuted,
               fontWeight: FontWeight.w600,
