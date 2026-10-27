@@ -4,6 +4,12 @@ All notable changes to The Blessed Bible. Newest first.
 
 ## [Unreleased]
 
+### Account
+- **Sign out to a guest:** One sheet asks whether to keep your study data and your name on this device (both ticked). You always land as a guest, under your name or "Guest".
+- **Reset this device:** Erases study data on this device only. Signed in, choose to sign out or stay signed in and re-download. Deleting this app's cloud data is a separate switch, off by default, confirmed by typing DELETE.
+- **Your name:** Guests can name themselves; signed-in name edits update the shared account (Blessed Arcade too).
+- **No more blank screens:** Finishing or restarting onboarding no longer replaces the app's root screen, slow account actions show progress, and Delete account, Back up and Restore from the account menu work again.
+
 ## [0.0.6] - 2026-10-26
 
 ### Commentary & Volumes
