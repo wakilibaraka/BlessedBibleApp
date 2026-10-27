@@ -24,7 +24,14 @@ class CommentaryNotifier extends AsyncNotifier<List<CommentaryEntry>> {
       final jsonString =
           await rootBundle.loadString('assets/commentary/commentary.json');
 
-      final entries = await compute(parseCommentaryJson, jsonString);
+      final bundledEntries = await compute(parseCommentaryJson, jsonString);
+      final jfbData = await rootBundle.load('assets/commentary/jfb.json.gz');
+      final jfbBytes = jfbData.buffer.asUint8List(
+        jfbData.offsetInBytes,
+        jfbData.lengthInBytes,
+      );
+      final jfbEntries = await compute(parseGzipCommentaryJson, jfbBytes);
+      final entries = <CommentaryEntry>[...bundledEntries, ...jfbEntries];
 
       final verses = <String>{};
       final vCommSet = <String>{};

@@ -4101,7 +4101,7 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get creditsCommentaryPerspective =>
-      'Ang komentaryo ay mula sa mga manunulat ng ika-19 at ika-20 siglo sa tradisyong Seventh-day Adventist at binabasa ang propesiya ng Bibliya mula sa pananaw na historisista. Iniaalok ito bilang tulong sa pag-aaral kasama ng Kasulatan, hindi bilang bahagi nito.';
+      'Kasama sa aklatan ang mga akda ng mga Adventistang pioneer at mga komentaryong Kristiyano mula sa ibang tradisyon. Nagkakaiba ang mga pananaw sa pagpapakahulugan; lahat ay pantulong sa pag-aaral kasama ng Kasulatan, hindi bahagi nito.';
 
   @override
   String get creditsPublicDomain => 'Pampublikong domain.';

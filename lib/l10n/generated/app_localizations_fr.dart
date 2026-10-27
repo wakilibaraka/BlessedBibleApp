@@ -4119,7 +4119,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get creditsCommentaryPerspective =>
-      'Les commentaires proviennent d\'auteurs des XIXe et XXe siècles de la tradition adventiste du septième jour et lisent la prophétie biblique selon la perspective historiciste. Ils sont proposés comme aide à l\'étude, à côté des Écritures, et n\'en font pas partie.';
+      'La bibliothèque comprend des ouvrages de pionniers adventistes du septième jour et des commentaires chrétiens d\'autres traditions. Les perspectives d\'interprétation varient ; tous sont des aides à l\'étude, à côté des Écritures, et n\'en font pas partie.';
 
   @override
   String get creditsPublicDomain => 'Domaine public.';

@@ -7010,7 +7010,7 @@ abstract class AppLocalizations {
   /// No description provided for @creditsCommentaryPerspective.
   ///
   /// In en, this message translates to:
-  /// **'The commentary comes from 19th- and 20th-century writers in the Seventh-day Adventist tradition and reads Bible prophecy from the historicist perspective. It is offered as a study aid alongside Scripture, not as part of it.'**
+  /// **'The library includes Seventh-day Adventist pioneer works and general Christian commentaries from other traditions. Interpretive perspectives vary; all are study aids alongside Scripture, not part of it.'**
   String get creditsCommentaryPerspective;
 
   /// No description provided for @creditsPublicDomain.

@@ -45,10 +45,11 @@ Status: ✅ OK to ship · ⚠️ verify before release · ⛔ do not ship as-is
 | Bíblia Livre | `content_packs/por_blj.db` | CC BY (version: item 5) | ⚠️ |
 | Romanian BTF 2015 | `assets/packs/ron_btf.db` | © 2015 Dr. Brian J. Nibbe, Sr., all rights reserved; permission needed (item 1) | ⛔ |
 
-## Commentary (`assets/commentary/commentary.json`, 4,724 entries)
+## Commentary (`assets/commentary/`)
 
 | Work | Author | Entries | License | Status |
-| --- | --- | --- | --- | --- |
+| --- | --- | ---: | --- | --- |
+| JFB, *Commentary Critical and Explanatory on the Whole Bible* (1871), `jfb.json.gz` | Robert Jamieson, A. R. Fausset and David Brown | 19,015 | Public domain; CCEL source explicitly identifies the 1871 print basis and public-domain rights. | ✅ |
 | The Desire of Ages (1898), Patriarchs and Prophets (1890), The Acts of the Apostles (1911), Prophets and Kings (1917) | Ellen G. White | 3,103 | Public domain (original editions; no modern compilations used) | ✅ |
 | Waggoner on Romans; The Glad Tidings (1900) | E. J. Waggoner | 898 | Public domain (edition: item 8) | ✅/⚠️ |
 | Daniel and the Revelation | Uriah Smith | 403 | Public domain (edition: item 7) | ⚠️ |

@@ -1,4 +1,6 @@
 import 'dart:convert';
+
+import 'package:archive/archive.dart';
 import '../data/bible_books.dart';
 import '../data/models/bible_model.dart';
 import '../models/commentary_entry.dart';
@@ -54,7 +56,18 @@ List<BibleBook> parseBibleRows(List<Map<String, dynamic>> rows) {
 /// Top-level function to parse Commentary JSON on a background isolate
 List<CommentaryEntry> parseCommentaryJson(String jsonString) {
   final decoded = jsonDecode(jsonString);
+  return _parseCommentaryEntries(decoded);
+}
 
+/// Parses the separately compressed, bundled general commentary pack.
+/// Kept as a top-level function so Flutter can run decompression and JSON
+/// parsing on a background isolate.
+List<CommentaryEntry> parseGzipCommentaryJson(List<int> bytes) {
+  final jsonString = utf8.decode(GZipDecoder().decodeBytes(bytes));
+  return parseCommentaryJson(jsonString);
+}
+
+List<CommentaryEntry> _parseCommentaryEntries(dynamic decoded) {
   List<dynamic> entriesList;
   if (decoded is Map<String, dynamic> && decoded.containsKey('entries')) {
     entriesList = decoded['entries'] as List<dynamic>;

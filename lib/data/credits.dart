@@ -58,6 +58,10 @@ List<CreditSection> creditSections(AppLocalizations l10n) => [
           CreditItem('E. J. Waggoner', 'Waggoner on Romans; The Glad Tidings.'),
           CreditItem('M. L. Andreasen', 'The Book of Hebrews (1948).'),
           CreditItem('Samuel T. Spear', l10n.creditsSelectedWriting),
+          CreditItem(
+              'Robert Jamieson, A. R. Fausset and David Brown',
+              'Commentary Critical and Explanatory on the Whole Bible (1871). '
+                  'Public domain. Source: CCEL (ccel.org/j/jamieson/jfb/cache/jfb.txt).'),
         ],
         note: l10n.creditsCommentaryPerspective,
       ),

@@ -57,6 +57,7 @@ def main():
 
     rows.append(("Devotional art (Dore plates)", mb(ROOT / "assets" / "devotional" / "art"), "bundled"))
     rows.append(("Commentary (4,724 entries)", mb(ROOT / "assets" / "commentary" / "commentary.json"), "bundled"))
+    rows.append(("JFB commentary (compressed)", mb(ROOT / "assets" / "commentary" / "jfb.json.gz"), "bundled; 19,015 entries, decompresses in memory"))
     rows.append(("Bible stories (66 books)", mb(ROOT / "assets" / "devotional" / "stories"), "bundled"))
     rows.append(("Reading plans", mb(ROOT / "assets" / "reading_plans"), "bundled"))
     rows.append(("Misc data (pericopes, word counts, ...)", mb(ROOT / "assets" / "data"), "bundled"))
