@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/local_storage/preferences_service.dart';
 import '../../l10n/l10n.dart';
 import '../../state/auth_provider.dart';
+import '../../state/profile_provider.dart';
 import '../../state/locale_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/reminders_provider.dart';
@@ -16,7 +17,6 @@ import '../../state/typography_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/account_menu.dart';
-import 'main_nav_screen.dart';
 import '../../theme/design_tokens.dart';
 
 // Onboarding keeps its own warm sepia look whatever theme is picked, so the
@@ -134,17 +134,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     // keeps following the device unless one was tapped.
     if (_page < 2) await _applyBible();
     final prefs = ref.read(preferencesProvider);
-    prefs.setOnboardingComplete(true);
     await prefs.prefs.remove(OnboardingScreen.pageKey);
     if (!mounted) return;
-    unawaited(Navigator.of(context).pushReplacement(
-      PageRouteBuilder<void>(
-        pageBuilder: (_, __, ___) => const MainNavScreen(),
-        transitionsBuilder: (_, animation, __, child) =>
-            FadeTransition(opacity: animation, child: child),
-        transitionDuration: Motion.of(context, Motion.slow),
-      ),
-    ));
+    // The app's home switches to the splash (until the offline Bible is
+    // ready) and then Home; replacing the root route here skipped both.
+    ref.read(onboardingCompleteProvider.notifier).set(true);
   }
 
   @override

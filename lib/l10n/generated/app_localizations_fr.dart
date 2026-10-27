@@ -47,6 +47,139 @@ class AppLocalizationsFr extends AppLocalizations {
   String get a11yRead => 'Lu';
 
   @override
+  String get accountEditName => 'Modifier le nom affiché';
+
+  @override
+  String get accountChooseName => 'Choisir un nom affiché';
+
+  @override
+  String get accountNameHint => 'Votre nom affiché';
+
+  @override
+  String get accountSave => 'Enregistrer';
+
+  @override
+  String get accountNameUpdated => 'Nom affiché mis à jour.';
+
+  @override
+  String get studyVerseOfTheDayHistory => 'Historique des versets du jour';
+
+  @override
+  String get studyWordOfTheDayHistory => 'Historique des mots du jour';
+
+  @override
+  String get studyRecentWords => 'Mots récents';
+
+  @override
+  String get accountAddName => 'Ajouter votre nom';
+
+  @override
+  String get accountNameSaveFailed =>
+      'Impossible d\'enregistrer votre nom. Vérifiez votre connexion et réessayez.';
+
+  @override
+  String get accountSignOutSheetBody =>
+      'Vos données restent en sécurité dans votre compte. Choisissez ce que cet appareil garde.';
+
+  @override
+  String get accountKeepStudyData =>
+      'Garder mes données d\'étude sur cet appareil';
+
+  @override
+  String get accountKeepStudyDataSubtitle =>
+      'Signets, surlignages, notes, plans et progression';
+
+  @override
+  String get accountKeepName => 'Garder mon nom sur cet appareil';
+
+  @override
+  String accountKeepNameSubtitle(String name) {
+    return 'Vous apparaîtrez comme « $name » au lieu de « Invité »';
+  }
+
+  @override
+  String get accountSigningOut => 'Déconnexion…';
+
+  @override
+  String accountSignedOutAs(String name) {
+    return 'Déconnecté. Vous utilisez l\'application en tant que $name.';
+  }
+
+  @override
+  String get accountSignedOutGuest =>
+      'Déconnecté. Vous utilisez l\'application en tant qu\'invité.';
+
+  @override
+  String get accountResetDevice => 'Réinitialiser cet appareil';
+
+  @override
+  String get accountResetDeviceSubtitle =>
+      'Effacer les données d\'étude de cet appareil uniquement';
+
+  @override
+  String get accountResetErases => 'Efface sur cet appareil :';
+
+  @override
+  String get accountResetEraseItems =>
+      '• Signets, surlignages, notes et journal\n• Plans de lecture, progression et séries\n• Traductions téléchargées';
+
+  @override
+  String get accountResetStays =>
+      'Reste : réglages, thème, votre nom, la Bible hors ligne et les données cloud de votre compte.';
+
+  @override
+  String get accountResetSignOutOption => 'Se déconnecter et réinitialiser';
+
+  @override
+  String get accountResetSignOutOptionSubtitle =>
+      'Vos données restent dans votre compte. Reconnectez-vous pour les récupérer.';
+
+  @override
+  String get accountResetStayOption => 'Rester connecté et retélécharger';
+
+  @override
+  String get accountResetStayOptionSubtitle =>
+      'Vide cet appareil, puis télécharge une copie à jour depuis votre compte.';
+
+  @override
+  String get accountResetDeleteCloud => 'Supprimer aussi mes données cloud';
+
+  @override
+  String get accountResetDeleteCloudSubtitle =>
+      'Retire définitivement de votre compte les signets, surlignages, notes et plans de cette application. Votre compte et Blessed Arcade restent.';
+
+  @override
+  String get accountResetAndDeleteCloud =>
+      'Réinitialiser et supprimer les données cloud';
+
+  @override
+  String get accountDeleteCloudTitle => 'Supprimer vos données cloud ?';
+
+  @override
+  String get accountDeleteCloudWord => 'SUPPRIMER';
+
+  @override
+  String accountDeleteCloudBody(String word) {
+    return 'Cela supprime définitivement les données synchronisées de cette application de votre compte, sur tous les appareils. C\'est irréversible.\n\nTapez $word pour confirmer.';
+  }
+
+  @override
+  String get accountDeleteCloudAction => 'Supprimer les données cloud';
+
+  @override
+  String get accountResetting => 'Réinitialisation…';
+
+  @override
+  String get accountResetDeviceDone => 'Cet appareil a été réinitialisé.';
+
+  @override
+  String get accountCloudDeleteFailed =>
+      'Impossible de supprimer vos données cloud ; rien n\'a été effacé. Vérifiez votre connexion et réessayez.';
+
+  @override
+  String get accountDeletingAccount => 'Suppression du compte…';
+
+  @override
   String get appTitle => 'The Blessed Bible';
 
   @override
@@ -2487,21 +2620,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Connectez-vous pour synchroniser vos appareils';
 
   @override
-  String get accountEditName => 'Edit display name';
-
-  @override
-  String get accountChooseName => 'Choose display name';
-
-  @override
-  String get accountNameHint => 'Your display name';
-
-  @override
-  String get accountSave => 'Save';
-
-  @override
-  String get accountNameUpdated => 'Display name updated.';
-
-  @override
   String get accountAccount => 'Compte';
 
   @override
@@ -3005,16 +3123,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get studyVerseOfTheDay => 'Verset du jour';
 
   @override
-  String get studyVerseOfTheDayHistory => 'Verse of the day history';
-
-  @override
   String get studyRecentVerses => 'Versets récents';
 
   @override
   String get studyWordLookUp => 'Consulter';
-
-  @override
-  String get studyRecentWords => 'Recent words';
 
   @override
   String get studyConcordanceClear => 'Effacer';
@@ -3165,9 +3277,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get studyWordOfTheDay => 'Mot du jour';
-
-  @override
-  String get studyWordOfTheDayHistory => 'Word of the day history';
 
   @override
   String get studyArchiveLink => 'Archives →';

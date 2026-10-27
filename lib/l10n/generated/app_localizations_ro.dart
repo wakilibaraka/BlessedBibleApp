@@ -48,6 +48,139 @@ class AppLocalizationsRo extends AppLocalizations {
   String get a11yRead => 'Citit';
 
   @override
+  String get accountEditName => 'Editează numele afișat';
+
+  @override
+  String get accountChooseName => 'Alege un nume afișat';
+
+  @override
+  String get accountNameHint => 'Numele tău afișat';
+
+  @override
+  String get accountSave => 'Salvează';
+
+  @override
+  String get accountNameUpdated => 'Numele afișat a fost actualizat.';
+
+  @override
+  String get studyVerseOfTheDayHistory => 'Istoricul versetelor zilei';
+
+  @override
+  String get studyWordOfTheDayHistory => 'Istoricul cuvintelor zilei';
+
+  @override
+  String get studyRecentWords => 'Cuvinte recente';
+
+  @override
+  String get accountAddName => 'Adaugă-ți numele';
+
+  @override
+  String get accountNameSaveFailed =>
+      'Nu am putut salva numele. Verifică conexiunea și încearcă din nou.';
+
+  @override
+  String get accountSignOutSheetBody =>
+      'Datele tale rămân în siguranță în cont. Alege ce păstrează acest dispozitiv.';
+
+  @override
+  String get accountKeepStudyData =>
+      'Păstrează datele de studiu pe acest dispozitiv';
+
+  @override
+  String get accountKeepStudyDataSubtitle =>
+      'Semne de carte, evidențieri, notițe, planuri și progres';
+
+  @override
+  String get accountKeepName => 'Păstrează-mi numele pe acest dispozitiv';
+
+  @override
+  String accountKeepNameSubtitle(String name) {
+    return 'Vei apărea ca „$name” în loc de „Invitat”';
+  }
+
+  @override
+  String get accountSigningOut => 'Se deconectează…';
+
+  @override
+  String accountSignedOutAs(String name) {
+    return 'Deconectat. Folosești aplicația ca $name.';
+  }
+
+  @override
+  String get accountSignedOutGuest =>
+      'Deconectat. Folosești aplicația ca invitat.';
+
+  @override
+  String get accountResetDevice => 'Resetează acest dispozitiv';
+
+  @override
+  String get accountResetDeviceSubtitle =>
+      'Șterge datele de studiu doar de pe acest dispozitiv';
+
+  @override
+  String get accountResetErases => 'Șterge de pe acest dispozitiv:';
+
+  @override
+  String get accountResetEraseItems =>
+      '• Semne de carte, evidențieri, notițe și jurnal\n• Planuri de citire, progres și serii\n• Traduceri descărcate';
+
+  @override
+  String get accountResetStays =>
+      'Rămân: setările, tema, numele tău, Biblia offline și datele din cloud ale contului.';
+
+  @override
+  String get accountResetSignOutOption => 'Deconectează-te și resetează';
+
+  @override
+  String get accountResetSignOutOptionSubtitle =>
+      'Datele rămân în cont. Conectează-te din nou ca să le aduci înapoi.';
+
+  @override
+  String get accountResetStayOption => 'Rămâi conectat și descarcă din nou';
+
+  @override
+  String get accountResetStayOptionSubtitle =>
+      'Golește dispozitivul, apoi descarcă o copie nouă din cont.';
+
+  @override
+  String get accountResetDeleteCloud => 'Șterge și datele mele din cloud';
+
+  @override
+  String get accountResetDeleteCloudSubtitle =>
+      'Elimină definitiv din cont semnele de carte, evidențierile, notițele și planurile acestei aplicații. Contul și Blessed Arcade rămân.';
+
+  @override
+  String get accountResetAndDeleteCloud =>
+      'Resetează și șterge datele din cloud';
+
+  @override
+  String get accountDeleteCloudTitle => 'Ștergi datele din cloud?';
+
+  @override
+  String get accountDeleteCloudWord => 'ȘTERGE';
+
+  @override
+  String accountDeleteCloudBody(String word) {
+    return 'Aceasta elimină definitiv din cont datele sincronizate ale aplicației, pe toate dispozitivele. Nu se poate anula.\n\nScrie $word pentru a confirma.';
+  }
+
+  @override
+  String get accountDeleteCloudAction => 'Șterge datele din cloud';
+
+  @override
+  String get accountResetting => 'Se resetează…';
+
+  @override
+  String get accountResetDeviceDone => 'Dispozitivul a fost resetat.';
+
+  @override
+  String get accountCloudDeleteFailed =>
+      'Nu am putut șterge datele din cloud, deci nu s-a șters nimic. Verifică conexiunea și încearcă din nou.';
+
+  @override
+  String get accountDeletingAccount => 'Se șterge contul…';
+
+  @override
   String get appTitle => 'The Blessed Bible';
 
   @override
@@ -2488,21 +2621,6 @@ class AppLocalizationsRo extends AppLocalizations {
   String get accountSignInToSync => 'Conectează-te pentru sincronizare';
 
   @override
-  String get accountEditName => 'Edit display name';
-
-  @override
-  String get accountChooseName => 'Choose display name';
-
-  @override
-  String get accountNameHint => 'Your display name';
-
-  @override
-  String get accountSave => 'Save';
-
-  @override
-  String get accountNameUpdated => 'Display name updated.';
-
-  @override
   String get accountAccount => 'Cont';
 
   @override
@@ -3002,16 +3120,10 @@ class AppLocalizationsRo extends AppLocalizations {
   String get studyVerseOfTheDay => 'Versetul zilei';
 
   @override
-  String get studyVerseOfTheDayHistory => 'Verse of the day history';
-
-  @override
   String get studyRecentVerses => 'Versete recente';
 
   @override
   String get studyWordLookUp => 'Caută';
-
-  @override
-  String get studyRecentWords => 'Recent words';
 
   @override
   String get studyConcordanceClear => 'Șterge';
@@ -3163,9 +3275,6 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get studyWordOfTheDay => 'Cuvântul zilei';
-
-  @override
-  String get studyWordOfTheDayHistory => 'Word of the day history';
 
   @override
   String get studyArchiveLink => 'Arhivă →';

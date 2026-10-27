@@ -188,8 +188,8 @@ class WotdArchiveScreen extends ConsumerWidget {
                                     const SizedBox(height: 12),
                                     Text(
                                       wordTitle,
-                                      style: theme.textTheme.titleMedium
-                                          ?.copyWith(
+                                      style:
+                                          theme.textTheme.titleMedium?.copyWith(
                                         fontWeight: FontWeight.bold,
                                         fontSize: TypeScale.title,
                                         color: tokens.readingInk,
@@ -201,8 +201,8 @@ class WotdArchiveScreen extends ConsumerWidget {
                                         snippet,
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
-                                        style:
-                                            theme.textTheme.bodyMedium?.copyWith(
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
                                           fontStyle: FontStyle.italic,
                                           color: tokens.readingInkMuted,
                                         ),

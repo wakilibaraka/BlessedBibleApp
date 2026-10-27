@@ -5,6 +5,7 @@ import '../data/local_storage/preferences_service.dart';
 import '../ui/widgets/restore_prompt.dart';
 import 'journal_provider.dart';
 import 'notes_provider.dart';
+import 'profile_provider.dart';
 import 'user_data_provider.dart';
 
 export 'package:blessed_account/blessed_account.dart'
@@ -38,20 +39,17 @@ class AuthActions {
   Future<SignInResult> signInWithApple() async =>
       _rememberSignIn(await _account.signInWithApple());
 
-  /// Updates the user's chosen display name: on-device for a guest,
-  /// and synced to the cloud profile when signed in.
+  /// Saves the name shown for this user: on this device for a guest, on
+  /// the shared account profile (also Blessed Arcade's) when signed in.
+  /// Throws if the account can't be reached.
   Future<void> updateDisplayName(String name) async {
     final trimmed = name.trim();
-    final prefs = ref.read(preferencesProvider);
     final user = ref.read(accountUserProvider).value;
-    if (user != null) {
-      if (trimmed.isNotEmpty) {
-        try {
-          await _account.profiles.update(user.uid, displayName: trimmed);
-        } catch (_) {}
-      }
-    } else {
-      await prefs.setGuestDisplayName(trimmed);
+    if (user == null) {
+      await ref.read(guestNameProvider.notifier).set(trimmed);
+    } else if (trimmed.isNotEmpty) {
+      await _account.profiles.ensureExists(user);
+      await _account.profiles.update(user.uid, displayName: trimmed);
     }
   }
 
@@ -83,6 +81,7 @@ class AuthActions {
   Future<void> deleteAccount() =>
       _account.deleteAccount(clearLocalData: () async {
         await ref.read(preferencesProvider).clearAllUserData();
+        await ref.read(guestNameProvider.notifier).set(null);
         ref
           ..invalidate(bookmarkDataProvider)
           ..invalidate(highlightsProvider)

@@ -47,6 +47,137 @@ class AppLocalizationsEn extends AppLocalizations {
   String get a11yRead => 'Read';
 
   @override
+  String get accountEditName => 'Edit display name';
+
+  @override
+  String get accountChooseName => 'Choose display name';
+
+  @override
+  String get accountNameHint => 'Your display name';
+
+  @override
+  String get accountSave => 'Save';
+
+  @override
+  String get accountNameUpdated => 'Display name updated.';
+
+  @override
+  String get studyVerseOfTheDayHistory => 'Verse of the day history';
+
+  @override
+  String get studyWordOfTheDayHistory => 'Word of the day history';
+
+  @override
+  String get studyRecentWords => 'Recent words';
+
+  @override
+  String get accountAddName => 'Add your name';
+
+  @override
+  String get accountNameSaveFailed =>
+      'Couldn\'t save your name. Check your connection and try again.';
+
+  @override
+  String get accountSignOutSheetBody =>
+      'Your data stays safe in your account. Choose what this device keeps.';
+
+  @override
+  String get accountKeepStudyData => 'Keep my study data on this device';
+
+  @override
+  String get accountKeepStudyDataSubtitle =>
+      'Bookmarks, highlights, notes, plans and progress';
+
+  @override
+  String get accountKeepName => 'Keep my name on this device';
+
+  @override
+  String accountKeepNameSubtitle(String name) {
+    return 'You\'ll show as \"$name\" instead of \"Guest\"';
+  }
+
+  @override
+  String get accountSigningOut => 'Signing out…';
+
+  @override
+  String accountSignedOutAs(String name) {
+    return 'Signed out. You\'re using the app as $name.';
+  }
+
+  @override
+  String get accountSignedOutGuest =>
+      'Signed out. You\'re using the app as a guest.';
+
+  @override
+  String get accountResetDevice => 'Reset this device';
+
+  @override
+  String get accountResetDeviceSubtitle =>
+      'Erase study data on this device only';
+
+  @override
+  String get accountResetErases => 'Erases on this device:';
+
+  @override
+  String get accountResetEraseItems =>
+      '• Bookmarks, highlights, notes and journal\n• Reading plans, progress and streaks\n• Downloaded translations';
+
+  @override
+  String get accountResetStays =>
+      'Stays: settings, theme, your name, the offline Bible and your account\'s cloud data.';
+
+  @override
+  String get accountResetSignOutOption => 'Sign out and reset';
+
+  @override
+  String get accountResetSignOutOptionSubtitle =>
+      'Your data stays in your account. Sign in again to bring it back.';
+
+  @override
+  String get accountResetStayOption => 'Stay signed in and re-download';
+
+  @override
+  String get accountResetStayOptionSubtitle =>
+      'Clears this device, then downloads a fresh copy from your account.';
+
+  @override
+  String get accountResetDeleteCloud => 'Also delete my cloud data';
+
+  @override
+  String get accountResetDeleteCloudSubtitle =>
+      'Removes this app\'s bookmarks, highlights, notes and plans from your account for good. Your account and Blessed Arcade stay.';
+
+  @override
+  String get accountResetAndDeleteCloud => 'Reset and delete cloud data';
+
+  @override
+  String get accountDeleteCloudTitle => 'Delete your cloud data?';
+
+  @override
+  String get accountDeleteCloudWord => 'DELETE';
+
+  @override
+  String accountDeleteCloudBody(String word) {
+    return 'This permanently removes this app\'s synced data from your account, on every device. It can\'t be undone.\n\nType $word to confirm.';
+  }
+
+  @override
+  String get accountDeleteCloudAction => 'Delete cloud data';
+
+  @override
+  String get accountResetting => 'Resetting…';
+
+  @override
+  String get accountResetDeviceDone => 'This device has been reset.';
+
+  @override
+  String get accountCloudDeleteFailed =>
+      'Couldn\'t delete your cloud data, so nothing was erased. Check your connection and try again.';
+
+  @override
+  String get accountDeletingAccount => 'Deleting account…';
+
+  @override
   String get appTitle => 'The Blessed Bible';
 
   @override
@@ -2461,21 +2592,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountSignInToSync => 'Sign in to sync across devices';
 
   @override
-  String get accountEditName => 'Edit display name';
-
-  @override
-  String get accountChooseName => 'Choose display name';
-
-  @override
-  String get accountNameHint => 'Your display name';
-
-  @override
-  String get accountSave => 'Save';
-
-  @override
-  String get accountNameUpdated => 'Display name updated.';
-
-  @override
   String get accountAccount => 'Account';
 
   @override
@@ -2974,16 +3090,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyVerseOfTheDay => 'Verse of the day';
 
   @override
-  String get studyVerseOfTheDayHistory => 'Verse of the day history';
-
-  @override
   String get studyRecentVerses => 'Recent verses';
 
   @override
   String get studyWordLookUp => 'Look up';
-
-  @override
-  String get studyRecentWords => 'Recent words';
 
   @override
   String get studyConcordanceClear => 'Clear';
@@ -3132,9 +3242,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get studyWordOfTheDay => 'Word of the day';
-
-  @override
-  String get studyWordOfTheDayHistory => 'Word of the day history';
 
   @override
   String get studyArchiveLink => 'Archive →';

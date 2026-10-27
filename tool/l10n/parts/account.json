@@ -1,0 +1,327 @@
+{
+ "accountEditName": {
+  "en": "Edit display name",
+  "fr": "Modifier le nom affiché",
+  "it": "Modifica nome visualizzato",
+  "ro": "Editează numele afișat",
+  "sw": "Badilisha jina linaloonyeshwa",
+  "tl": "I-edit ang display name"
+ },
+ "accountChooseName": {
+  "en": "Choose display name",
+  "fr": "Choisir un nom affiché",
+  "it": "Scegli un nome visualizzato",
+  "ro": "Alege un nume afișat",
+  "sw": "Chagua jina la kuonyesha",
+  "tl": "Pumili ng display name"
+ },
+ "accountNameHint": {
+  "en": "Your display name",
+  "fr": "Votre nom affiché",
+  "it": "Il tuo nome visualizzato",
+  "ro": "Numele tău afișat",
+  "sw": "Jina lako la kuonyesha",
+  "tl": "Ang iyong display name"
+ },
+ "accountSave": {
+  "en": "Save",
+  "fr": "Enregistrer",
+  "it": "Salva",
+  "ro": "Salvează",
+  "sw": "Hifadhi",
+  "tl": "I-save"
+ },
+ "accountNameUpdated": {
+  "en": "Display name updated.",
+  "fr": "Nom affiché mis à jour.",
+  "it": "Nome visualizzato aggiornato.",
+  "ro": "Numele afișat a fost actualizat.",
+  "sw": "Jina la kuonyesha limesasishwa.",
+  "tl": "Na-update ang display name."
+ },
+ "studyVerseOfTheDayHistory": {
+  "en": "Verse of the day history",
+  "fr": "Historique des versets du jour",
+  "it": "Cronologia dei versetti del giorno",
+  "ro": "Istoricul versetelor zilei",
+  "sw": "Historia ya mstari wa siku",
+  "tl": "Kasaysayan ng talata ng araw"
+ },
+ "studyWordOfTheDayHistory": {
+  "en": "Word of the day history",
+  "fr": "Historique des mots du jour",
+  "it": "Cronologia delle parole del giorno",
+  "ro": "Istoricul cuvintelor zilei",
+  "sw": "Historia ya neno la siku",
+  "tl": "Kasaysayan ng salita ng araw"
+ },
+ "studyRecentWords": {
+  "en": "Recent words",
+  "fr": "Mots récents",
+  "it": "Parole recenti",
+  "ro": "Cuvinte recente",
+  "sw": "Maneno ya hivi karibuni",
+  "tl": "Mga kamakailang salita"
+ },
+ "accountAddName": {
+  "en": "Add your name",
+  "fr": "Ajouter votre nom",
+  "it": "Aggiungi il tuo nome",
+  "ro": "Adaugă-ți numele",
+  "sw": "Ongeza jina lako",
+  "tl": "Idagdag ang pangalan mo"
+ },
+ "accountNameSaveFailed": {
+  "en": "Couldn't save your name. Check your connection and try again.",
+  "fr": "Impossible d'enregistrer votre nom. Vérifiez votre connexion et réessayez.",
+  "it": "Impossibile salvare il nome. Controlla la connessione e riprova.",
+  "ro": "Nu am putut salva numele. Verifică conexiunea și încearcă din nou.",
+  "sw": "Imeshindwa kuhifadhi jina lako. Angalia muunganisho wako na ujaribu tena.",
+  "tl": "Hindi ma-save ang pangalan mo. Suriin ang koneksyon at subukang muli."
+ },
+ "accountSignOutSheetBody": {
+  "en": "Your data stays safe in your account. Choose what this device keeps.",
+  "fr": "Vos données restent en sécurité dans votre compte. Choisissez ce que cet appareil garde.",
+  "it": "I tuoi dati restano al sicuro nel tuo account. Scegli cosa tenere su questo dispositivo.",
+  "ro": "Datele tale rămân în siguranță în cont. Alege ce păstrează acest dispozitiv.",
+  "sw": "Data yako iko salama kwenye akaunti yako. Chagua kifaa hiki kibaki na nini.",
+  "tl": "Ligtas ang data mo sa iyong account. Piliin kung ano ang itatabi ng device na ito."
+ },
+ "accountKeepStudyData": {
+  "en": "Keep my study data on this device",
+  "fr": "Garder mes données d'étude sur cet appareil",
+  "it": "Tieni i miei dati di studio su questo dispositivo",
+  "ro": "Păstrează datele de studiu pe acest dispozitiv",
+  "sw": "Weka data yangu ya kujifunza kwenye kifaa hiki",
+  "tl": "Itabi ang study data ko sa device na ito"
+ },
+ "accountKeepStudyDataSubtitle": {
+  "en": "Bookmarks, highlights, notes, plans and progress",
+  "fr": "Signets, surlignages, notes, plans et progression",
+  "it": "Segnalibri, evidenziazioni, note, piani e progressi",
+  "ro": "Semne de carte, evidențieri, notițe, planuri și progres",
+  "sw": "Alamisho, vivutio, maelezo, mipango na maendeleo",
+  "tl": "Mga bookmark, highlight, tala, plano at progreso"
+ },
+ "accountKeepName": {
+  "en": "Keep my name on this device",
+  "fr": "Garder mon nom sur cet appareil",
+  "it": "Tieni il mio nome su questo dispositivo",
+  "ro": "Păstrează-mi numele pe acest dispozitiv",
+  "sw": "Weka jina langu kwenye kifaa hiki",
+  "tl": "Itabi ang pangalan ko sa device na ito"
+ },
+ "accountKeepNameSubtitle": {
+  "en": "You'll show as \"{name}\" instead of \"Guest\"",
+  "fr": "Vous apparaîtrez comme « {name} » au lieu de « Invité »",
+  "it": "Comparirai come \"{name}\" invece di \"Ospite\"",
+  "ro": "Vei apărea ca „{name}” în loc de „Invitat”",
+  "sw": "Utaonekana kama \"{name}\" badala ya \"Mgeni\"",
+  "tl": "Lalabas ka bilang \"{name}\" sa halip na \"Bisita\"",
+  "@": {
+   "placeholders": {
+    "name": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "accountSigningOut": {
+  "en": "Signing out…",
+  "fr": "Déconnexion…",
+  "it": "Disconnessione…",
+  "ro": "Se deconectează…",
+  "sw": "Inatoka…",
+  "tl": "Nagsa-sign out…"
+ },
+ "accountSignedOutAs": {
+  "en": "Signed out. You're using the app as {name}.",
+  "fr": "Déconnecté. Vous utilisez l'application en tant que {name}.",
+  "it": "Disconnesso. Stai usando l'app come {name}.",
+  "ro": "Deconectat. Folosești aplicația ca {name}.",
+  "sw": "Umetoka. Unatumia programu kama {name}.",
+  "tl": "Naka-sign out na. Ginagamit mo ang app bilang {name}.",
+  "@": {
+   "placeholders": {
+    "name": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "accountSignedOutGuest": {
+  "en": "Signed out. You're using the app as a guest.",
+  "fr": "Déconnecté. Vous utilisez l'application en tant qu'invité.",
+  "it": "Disconnesso. Stai usando l'app come ospite.",
+  "ro": "Deconectat. Folosești aplicația ca invitat.",
+  "sw": "Umetoka. Unatumia programu kama mgeni.",
+  "tl": "Naka-sign out na. Ginagamit mo ang app bilang bisita."
+ },
+ "accountResetDevice": {
+  "en": "Reset this device",
+  "fr": "Réinitialiser cet appareil",
+  "it": "Reimposta questo dispositivo",
+  "ro": "Resetează acest dispozitiv",
+  "sw": "Weka upya kifaa hiki",
+  "tl": "I-reset ang device na ito"
+ },
+ "accountResetDeviceSubtitle": {
+  "en": "Erase study data on this device only",
+  "fr": "Effacer les données d'étude de cet appareil uniquement",
+  "it": "Cancella i dati di studio solo su questo dispositivo",
+  "ro": "Șterge datele de studiu doar de pe acest dispozitiv",
+  "sw": "Futa data ya kujifunza kwenye kifaa hiki pekee",
+  "tl": "Burahin ang study data sa device na ito lang"
+ },
+ "accountResetErases": {
+  "en": "Erases on this device:",
+  "fr": "Efface sur cet appareil :",
+  "it": "Cancella su questo dispositivo:",
+  "ro": "Șterge de pe acest dispozitiv:",
+  "sw": "Inafuta kwenye kifaa hiki:",
+  "tl": "Buburahin sa device na ito:"
+ },
+ "accountResetEraseItems": {
+  "en": "• Bookmarks, highlights, notes and journal\n• Reading plans, progress and streaks\n• Downloaded translations",
+  "fr": "• Signets, surlignages, notes et journal\n• Plans de lecture, progression et séries\n• Traductions téléchargées",
+  "it": "• Segnalibri, evidenziazioni, note e diario\n• Piani di lettura, progressi e serie\n• Traduzioni scaricate",
+  "ro": "• Semne de carte, evidențieri, notițe și jurnal\n• Planuri de citire, progres și serii\n• Traduceri descărcate",
+  "sw": "• Alamisho, vivutio, maelezo na shajara\n• Mipango ya kusoma, maendeleo na mfululizo\n• Tafsiri zilizopakuliwa",
+  "tl": "• Mga bookmark, highlight, tala at journal\n• Mga reading plan, progreso at streak\n• Mga na-download na salin"
+ },
+ "accountResetStays": {
+  "en": "Stays: settings, theme, your name, the offline Bible and your account's cloud data.",
+  "fr": "Reste : réglages, thème, votre nom, la Bible hors ligne et les données cloud de votre compte.",
+  "it": "Resta: impostazioni, tema, il tuo nome, la Bibbia offline e i dati cloud del tuo account.",
+  "ro": "Rămân: setările, tema, numele tău, Biblia offline și datele din cloud ale contului.",
+  "sw": "Vinabaki: mipangilio, mandhari, jina lako, Biblia ya nje ya mtandao na data ya akaunti yako kwenye wingu.",
+  "tl": "Mananatili: settings, tema, pangalan mo, ang offline na Bibliya at ang cloud data ng account mo."
+ },
+ "accountResetSignOutOption": {
+  "en": "Sign out and reset",
+  "fr": "Se déconnecter et réinitialiser",
+  "it": "Esci e reimposta",
+  "ro": "Deconectează-te și resetează",
+  "sw": "Toka na uweke upya",
+  "tl": "Mag-sign out at i-reset"
+ },
+ "accountResetSignOutOptionSubtitle": {
+  "en": "Your data stays in your account. Sign in again to bring it back.",
+  "fr": "Vos données restent dans votre compte. Reconnectez-vous pour les récupérer.",
+  "it": "I tuoi dati restano nel tuo account. Accedi di nuovo per recuperarli.",
+  "ro": "Datele rămân în cont. Conectează-te din nou ca să le aduci înapoi.",
+  "sw": "Data yako inabaki kwenye akaunti yako. Ingia tena kuirudisha.",
+  "tl": "Nananatili ang data mo sa account. Mag-sign in ulit para maibalik ito."
+ },
+ "accountResetStayOption": {
+  "en": "Stay signed in and re-download",
+  "fr": "Rester connecté et retélécharger",
+  "it": "Resta connesso e scarica di nuovo",
+  "ro": "Rămâi conectat și descarcă din nou",
+  "sw": "Endelea kuingia na upakue upya",
+  "tl": "Manatiling naka-sign in at i-download ulit"
+ },
+ "accountResetStayOptionSubtitle": {
+  "en": "Clears this device, then downloads a fresh copy from your account.",
+  "fr": "Vide cet appareil, puis télécharge une copie à jour depuis votre compte.",
+  "it": "Svuota questo dispositivo, poi scarica una copia aggiornata dal tuo account.",
+  "ro": "Golește dispozitivul, apoi descarcă o copie nouă din cont.",
+  "sw": "Inafuta kifaa hiki, kisha inapakua nakala mpya kutoka kwenye akaunti yako.",
+  "tl": "Nililinis ang device, saka nagda-download ng bagong kopya mula sa account mo."
+ },
+ "accountResetDeleteCloud": {
+  "en": "Also delete my cloud data",
+  "fr": "Supprimer aussi mes données cloud",
+  "it": "Elimina anche i miei dati cloud",
+  "ro": "Șterge și datele mele din cloud",
+  "sw": "Futa pia data yangu ya wingu",
+  "tl": "Burahin din ang cloud data ko"
+ },
+ "accountResetDeleteCloudSubtitle": {
+  "en": "Removes this app's bookmarks, highlights, notes and plans from your account for good. Your account and Blessed Arcade stay.",
+  "fr": "Retire définitivement de votre compte les signets, surlignages, notes et plans de cette application. Votre compte et Blessed Arcade restent.",
+  "it": "Rimuove per sempre dal tuo account segnalibri, evidenziazioni, note e piani di questa app. Il tuo account e Blessed Arcade restano.",
+  "ro": "Elimină definitiv din cont semnele de carte, evidențierile, notițele și planurile acestei aplicații. Contul și Blessed Arcade rămân.",
+  "sw": "Inaondoa kabisa alamisho, vivutio, maelezo na mipango ya programu hii kwenye akaunti yako. Akaunti yako na Blessed Arcade vinabaki.",
+  "tl": "Permanenteng tinatanggal sa account mo ang mga bookmark, highlight, tala at plano ng app na ito. Mananatili ang account mo at ang Blessed Arcade."
+ },
+ "accountResetAndDeleteCloud": {
+  "en": "Reset and delete cloud data",
+  "fr": "Réinitialiser et supprimer les données cloud",
+  "it": "Reimposta ed elimina i dati cloud",
+  "ro": "Resetează și șterge datele din cloud",
+  "sw": "Weka upya na ufute data ya wingu",
+  "tl": "I-reset at burahin ang cloud data"
+ },
+ "accountDeleteCloudTitle": {
+  "en": "Delete your cloud data?",
+  "fr": "Supprimer vos données cloud ?",
+  "it": "Eliminare i tuoi dati cloud?",
+  "ro": "Ștergi datele din cloud?",
+  "sw": "Futa data yako ya wingu?",
+  "tl": "Burahin ang cloud data mo?"
+ },
+ "accountDeleteCloudWord": {
+  "en": "DELETE",
+  "fr": "SUPPRIMER",
+  "it": "ELIMINA",
+  "ro": "ȘTERGE",
+  "sw": "FUTA",
+  "tl": "BURAHIN"
+ },
+ "accountDeleteCloudBody": {
+  "en": "This permanently removes this app's synced data from your account, on every device. It can't be undone.\n\nType {word} to confirm.",
+  "fr": "Cela supprime définitivement les données synchronisées de cette application de votre compte, sur tous les appareils. C'est irréversible.\n\nTapez {word} pour confirmer.",
+  "it": "Questo rimuove per sempre i dati sincronizzati di questa app dal tuo account, su ogni dispositivo. Non si può annullare.\n\nScrivi {word} per confermare.",
+  "ro": "Aceasta elimină definitiv din cont datele sincronizate ale aplicației, pe toate dispozitivele. Nu se poate anula.\n\nScrie {word} pentru a confirma.",
+  "sw": "Hii inaondoa kabisa data iliyosawazishwa ya programu hii kwenye akaunti yako, kwenye kila kifaa. Haiwezi kutenduliwa.\n\nAndika {word} kuthibitisha.",
+  "tl": "Permanenteng tinatanggal nito ang naka-sync na data ng app sa account mo, sa bawat device. Hindi na ito maibabalik.\n\nI-type ang {word} para kumpirmahin.",
+  "@": {
+   "placeholders": {
+    "word": {
+     "type": "String"
+    }
+   }
+  }
+ },
+ "accountDeleteCloudAction": {
+  "en": "Delete cloud data",
+  "fr": "Supprimer les données cloud",
+  "it": "Elimina i dati cloud",
+  "ro": "Șterge datele din cloud",
+  "sw": "Futa data ya wingu",
+  "tl": "Burahin ang cloud data"
+ },
+ "accountResetting": {
+  "en": "Resetting…",
+  "fr": "Réinitialisation…",
+  "it": "Reimpostazione…",
+  "ro": "Se resetează…",
+  "sw": "Inaweka upya…",
+  "tl": "Nire-reset…"
+ },
+ "accountResetDeviceDone": {
+  "en": "This device has been reset.",
+  "fr": "Cet appareil a été réinitialisé.",
+  "it": "Questo dispositivo è stato reimpostato.",
+  "ro": "Dispozitivul a fost resetat.",
+  "sw": "Kifaa hiki kimewekwa upya.",
+  "tl": "Na-reset na ang device na ito."
+ },
+ "accountCloudDeleteFailed": {
+  "en": "Couldn't delete your cloud data, so nothing was erased. Check your connection and try again.",
+  "fr": "Impossible de supprimer vos données cloud ; rien n'a été effacé. Vérifiez votre connexion et réessayez.",
+  "it": "Impossibile eliminare i dati cloud, quindi non è stato cancellato nulla. Controlla la connessione e riprova.",
+  "ro": "Nu am putut șterge datele din cloud, deci nu s-a șters nimic. Verifică conexiunea și încearcă din nou.",
+  "sw": "Imeshindwa kufuta data yako ya wingu, hivyo hakuna kilichofutwa. Angalia muunganisho wako na ujaribu tena.",
+  "tl": "Hindi mabura ang cloud data mo, kaya walang nabura. Suriin ang koneksyon at subukang muli."
+ },
+ "accountDeletingAccount": {
+  "en": "Deleting account…",
+  "fr": "Suppression du compte…",
+  "it": "Eliminazione dell'account…",
+  "ro": "Se șterge contul…",
+  "sw": "Inafuta akaunti…",
+  "tl": "Binubura ang account…"
+ }
+}

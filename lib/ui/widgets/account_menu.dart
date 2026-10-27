@@ -2,24 +2,16 @@ import 'package:flutter/material.dart';
 import '../../l10n/l10n.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../data/local_storage/preferences_service.dart';
 import '../../services/backup_service.dart';
-import '../../services/bible_database_service.dart';
 import '../../services/firebase_setup.dart';
-import '../../services/translation_pack_store.dart';
 import '../../state/auth_provider.dart';
-import '../../state/journal_provider.dart';
+import '../../state/profile_provider.dart';
 import '../../state/nav_provider.dart';
-import '../../state/notes_provider.dart';
-import '../../state/reading_plan_provider.dart';
-import '../../state/streak_provider.dart';
-import '../../state/translation_provider.dart';
-import '../../state/user_data_provider.dart'
-    show bookmarkDataProvider, highlightsProvider;
 import '../../sync/bible_sync.dart';
 import '../../theme/design_tokens.dart';
+import 'account_flows.dart';
+import 'action_scope.dart';
 
 /// Shared account avatar: photo → initial → person icon, themed.
 /// Extracted from the account button so every surface matches.
@@ -31,11 +23,7 @@ class AccountAvatar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final user = ref.watch(accountUserProvider).value;
-    final guestName =
-        ref.watch(preferencesProvider).getGuestDisplayName()?.trim() ?? '';
-    final name = (user?.displayName?.trim().isNotEmpty ?? false)
-        ? user!.displayName!.trim()
-        : guestName;
+    final name = ref.watch(displayNameProvider) ?? '';
     Widget fallback;
     if (name.isNotEmpty) {
       fallback = CircleAvatar(
@@ -163,26 +151,26 @@ class _AccountMenuBody extends ConsumerWidget {
           icon: Icons.upload_file_outlined,
           label: context.l10n.accountBackUp,
           subtitle: context.l10n.accountBackUpSubtitle,
-          onTap: () {
-            Navigator.of(context).pop();
-            BackupService.exportData(context, ref);
+          // The menu stays open until the share sheet is up: the export
+          // needs this context, which closing the menu first would end.
+          onTap: () async {
+            await BackupService.exportData(context, ref);
+            if (context.mounted) Navigator.of(context).pop();
           },
         ),
         _MenuTile(
           icon: Icons.download_outlined,
           label: context.l10n.accountRestore,
           subtitle: context.l10n.accountRestoreSubtitle,
-          onTap: () {
-            Navigator.of(context).pop();
-            _showRestoreDialog(context, ref);
-          },
+          onTap: () => _showRestoreDialog(context, ref),
         ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
         _MenuTile(
           icon: Icons.delete_sweep_outlined,
-          label: context.l10n.accountResetApp,
-          subtitle: context.l10n.accountResetAppSubtitle,
+          label: context.l10n.accountResetDevice,
+          subtitle: context.l10n.accountResetDeviceSubtitle,
           destructive: true,
-          onTap: () => _confirmReset(context, context, ref),
+          onTap: () => resetDeviceFlow(context),
         ),
       ],
     );
@@ -218,11 +206,8 @@ class _AccountHeroCardState extends ConsumerState<_AccountHeroCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final user = ref.watch(accountUserProvider).value;
-    final guestName =
-        ref.watch(preferencesProvider).getGuestDisplayName()?.trim() ?? '';
-    final name = (user?.displayName?.trim().isNotEmpty ?? false)
-        ? user!.displayName!.trim()
-        : (guestName.isNotEmpty ? guestName : context.l10n.accountGuest);
+    final chosenName = ref.watch(displayNameProvider);
+    final name = chosenName ?? context.l10n.accountGuest;
     final email = user?.email?.trim() ?? '';
     final appleAvailable = ref.watch(appleSignInAvailableProvider);
 
@@ -265,7 +250,9 @@ class _AccountHeroCardState extends ConsumerState<_AccountHeroCard> {
                           size: 14, color: theme.colorScheme.primary),
                       const SizedBox(width: 4),
                       Text(
-                        context.l10n.accountEditName,
+                        chosenName == null
+                            ? context.l10n.accountAddName
+                            : context.l10n.accountEditName,
                         style: theme.textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: theme.colorScheme.primary,
@@ -362,14 +349,13 @@ class _AccountHeroCardState extends ConsumerState<_AccountHeroCard> {
                     style: OutlinedButton.styleFrom(
                       foregroundColor: theme.colorScheme.error,
                       side: BorderSide(
-                        color:
-                            theme.colorScheme.error.withValues(alpha: 0.35),
+                        color: theme.colorScheme.error.withValues(alpha: 0.35),
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(Radii.lg),
                       ),
                     ),
-                    onPressed: () => _signOut(context, ref),
+                    onPressed: () => signOutFlow(context),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -377,7 +363,7 @@ class _AccountHeroCardState extends ConsumerState<_AccountHeroCard> {
                   tooltip: context.l10n.accountDeleteAccount,
                   icon: Icon(Icons.delete_outline_rounded,
                       color: theme.colorScheme.error.withValues(alpha: 0.7)),
-                  onPressed: () => _confirmDeleteAccount(context, ref),
+                  onPressed: () => deleteAccountFlow(context),
                 ),
               ],
             ),
@@ -389,18 +375,15 @@ class _AccountHeroCardState extends ConsumerState<_AccountHeroCard> {
 }
 
 void _showEditDisplayNameDialog(BuildContext context, WidgetRef ref) {
-  final user = ref.read(accountUserProvider).value;
-  final guestName = ref.read(preferencesProvider).getGuestDisplayName() ?? '';
-  final initialName = (user?.displayName?.trim().isNotEmpty ?? false)
-      ? user!.displayName!.trim()
-      : guestName;
-
-  final controller = TextEditingController(text: initialName);
+  final signedIn = ref.read(accountUserProvider).value != null;
+  final scope = ActionScope.of(context);
+  final controller =
+      TextEditingController(text: ref.read(displayNameProvider) ?? '');
 
   showDialog<void>(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: Text(user != null
+      title: Text(signedIn
           ? context.l10n.accountEditName
           : context.l10n.accountChooseName),
       content: TextField(
@@ -422,71 +405,22 @@ void _showEditDisplayNameDialog(BuildContext context, WidgetRef ref) {
           onPressed: () async {
             final newName = controller.text.trim();
             Navigator.of(ctx).pop();
-            await ref.read(authActionsProvider).updateDisplayName(newName);
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(context.l10n.accountNameUpdated),
-                  behavior: SnackBarBehavior.floating,
-                  duration: const Duration(seconds: 2),
-                ),
-              );
+            try {
+              await scope.container
+                  .read(authActionsProvider)
+                  .updateDisplayName(newName);
+              scope.message(scope.l10n.accountNameUpdated);
+            } catch (e) {
+              reportNonFatal('update display name',
+                  code: e.runtimeType.toString());
+              scope.message(scope.l10n.accountNameSaveFailed);
             }
           },
           child: Text(context.l10n.accountSave),
         ),
       ],
     ),
-  );
-}
-
-Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
-  final confirm = await showDialog<bool>(
-    context: context,
-    builder: (ctx) => AlertDialog(
-      title: Text(context.l10n.accountDeleteAccountTitle),
-      content: Text(context.l10n.accountDeleteAccountBody),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(ctx, false),
-          child: Text(context.l10n.commonCancel),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(ctx, true),
-          child: Text(
-            context.l10n.commonDelete,
-            style: TextStyle(color: ctx.palette.danger),
-          ),
-        ),
-      ],
-    ),
-  );
-
-  if (confirm == true && context.mounted) {
-    try {
-      await ref.read(authActionsProvider).deleteAccount();
-      if (context.mounted) {
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.accountDeleted)),
-        );
-      }
-    } on SignInCancelledException {
-      // Dismissed re-authentication
-    } on SignInFailedException catch (e) {
-      reportNonFatal('Re-authentication failed: ${e.failure.name}',
-          code: e.code);
-      if (!context.mounted) return;
-      _showError(
-          context,
-          context.l10n.accountReauthFailed(
-              SignInResult.failed(e.failure).message));
-    } catch (e) {
-      reportNonFatal('delete account', code: e.runtimeType.toString());
-      if (!context.mounted) return;
-      _showError(context, context.l10n.accountDeleteFailed);
-    }
-  }
+  ).whenComplete(controller.dispose);
 }
 
 class _MenuTile extends StatelessWidget {
@@ -685,39 +619,6 @@ Future<void> _askAccountChoice(BuildContext context, WidgetRef ref) async {
       .resolveAccountChoice(startFresh: startFresh);
 }
 
-/// Asks whether to keep this device's data, uploads pending changes, then
-/// signs out.
-Future<void> _signOut(BuildContext context, WidgetRef ref) async {
-  final remove = await showDialog<bool>(
-    context: context,
-    builder: (ctx) => AlertDialog(
-      title: Text(context.l10n.accountSignOutTitle),
-      content: Text(context.l10n.accountSignOutBody),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(ctx),
-          child: Text(context.l10n.commonCancel),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(ctx, true),
-          child: Text(context.l10n.accountRemoveFromDevice,
-              style: TextStyle(color: ctx.palette.danger)),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(ctx, false),
-          child: Text(context.l10n.accountKeepOnDevice),
-        ),
-      ],
-    ),
-  );
-  if (remove == null) return;
-  final sync = ref.read(syncControllerProvider.notifier);
-  await sync.prepareSignOut(forget: remove);
-  await ref.read(authActionsProvider).signOut();
-  if (remove) await sync.clearLocalData();
-  if (context.mounted) Navigator.of(context).pop();
-}
-
 /// "Synced just now", "Synced 5 min ago", ...
 @visibleForTesting
 String syncedLabel(DateTime? at, DateTime now, [AppLocalizations? l10n]) {
@@ -762,100 +663,19 @@ void _showRestoreDialog(BuildContext context, WidgetRef ref) {
           child: Text(context.l10n.commonCancel),
         ),
         ElevatedButton(
-          onPressed: () {
+          onPressed: () async {
             final text = controller.text.trim();
             Navigator.of(ctx).pop();
+            // Import while the menu is still open (it needs this context),
+            // then close the menu so the result message shows.
             if (text.isNotEmpty) {
-              BackupService.importData(context, ref, text);
+              await BackupService.importData(context, ref, text);
             }
+            if (context.mounted) Navigator.of(context).pop();
           },
           child: Text(context.l10n.accountRestoreAction),
         ),
       ],
     ),
   );
-}
-
-/// Destructive confirmation, then wipe all on-device user data.
-void _confirmReset(
-    BuildContext sheetContext, BuildContext context, WidgetRef ref) {
-  showDialog<void>(
-    context: context,
-    builder: (ctx) => AlertDialog(
-      title: Text(context.l10n.accountResetTitle),
-      content: Text(context.l10n.accountResetBody),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(ctx).pop(),
-          child: Text(context.l10n.commonCancel),
-        ),
-        TextButton(
-          onPressed: () async {
-            Navigator.of(ctx).pop();
-            Navigator.of(sheetContext).pop();
-            await _resetAppData(ref);
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(context.l10n.accountResetDone),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            }
-          },
-          child: Text(context.l10n.accountReset,
-              style: TextStyle(color: Theme.of(ctx).colorScheme.error)),
-        ),
-      ],
-    ),
-  );
-}
-
-/// Erases user data (bookmarks, plans, progress, translations, streaks)
-/// while keeping settings, theme and bundled content intact.
-Future<void> _resetAppData(WidgetRef ref) async {
-  final prefsSvc = ref.read(preferencesProvider);
-  await prefsSvc.clearAllUserData();
-
-  final sp = await SharedPreferences.getInstance();
-  await sp.remove('active_plan_ids');
-  final customIds = sp.getStringList('custom_plan_ids') ?? [];
-  for (final id in customIds) {
-    await sp.remove('custom_plan_$id');
-  }
-  await sp.remove('custom_plan_ids');
-  for (final key in sp
-      .getKeys()
-      .where((k) => k.startsWith('reading_plan_state_'))
-      .toList()) {
-    await sp.remove(key);
-  }
-  await sp.remove('deleted_packs');
-  await sp.remove('study_layout');
-
-  // Downloaded translations (bundled packs self-restore on next launch).
-  try {
-    final installed = await bibleDbService.getTranslations();
-    for (final t in installed) {
-      if (!TranslationPackStore.isCoreId(t.translationId)) {
-        try {
-          await bibleDbService.deleteTranslationPack(t.translationId);
-        } catch (_) {}
-      }
-    }
-  } catch (_) {}
-
-  await prefsSvc.setActiveTranslation('kjv');
-  await prefsSvc.setSecondaryTranslation(null);
-
-  ref.invalidate(bookmarkDataProvider);
-  ref.invalidate(highlightsProvider);
-  ref.invalidate(notesProvider);
-  ref.invalidate(journalProvider);
-  ref.invalidate(streakProvider);
-  ref.invalidate(activePlanIdsProvider);
-  ref.invalidate(availableTranslationsProvider);
-  ref.invalidate(activeTranslationProvider);
-  ref.invalidate(secondaryTranslationProvider);
-  ref.invalidate(readingPlanProvider);
 }

@@ -1204,7 +1204,8 @@ class _WotdCard extends ConsumerWidget {
         featured: span == CardSpan.full,
         onTap: openArchive,
         padding: const EdgeInsets.all(15),
-        child: content(l10n.studyWordOfTheDayHistory, l10n.studyUnavailableNow, null),
+        child: content(
+            l10n.studyWordOfTheDayHistory, l10n.studyUnavailableNow, null),
       ),
     );
   }

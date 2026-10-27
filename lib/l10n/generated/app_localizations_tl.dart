@@ -47,6 +47,138 @@ class AppLocalizationsTl extends AppLocalizations {
   String get a11yRead => 'Nabasa na';
 
   @override
+  String get accountEditName => 'I-edit ang display name';
+
+  @override
+  String get accountChooseName => 'Pumili ng display name';
+
+  @override
+  String get accountNameHint => 'Ang iyong display name';
+
+  @override
+  String get accountSave => 'I-save';
+
+  @override
+  String get accountNameUpdated => 'Na-update ang display name.';
+
+  @override
+  String get studyVerseOfTheDayHistory => 'Kasaysayan ng talata ng araw';
+
+  @override
+  String get studyWordOfTheDayHistory => 'Kasaysayan ng salita ng araw';
+
+  @override
+  String get studyRecentWords => 'Mga kamakailang salita';
+
+  @override
+  String get accountAddName => 'Idagdag ang pangalan mo';
+
+  @override
+  String get accountNameSaveFailed =>
+      'Hindi ma-save ang pangalan mo. Suriin ang koneksyon at subukang muli.';
+
+  @override
+  String get accountSignOutSheetBody =>
+      'Ligtas ang data mo sa iyong account. Piliin kung ano ang itatabi ng device na ito.';
+
+  @override
+  String get accountKeepStudyData => 'Itabi ang study data ko sa device na ito';
+
+  @override
+  String get accountKeepStudyDataSubtitle =>
+      'Mga bookmark, highlight, tala, plano at progreso';
+
+  @override
+  String get accountKeepName => 'Itabi ang pangalan ko sa device na ito';
+
+  @override
+  String accountKeepNameSubtitle(String name) {
+    return 'Lalabas ka bilang \"$name\" sa halip na \"Bisita\"';
+  }
+
+  @override
+  String get accountSigningOut => 'Nagsa-sign out…';
+
+  @override
+  String accountSignedOutAs(String name) {
+    return 'Naka-sign out na. Ginagamit mo ang app bilang $name.';
+  }
+
+  @override
+  String get accountSignedOutGuest =>
+      'Naka-sign out na. Ginagamit mo ang app bilang bisita.';
+
+  @override
+  String get accountResetDevice => 'I-reset ang device na ito';
+
+  @override
+  String get accountResetDeviceSubtitle =>
+      'Burahin ang study data sa device na ito lang';
+
+  @override
+  String get accountResetErases => 'Buburahin sa device na ito:';
+
+  @override
+  String get accountResetEraseItems =>
+      '• Mga bookmark, highlight, tala at journal\n• Mga reading plan, progreso at streak\n• Mga na-download na salin';
+
+  @override
+  String get accountResetStays =>
+      'Mananatili: settings, tema, pangalan mo, ang offline na Bibliya at ang cloud data ng account mo.';
+
+  @override
+  String get accountResetSignOutOption => 'Mag-sign out at i-reset';
+
+  @override
+  String get accountResetSignOutOptionSubtitle =>
+      'Nananatili ang data mo sa account. Mag-sign in ulit para maibalik ito.';
+
+  @override
+  String get accountResetStayOption =>
+      'Manatiling naka-sign in at i-download ulit';
+
+  @override
+  String get accountResetStayOptionSubtitle =>
+      'Nililinis ang device, saka nagda-download ng bagong kopya mula sa account mo.';
+
+  @override
+  String get accountResetDeleteCloud => 'Burahin din ang cloud data ko';
+
+  @override
+  String get accountResetDeleteCloudSubtitle =>
+      'Permanenteng tinatanggal sa account mo ang mga bookmark, highlight, tala at plano ng app na ito. Mananatili ang account mo at ang Blessed Arcade.';
+
+  @override
+  String get accountResetAndDeleteCloud => 'I-reset at burahin ang cloud data';
+
+  @override
+  String get accountDeleteCloudTitle => 'Burahin ang cloud data mo?';
+
+  @override
+  String get accountDeleteCloudWord => 'BURAHIN';
+
+  @override
+  String accountDeleteCloudBody(String word) {
+    return 'Permanenteng tinatanggal nito ang naka-sync na data ng app sa account mo, sa bawat device. Hindi na ito maibabalik.\n\nI-type ang $word para kumpirmahin.';
+  }
+
+  @override
+  String get accountDeleteCloudAction => 'Burahin ang cloud data';
+
+  @override
+  String get accountResetting => 'Nire-reset…';
+
+  @override
+  String get accountResetDeviceDone => 'Na-reset na ang device na ito.';
+
+  @override
+  String get accountCloudDeleteFailed =>
+      'Hindi mabura ang cloud data mo, kaya walang nabura. Suriin ang koneksyon at subukang muli.';
+
+  @override
+  String get accountDeletingAccount => 'Binubura ang account…';
+
+  @override
   String get appTitle => 'The Blessed Bible';
 
   @override
@@ -2478,21 +2610,6 @@ class AppLocalizationsTl extends AppLocalizations {
   String get accountSignInToSync => 'Mag-sign in para mag-sync sa mga device';
 
   @override
-  String get accountEditName => 'Edit display name';
-
-  @override
-  String get accountChooseName => 'Choose display name';
-
-  @override
-  String get accountNameHint => 'Your display name';
-
-  @override
-  String get accountSave => 'Save';
-
-  @override
-  String get accountNameUpdated => 'Display name updated.';
-
-  @override
   String get accountAccount => 'Account';
 
   @override
@@ -2994,16 +3111,10 @@ class AppLocalizationsTl extends AppLocalizations {
   String get studyVerseOfTheDay => 'Talata para sa araw na ito';
 
   @override
-  String get studyVerseOfTheDayHistory => 'Verse of the day history';
-
-  @override
   String get studyRecentVerses => 'Kamakailang mga talata';
 
   @override
   String get studyWordLookUp => 'Hanapin';
-
-  @override
-  String get studyRecentWords => 'Recent words';
 
   @override
   String get studyConcordanceClear => 'Burahin';
@@ -3153,9 +3264,6 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get studyWordOfTheDay => 'Salita ng araw';
-
-  @override
-  String get studyWordOfTheDayHistory => 'Word of the day history';
 
   @override
   String get studyArchiveLink => 'Archive →';
