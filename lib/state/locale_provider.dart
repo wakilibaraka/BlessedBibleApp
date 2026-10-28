@@ -32,6 +32,8 @@ const List<AppLanguage> appLanguages = [
   AppLanguage('ro', 'Română', 'ron_btf'),
   AppLanguage('sw', 'Kiswahili', 'swh_ulb'),
   AppLanguage('tl', 'Tagalog', 'tgl_ulb'),
+  AppLanguage('es', 'Español', 'spa_r09'),
+  AppLanguage('pt', 'Português', 'por_blj'),
 ];
 
 AppLanguage? appLanguageFor(String code) {

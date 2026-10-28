@@ -6,6 +6,9 @@
   "ro": "Editează numele afișat",
   "sw": "Badilisha jina linaloonyeshwa",
   "tl": "I-edit ang display name"
+ ,
+   "es": "Edit display name",
+   "pt": "Edit display name"
  },
  "accountChooseName": {
   "en": "Choose display name",
@@ -14,6 +17,9 @@
   "ro": "Alege un nume afișat",
   "sw": "Chagua jina la kuonyesha",
   "tl": "Pumili ng display name"
+ ,
+   "es": "Choose display name",
+   "pt": "Choose display name"
  },
  "accountNameHint": {
   "en": "Your display name",
@@ -22,6 +28,9 @@
   "ro": "Numele tău afișat",
   "sw": "Jina lako la kuonyesha",
   "tl": "Ang iyong display name"
+ ,
+   "es": "Your display name",
+   "pt": "Your display name"
  },
  "accountSave": {
   "en": "Save",
@@ -30,6 +39,9 @@
   "ro": "Salvează",
   "sw": "Hifadhi",
   "tl": "I-save"
+ ,
+   "es": "Guardar",
+   "pt": "Guardar"
  },
  "accountNameUpdated": {
   "en": "Display name updated.",
@@ -38,6 +50,9 @@
   "ro": "Numele afișat a fost actualizat.",
   "sw": "Jina la kuonyesha limesasishwa.",
   "tl": "Na-update ang display name."
+ ,
+   "es": "Display name updated.",
+   "pt": "Display name updated."
  },
  "studyVerseOfTheDayHistory": {
   "en": "Verse of the day history",
@@ -46,6 +61,9 @@
   "ro": "Istoricul versetelor zilei",
   "sw": "Historia ya mstari wa siku",
   "tl": "Kasaysayan ng talata ng araw"
+ ,
+   "es": "Verse of the day history",
+   "pt": "Verse of the day history"
  },
  "studyWordOfTheDayHistory": {
   "en": "Word of the day history",
@@ -54,6 +72,9 @@
   "ro": "Istoricul cuvintelor zilei",
   "sw": "Historia ya neno la siku",
   "tl": "Kasaysayan ng salita ng araw"
+ ,
+   "es": "Word of the day history",
+   "pt": "Word of the day history"
  },
  "studyRecentWords": {
   "en": "Recent words",
@@ -62,6 +83,9 @@
   "ro": "Cuvinte recente",
   "sw": "Maneno ya hivi karibuni",
   "tl": "Mga kamakailang salita"
+ ,
+   "es": "Recent words",
+   "pt": "Recent words"
  },
  "accountAddName": {
   "en": "Add your name",
@@ -70,6 +94,9 @@
   "ro": "Adaugă-ți numele",
   "sw": "Ongeza jina lako",
   "tl": "Idagdag ang pangalan mo"
+ ,
+   "es": "Add your name",
+   "pt": "Add your name"
  },
  "accountNameSaveFailed": {
   "en": "Couldn't save your name. Check your connection and try again.",
@@ -78,6 +105,9 @@
   "ro": "Nu am putut salva numele. Verifică conexiunea și încearcă din nou.",
   "sw": "Imeshindwa kuhifadhi jina lako. Angalia muunganisho wako na ujaribu tena.",
   "tl": "Hindi ma-save ang pangalan mo. Suriin ang koneksyon at subukang muli."
+ ,
+   "es": "Couldn't save your name. Check your connection and try again.",
+   "pt": "Couldn't save your name. Check your connection and try again."
  },
  "accountSignOutSheetBody": {
   "en": "Your data stays safe in your account. Choose what this device keeps.",
@@ -86,6 +116,9 @@
   "ro": "Datele tale rămân în siguranță în cont. Alege ce păstrează acest dispozitiv.",
   "sw": "Data yako iko salama kwenye akaunti yako. Chagua kifaa hiki kibaki na nini.",
   "tl": "Ligtas ang data mo sa iyong account. Piliin kung ano ang itatabi ng device na ito."
+ ,
+   "es": "Your data stays safe in your account. Choose what this device keeps.",
+   "pt": "Your data stays safe in your account. Choose what this device keeps."
  },
  "accountKeepStudyData": {
   "en": "Keep my study data on this device",
@@ -94,6 +127,9 @@
   "ro": "Păstrează datele de studiu pe acest dispozitiv",
   "sw": "Weka data yangu ya kujifunza kwenye kifaa hiki",
   "tl": "Itabi ang study data ko sa device na ito"
+ ,
+   "es": "Keep my study data on this device",
+   "pt": "Keep my study data on this device"
  },
  "accountKeepStudyDataSubtitle": {
   "en": "Bookmarks, highlights, notes, plans and progress",
@@ -102,6 +138,9 @@
   "ro": "Semne de carte, evidențieri, notițe, planuri și progres",
   "sw": "Alamisho, vivutio, maelezo, mipango na maendeleo",
   "tl": "Mga bookmark, highlight, tala, plano at progreso"
+ ,
+   "es": "Bookmarks, highlights, notes, plans and progress",
+   "pt": "Bookmarks, highlights, notes, plans and progress"
  },
  "accountKeepName": {
   "en": "Keep my name on this device",
@@ -110,6 +149,9 @@
   "ro": "Păstrează-mi numele pe acest dispozitiv",
   "sw": "Weka jina langu kwenye kifaa hiki",
   "tl": "Itabi ang pangalan ko sa device na ito"
+ ,
+   "es": "Keep my name on this device",
+   "pt": "Keep my name on this device"
  },
  "accountKeepNameSubtitle": {
   "en": "You'll show as \"{name}\" instead of \"Guest\"",
@@ -125,6 +167,9 @@
     }
    }
   }
+ ,
+   "es": "You'll show as \"{name}\" instead of \"Guest\"",
+   "pt": "You'll show as \"{name}\" instead of \"Guest\""
  },
  "accountSigningOut": {
   "en": "Signing out…",
@@ -133,6 +178,9 @@
   "ro": "Se deconectează…",
   "sw": "Inatoka…",
   "tl": "Nagsa-sign out…"
+ ,
+   "es": "Signing out…",
+   "pt": "Signing out…"
  },
  "accountSignedOutAs": {
   "en": "Signed out. You're using the app as {name}.",
@@ -148,6 +196,9 @@
     }
    }
   }
+ ,
+   "es": "Signed out. You're using the app as {name}.",
+   "pt": "Signed out. You're using the app as {name}."
  },
  "accountSignedOutGuest": {
   "en": "Signed out. You're using the app as a guest.",
@@ -156,6 +207,9 @@
   "ro": "Deconectat. Folosești aplicația ca invitat.",
   "sw": "Umetoka. Unatumia programu kama mgeni.",
   "tl": "Naka-sign out na. Ginagamit mo ang app bilang bisita."
+ ,
+   "es": "Signed out. You're using the app as a guest.",
+   "pt": "Signed out. You're using the app as a guest."
  },
  "accountResetDevice": {
   "en": "Reset this device",
@@ -164,6 +218,9 @@
   "ro": "Resetează acest dispozitiv",
   "sw": "Weka upya kifaa hiki",
   "tl": "I-reset ang device na ito"
+ ,
+   "es": "Reset this device",
+   "pt": "Reset this device"
  },
  "accountResetDeviceSubtitle": {
   "en": "Erase study data on this device only",
@@ -172,6 +229,9 @@
   "ro": "Șterge datele de studiu doar de pe acest dispozitiv",
   "sw": "Futa data ya kujifunza kwenye kifaa hiki pekee",
   "tl": "Burahin ang study data sa device na ito lang"
+ ,
+   "es": "Erase study data on this device only",
+   "pt": "Erase study data on this device only"
  },
  "accountResetErases": {
   "en": "Erases on this device:",
@@ -180,6 +240,9 @@
   "ro": "Șterge de pe acest dispozitiv:",
   "sw": "Inafuta kwenye kifaa hiki:",
   "tl": "Buburahin sa device na ito:"
+ ,
+   "es": "Erases on this device:",
+   "pt": "Erases on this device:"
  },
  "accountResetEraseItems": {
   "en": "• Bookmarks, highlights, notes and journal\n• Reading plans, progress and streaks\n• Downloaded translations",
@@ -188,6 +251,9 @@
   "ro": "• Semne de carte, evidențieri, notițe și jurnal\n• Planuri de citire, progres și serii\n• Traduceri descărcate",
   "sw": "• Alamisho, vivutio, maelezo na shajara\n• Mipango ya kusoma, maendeleo na mfululizo\n• Tafsiri zilizopakuliwa",
   "tl": "• Mga bookmark, highlight, tala at journal\n• Mga reading plan, progreso at streak\n• Mga na-download na salin"
+ ,
+   "es": "• Bookmarks, highlights, notes and journal\n• Reading plans, progress and streaks\n• Downloaded translations",
+   "pt": "• Bookmarks, highlights, notes and journal\n• Reading plans, progress and streaks\n• Downloaded translations"
  },
  "accountResetStays": {
   "en": "Stays: settings, theme, your name, the offline Bible and your account's cloud data.",
@@ -196,6 +262,9 @@
   "ro": "Rămân: setările, tema, numele tău, Biblia offline și datele din cloud ale contului.",
   "sw": "Vinabaki: mipangilio, mandhari, jina lako, Biblia ya nje ya mtandao na data ya akaunti yako kwenye wingu.",
   "tl": "Mananatili: settings, tema, pangalan mo, ang offline na Bibliya at ang cloud data ng account mo."
+ ,
+   "es": "Stays: settings, theme, your name, the offline Bible and your account's cloud data.",
+   "pt": "Stays: settings, theme, your name, the offline Bible and your account's cloud data."
  },
  "accountResetSignOutOption": {
   "en": "Sign out and reset",
@@ -204,6 +273,9 @@
   "ro": "Deconectează-te și resetează",
   "sw": "Toka na uweke upya",
   "tl": "Mag-sign out at i-reset"
+ ,
+   "es": "Sign out and reset",
+   "pt": "Sign out and reset"
  },
  "accountResetSignOutOptionSubtitle": {
   "en": "Your data stays in your account. Sign in again to bring it back.",
@@ -212,6 +284,9 @@
   "ro": "Datele rămân în cont. Conectează-te din nou ca să le aduci înapoi.",
   "sw": "Data yako inabaki kwenye akaunti yako. Ingia tena kuirudisha.",
   "tl": "Nananatili ang data mo sa account. Mag-sign in ulit para maibalik ito."
+ ,
+   "es": "Your data stays in your account. Sign in again to bring it back.",
+   "pt": "Your data stays in your account. Sign in again to bring it back."
  },
  "accountResetStayOption": {
   "en": "Stay signed in and re-download",
@@ -220,6 +295,9 @@
   "ro": "Rămâi conectat și descarcă din nou",
   "sw": "Endelea kuingia na upakue upya",
   "tl": "Manatiling naka-sign in at i-download ulit"
+ ,
+   "es": "Stay signed in and re-download",
+   "pt": "Stay signed in and re-download"
  },
  "accountResetStayOptionSubtitle": {
   "en": "Clears this device, then downloads a fresh copy from your account.",
@@ -228,6 +306,9 @@
   "ro": "Golește dispozitivul, apoi descarcă o copie nouă din cont.",
   "sw": "Inafuta kifaa hiki, kisha inapakua nakala mpya kutoka kwenye akaunti yako.",
   "tl": "Nililinis ang device, saka nagda-download ng bagong kopya mula sa account mo."
+ ,
+   "es": "Clears this device, then downloads a fresh copy from your account.",
+   "pt": "Clears this device, then downloads a fresh copy from your account."
  },
  "accountResetDeleteCloud": {
   "en": "Also delete my cloud data",
@@ -236,6 +317,9 @@
   "ro": "Șterge și datele mele din cloud",
   "sw": "Futa pia data yangu ya wingu",
   "tl": "Burahin din ang cloud data ko"
+ ,
+   "es": "Also delete my cloud data",
+   "pt": "Also delete my cloud data"
  },
  "accountResetDeleteCloudSubtitle": {
   "en": "Removes this app's bookmarks, highlights, notes and plans from your account for good. Your account and Blessed Arcade stay.",
@@ -244,6 +328,9 @@
   "ro": "Elimină definitiv din cont semnele de carte, evidențierile, notițele și planurile acestei aplicații. Contul și Blessed Arcade rămân.",
   "sw": "Inaondoa kabisa alamisho, vivutio, maelezo na mipango ya programu hii kwenye akaunti yako. Akaunti yako na Blessed Arcade vinabaki.",
   "tl": "Permanenteng tinatanggal sa account mo ang mga bookmark, highlight, tala at plano ng app na ito. Mananatili ang account mo at ang Blessed Arcade."
+ ,
+   "es": "Removes this app's bookmarks, highlights, notes and plans from your account for good. Your account and Blessed Arcade stay.",
+   "pt": "Removes this app's bookmarks, highlights, notes and plans from your account for good. Your account and Blessed Arcade stay."
  },
  "accountResetAndDeleteCloud": {
   "en": "Reset and delete cloud data",
@@ -252,6 +339,9 @@
   "ro": "Resetează și șterge datele din cloud",
   "sw": "Weka upya na ufute data ya wingu",
   "tl": "I-reset at burahin ang cloud data"
+ ,
+   "es": "Reset and delete cloud data",
+   "pt": "Reset and delete cloud data"
  },
  "accountDeleteCloudTitle": {
   "en": "Delete your cloud data?",
@@ -260,6 +350,9 @@
   "ro": "Ștergi datele din cloud?",
   "sw": "Futa data yako ya wingu?",
   "tl": "Burahin ang cloud data mo?"
+ ,
+   "es": "Delete your cloud data?",
+   "pt": "Delete your cloud data?"
  },
  "accountDeleteCloudWord": {
   "en": "DELETE",
@@ -268,6 +361,9 @@
   "ro": "ȘTERGE",
   "sw": "FUTA",
   "tl": "BURAHIN"
+ ,
+   "es": "DELETE",
+   "pt": "DELETE"
  },
  "accountDeleteCloudBody": {
   "en": "This permanently removes this app's synced data from your account, on every device. It can't be undone.\n\nType {word} to confirm.",
@@ -283,6 +379,9 @@
     }
    }
   }
+ ,
+   "es": "This permanently removes this app's synced data from your account, on every device. It can't be undone.\n\nType {word} to confirm.",
+   "pt": "This permanently removes this app's synced data from your account, on every device. It can't be undone.\n\nType {word} to confirm."
  },
  "accountDeleteCloudAction": {
   "en": "Delete cloud data",
@@ -291,6 +390,9 @@
   "ro": "Șterge datele din cloud",
   "sw": "Futa data ya wingu",
   "tl": "Burahin ang cloud data"
+ ,
+   "es": "Delete cloud data",
+   "pt": "Delete cloud data"
  },
  "accountResetting": {
   "en": "Resetting…",
@@ -299,6 +401,9 @@
   "ro": "Se resetează…",
   "sw": "Inaweka upya…",
   "tl": "Nire-reset…"
+ ,
+   "es": "Resetting…",
+   "pt": "Resetting…"
  },
  "accountResetDeviceDone": {
   "en": "This device has been reset.",
@@ -307,6 +412,9 @@
   "ro": "Dispozitivul a fost resetat.",
   "sw": "Kifaa hiki kimewekwa upya.",
   "tl": "Na-reset na ang device na ito."
+ ,
+   "es": "This device has been reset.",
+   "pt": "This device has been reset."
  },
  "accountCloudDeleteFailed": {
   "en": "Couldn't delete your cloud data, so nothing was erased. Check your connection and try again.",
@@ -315,6 +423,9 @@
   "ro": "Nu am putut șterge datele din cloud, deci nu s-a șters nimic. Verifică conexiunea și încearcă din nou.",
   "sw": "Imeshindwa kufuta data yako ya wingu, hivyo hakuna kilichofutwa. Angalia muunganisho wako na ujaribu tena.",
   "tl": "Hindi mabura ang cloud data mo, kaya walang nabura. Suriin ang koneksyon at subukang muli."
+ ,
+   "es": "Couldn't delete your cloud data, so nothing was erased. Check your connection and try again.",
+   "pt": "Couldn't delete your cloud data, so nothing was erased. Check your connection and try again."
  },
  "accountDeletingAccount": {
   "en": "Deleting account…",
@@ -323,5 +434,8 @@
   "ro": "Se șterge contul…",
   "sw": "Inafuta akaunti…",
   "tl": "Binubura ang account…"
+ ,
+   "es": "Deleting account…",
+   "pt": "Deleting account…"
  }
 }

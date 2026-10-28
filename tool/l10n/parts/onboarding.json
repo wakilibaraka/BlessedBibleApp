@@ -6,6 +6,9 @@
     "ro": "Scriptura, fără distrageri.",
     "sw": "Maandiko, bila usumbufu.",
     "tl": "Ang Kasulatan, walang abala."
+  ,
+    "es": "La Escritura, sin distracciones.",
+    "pt": "As Escrituras, sem distrações."
   },
   "onboardingPickLanguage": {
     "en": "Choose your language",
@@ -14,6 +17,9 @@
     "ro": "Alege limba",
     "sw": "Chagua lugha yako",
     "tl": "Piliin ang iyong wika"
+  ,
+    "es": "Choose your language",
+    "pt": "Choose your language"
   },
   "onboardingLanguageHint": {
     "en": "You can change this any time in Settings.",
@@ -22,6 +28,9 @@
     "ro": "O poți schimba oricând din Setări.",
     "sw": "Unaweza kuibadilisha wakati wowote kwenye Mipangilio.",
     "tl": "Mababago mo ito anumang oras sa Settings."
+  ,
+    "es": "You can change this any time in Settings.",
+    "pt": "You can change this any time in Settings."
   },
   "onboardingBibleTitle": {
     "en": "Your Bible",
@@ -30,6 +39,9 @@
     "ro": "Biblia ta",
     "sw": "Biblia yako",
     "tl": "Ang iyong Bibliya"
+  ,
+    "es": "Your Bible",
+    "pt": "Your Bible"
   },
   "onboardingBibleBody": {
     "en": "Pick the translation you read most. You can show a second one side by side.",
@@ -38,6 +50,9 @@
     "ro": "Alege traducerea pe care o citești cel mai des. Poți afișa și una a doua alături.",
     "sw": "Chagua tafsiri unayosoma zaidi. Unaweza kuonyesha nyingine ya pili kando yake.",
     "tl": "Piliin ang saling madalas mong basahin. Maaari kang magpakita ng pangalawa nang magkatabi."
+  ,
+    "es": "Pick the translation you read most. You can show a second one side by side.",
+    "pt": "Pick the translation you read most. You can show a second one side by side."
   },
   "onboardingParallel": {
     "en": "Also show {name} alongside",
@@ -53,6 +68,9 @@
         }
       }
     }
+  ,
+    "es": "Also show {name} alongside",
+    "pt": "Also show {name} alongside"
   },
   "onboardingPrimaryVersion": {
     "en": "Main translation",
@@ -61,6 +79,9 @@
     "ro": "Traducerea principală",
     "sw": "Tafsiri kuu",
     "tl": "Pangunahing salin"
+  ,
+    "es": "Main translation",
+    "pt": "Main translation"
   },
   "onboardingSecondaryVersion": {
     "en": "Second translation",
@@ -69,6 +90,9 @@
     "ro": "A doua traducere",
     "sw": "Tafsiri ya pili",
     "tl": "Pangalawang salin"
+  ,
+    "es": "Second translation",
+    "pt": "Second translation"
   },
   "onboardingSecondaryDesc": {
     "en": "Shown alongside your main Bible in parallel view",
@@ -77,6 +101,9 @@
     "ro": "Afișată alături de Biblia principală în vizualizarea paralelă",
     "sw": "Inaonyeshwa kando ya Biblia yako kuu katika mwonekano sambamba",
     "tl": "Ipinapakita sa tabi ng iyong Bibliya sa parallel view"
+  ,
+    "es": "Shown alongside your main Bible in parallel view",
+    "pt": "Shown alongside your main Bible in parallel view"
   },
   "onboardingLookTitle": {
     "en": "Make it comfortable",
@@ -85,6 +112,9 @@
     "ro": "Citește confortabil",
     "sw": "Soma kwa starehe",
     "tl": "Gawing komportable"
+  ,
+    "es": "Make it comfortable",
+    "pt": "Make it comfortable"
   },
   "onboardingLookBody": {
     "en": "Choose a page color, font and text size. Everything can be fine-tuned later.",
@@ -93,6 +123,9 @@
     "ro": "Alege culoarea paginii, fontul și mărimea textului. Totul se poate ajusta ulterior.",
     "sw": "Chagua rangi ya ukurasa, mtindo wa maandishi na ukubwa. Kila kitu kinaweza kurekebishwa baadaye.",
     "tl": "Pumili ng kulay ng pahina, font at laki ng teksto. Maaaring ayusin ang lahat mamaya."
+  ,
+    "es": "Choose a page color, font and text size. Everything can be fine-tuned later.",
+    "pt": "Choose a page color, font and text size. Everything can be fine-tuned later."
   },
   "onboardingThemeDaily": {
     "en": "Daily rotation",
@@ -101,6 +134,9 @@
     "ro": "Rotație zilnică",
     "sw": "Mzunguko wa kila siku",
     "tl": "Araw-araw na pagpapalit"
+  ,
+    "es": "Daily rotation",
+    "pt": "Daily rotation"
   },
   "onboardingThemeDailyDesc": {
     "en": "Changes daily to reflect the rich themes of Scripture",
@@ -109,6 +145,9 @@
     "ro": "Se schimbă zilnic pentru a reflecta temele bogate ale Scripturii",
     "sw": "Hubadilika kila siku kuakisi mandhari tele ya Maandiko",
     "tl": "Nagbabago araw-araw upang ipakita ang mayayamang tema ng Kasulatan"
+  ,
+    "es": "Changes daily to reflect the rich themes of Scripture",
+    "pt": "Changes daily to reflect the rich themes of Scripture"
   },
   "onboardingFontFamily": {
     "en": "Font style",
@@ -117,6 +156,9 @@
     "ro": "Stil font",
     "sw": "Mtindo wa herufi",
     "tl": "Estilo ng font"
+  ,
+    "es": "Font style",
+    "pt": "Font style"
   },
   "onboardingShuffleHint": {
     "en": "Tap to shuffle",
@@ -125,6 +167,9 @@
     "ro": "Apasă pentru amestecare",
     "sw": "Gusa ili kuchanganya",
     "tl": "Pindutin para i-shuffle"
+  ,
+    "es": "Tap to shuffle",
+    "pt": "Tap to shuffle"
   },
   "onboardingThemeLight": {
     "en": "Light",
@@ -133,6 +178,9 @@
     "ro": "Luminos",
     "sw": "Mwanga",
     "tl": "Maliwanag"
+  ,
+    "es": "Light",
+    "pt": "Light"
   },
   "onboardingThemeSepia": {
     "en": "Sepia",
@@ -141,6 +189,9 @@
     "ro": "Sepia",
     "sw": "Sepia",
     "tl": "Sepia"
+  ,
+    "es": "Sepia",
+    "pt": "Sepia"
   },
   "onboardingThemeDark": {
     "en": "Dark",
@@ -149,6 +200,9 @@
     "ro": "Întunecat",
     "sw": "Giza",
     "tl": "Madilim"
+  ,
+    "es": "Dark",
+    "pt": "Dark"
   },
   "onboardingTextSize": {
     "en": "Text size",
@@ -157,6 +211,9 @@
     "ro": "Mărimea textului",
     "sw": "Ukubwa wa maandishi",
     "tl": "Laki ng teksto"
+  ,
+    "es": "Text size",
+    "pt": "Text size"
   },
   "onboardingPreviewVerse": {
     "en": "In the beginning was the Word, and the Word was with God, and the Word was God.",
@@ -165,6 +222,9 @@
     "ro": "La început era Cuvântul, și Cuvântul era cu Dumnezeu, și Cuvântul era Dumnezeu.",
     "sw": "Hapo mwanzo kulikuwako Neno, naye Neno alikuwako kwa Mungu, naye Neno alikuwa Mungu.",
     "tl": "Nang pasimula ay ang Salita, at ang Salita ay kasama ng Diyos, at ang Salita ay Diyos."
+  ,
+    "es": "In the beginning was the Word, and the Word was with God, and the Word was God.",
+    "pt": "In the beginning was the Word, and the Word was with God, and the Word was God."
   },
   "onboardingPreviewRef": {
     "en": "John 1:1",
@@ -173,6 +233,9 @@
     "ro": "Ioan 1:1",
     "sw": "Yohana 1:1",
     "tl": "Juan 1:1"
+  ,
+    "es": "John 1:1",
+    "pt": "John 1:1"
   },
   "onboardingFeaturesTitle": {
     "en": "Everything for your daily walk",
@@ -181,6 +244,9 @@
     "ro": "Tot ce-ți trebuie zi de zi",
     "sw": "Kila kitu kwa safari yako ya kila siku",
     "tl": "Lahat para sa iyong araw-araw na paglakad"
+  ,
+    "es": "Everything for your daily walk",
+    "pt": "Everything for your daily walk"
   },
   "onboardingFeatureWordTitle": {
     "en": "The Pure Word",
@@ -189,6 +255,9 @@
     "ro": "Cuvântul, simplu",
     "sw": "Neno Safi",
     "tl": "Ang Dalisay na Salita"
+  ,
+    "es": "La Palabra Pura",
+    "pt": "A Palavra Pura"
   },
   "onboardingFeatureWordBody": {
     "en": "Read without distraction, with highlights, notes and bookmarks.",
@@ -197,6 +266,9 @@
     "ro": "Citește fără distrageri, cu evidențieri, notițe și semne de carte.",
     "sw": "Soma bila usumbufu, ukiwa na alama, maelezo na vialamisho.",
     "tl": "Magbasa nang walang abala, may highlight, tala at bookmark."
+  ,
+    "es": "Read without distraction, with highlights, notes and bookmarks.",
+    "pt": "Read without distraction, with highlights, notes and bookmarks."
   },
   "onboardingFeaturePlansTitle": {
     "en": "Reading plans",
@@ -205,6 +277,9 @@
     "ro": "Planuri de citire",
     "sw": "Mipango ya Kusoma",
     "tl": "Mga Plano sa Pagbasa"
+  ,
+    "es": "Reading plans",
+    "pt": "Reading plans"
   },
   "onboardingFeaturePlansBody": {
     "en": "Chronological, thematic or your own — with gentle reminders.",
@@ -213,6 +288,9 @@
     "ro": "Cronologice, tematice sau proprii — cu mementouri discrete.",
     "sw": "Ya mpangilio wa wakati, ya mada au yako mwenyewe — pamoja na vikumbusho vya upole.",
     "tl": "Kronolohikal, ayon sa paksa o sarili mo — may banayad na paalala."
+  ,
+    "es": "Chronological, thematic or your own — with gentle reminders.",
+    "pt": "Chronological, thematic or your own — with gentle reminders."
   },
   "onboardingFeatureStudyTitle": {
     "en": "Deep study",
@@ -221,6 +299,9 @@
     "ro": "Studiu aprofundat",
     "sw": "Mafunzo ya Kina",
     "tl": "Malalim na Pag-aaral"
+  ,
+    "es": "Deep study",
+    "pt": "Deep study"
   },
   "onboardingFeatureStudyBody": {
     "en": "Commentary, dictionary, Strong's and maps, right beside the text.",
@@ -229,6 +310,9 @@
     "ro": "Comentarii, dicționar, Strong și hărți, chiar lângă text.",
     "sw": "Maelezo, kamusi, Strong na ramani, kando ya maandiko.",
     "tl": "Komentaryo, diksyunaryo, Strong at mapa, katabi ng teksto."
+  ,
+    "es": "Commentary, dictionary, Strong's and maps, right beside the text.",
+    "pt": "Commentary, dictionary, Strong's and maps, right beside the text."
   },
   "onboardingFeatureSyncTitle": {
     "en": "Kept safe",
@@ -237,6 +321,9 @@
     "ro": "În siguranță",
     "sw": "Salama",
     "tl": "Ligtas"
+  ,
+    "es": "Kept safe",
+    "pt": "Kept safe"
   },
   "onboardingFeatureSyncBody": {
     "en": "Sign in any time to sync across your devices. No account needed to read.",
@@ -245,6 +332,9 @@
     "ro": "Conectează-te oricând pentru a sincroniza dispozitivele. Pentru citit nu ai nevoie de cont.",
     "sw": "Ingia wakati wowote ili kusawazisha vifaa vyako. Huhitaji akaunti ili kusoma.",
     "tl": "Mag-sign in anumang oras para i-sync ang iyong mga device. Hindi kailangan ng account para magbasa."
+  ,
+    "es": "Sign in any time to sync across your devices. No account needed to read.",
+    "pt": "Sign in any time to sync across your devices. No account needed to read."
   },
   "onboardingBegin": {
     "en": "Begin reading",
@@ -253,6 +343,9 @@
     "ro": "Începe să citești",
     "sw": "Anza kusoma",
     "tl": "Simulan ang pagbasa"
+  ,
+    "es": "Begin reading",
+    "pt": "Begin reading"
   },
   "onboardingStep": {
     "en": "Step {current} of {total}",
@@ -271,6 +364,9 @@
         }
       }
     }
+  ,
+    "es": "Step {current} of {total}",
+    "pt": "Step {current} of {total}"
   },
   "onboardingReminderTitle": {
     "en": "A gentle daily reminder",
@@ -279,6 +375,9 @@
     "ro": "Un memento zilnic discret",
     "sw": "Kikumbusho cha upole kila siku",
     "tl": "Isang banayad na paalala araw-araw"
+  ,
+    "es": "A gentle daily reminder",
+    "pt": "A gentle daily reminder"
   },
   "onboardingReminderBody": {
     "en": "A short nudge at the time you choose helps build a daily habit. We only notify you for reading — never ads.",
@@ -287,6 +386,9 @@
     "ro": "Un mic memento la ora aleasă te ajută să-ți formezi un obicei zilnic. Doar pentru citire — niciodată reclame.",
     "sw": "Ukumbusho mfupi kwa wakati unaouchagua husaidia kujenga desturi ya kila siku. Ni kwa kusoma tu — kamwe si matangazo.",
     "tl": "Ang maikling paalala sa oras na pipiliin mo ay tumutulong bumuo ng araw-araw na gawi. Para lang sa pagbasa — hindi kailanman ad."
+  ,
+    "es": "A short nudge at the time you choose helps build a daily habit. We only notify you for reading — never ads.",
+    "pt": "A short nudge at the time you choose helps build a daily habit. We only notify you for reading — never ads."
   },
   "onboardingReminderToggle": {
     "en": "Remind me to read each day",
@@ -295,6 +397,9 @@
     "ro": "Amintește-mi să citesc zilnic",
     "sw": "Nikumbushe kusoma kila siku",
     "tl": "Paalalahanan akong magbasa araw-araw"
+  ,
+    "es": "Remind me to read each day",
+    "pt": "Remind me to read each day"
   },
   "onboardingReminderTime": {
     "en": "Reminder time",
@@ -303,6 +408,9 @@
     "ro": "Ora mementoului",
     "sw": "Wakati wa kikumbusho",
     "tl": "Oras ng paalala"
+  ,
+    "es": "Reminder time",
+    "pt": "Reminder time"
   },
   "onboardingReminderPermission": {
     "en": "Your phone will ask permission to show notifications. You can change this later in Settings.",
@@ -311,6 +419,9 @@
     "ro": "Telefonul va cere permisiunea de a afișa notificări. O poți schimba ulterior din Setări.",
     "sw": "Simu yako itaomba ruhusa ya kuonyesha arifa. Unaweza kubadilisha hili baadaye kwenye Mipangilio.",
     "tl": "Hihingi ng pahintulot ang iyong telepono na magpakita ng notification. Mababago ito mamaya sa Settings."
+  ,
+    "es": "Your phone will ask permission to show notifications. You can change this later in Settings.",
+    "pt": "Your phone will ask permission to show notifications. You can change this later in Settings."
   },
   "onboardingAccountTitle": {
     "en": "Keep your notes safe",
@@ -319,6 +430,9 @@
     "ro": "Păstrează-ți notițele în siguranță",
     "sw": "Linda maelezo yako",
     "tl": "Panatilihing ligtas ang iyong mga tala"
+  ,
+    "es": "Keep your notes safe",
+    "pt": "Keep your notes safe"
   },
   "onboardingAccountBody": {
     "en": "Signing in is optional. The app works fully offline without an account. With one, your highlights, notes, bookmarks and plans are backed up and kept in step across your devices.",
@@ -327,6 +441,9 @@
     "ro": "Conectarea este opțională. Aplicația funcționează complet offline, fără cont. Cu un cont, evidențierile, notițele, semnele de carte și planurile sunt salvate și sincronizate pe dispozitivele tale.",
     "sw": "Kuingia ni hiari. Programu hufanya kazi kikamilifu bila mtandao na bila akaunti. Ukiwa na akaunti, alama, maelezo, vialamisho na mipango yako huhifadhiwa na kusawazishwa kwenye vifaa vyako.",
     "tl": "Opsyonal ang pag-sign in. Gumagana nang buo ang app offline kahit walang account. Kapag may account, naka-back up at naka-sync sa iyong mga device ang iyong mga highlight, tala, bookmark at plano."
+  ,
+    "es": "Signing in is optional. The app works fully offline without an account. With one, your highlights, notes, bookmarks and plans are backed up and kept in step across your devices.",
+    "pt": "Signing in is optional. The app works fully offline without an account. With one, your highlights, notes, bookmarks and plans are backed up and kept in step across your devices."
   },
   "onboardingSignedInAs": {
     "en": "Signed in as {name}",
@@ -342,6 +459,9 @@
         }
       }
     }
+  ,
+    "es": "Signed in as {name}",
+    "pt": "Signed in as {name}"
   },
   "onboardingNotNow": {
     "en": "Not now",
@@ -350,5 +470,8 @@
     "ro": "Nu acum",
     "sw": "Si sasa",
     "tl": "Hindi muna"
+  ,
+    "es": "Not now",
+    "pt": "Not now"
   }
 }

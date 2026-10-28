@@ -34,7 +34,7 @@ void main() {
     final en = load('en');
     final keys = en.keys.where((k) => !k.startsWith('@')).toSet();
     final placeholder = RegExp(r'\{(\w+)[,}]');
-    for (final lang in ['fr', 'it', 'ro', 'sw', 'tl']) {
+    for (final lang in ['es', 'fr', 'it', 'pt', 'ro', 'sw', 'tl']) {
       final other = load(lang);
       expect(other.keys.where((k) => !k.startsWith('@')).toSet(), keys,
           reason: lang);

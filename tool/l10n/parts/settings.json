@@ -6,6 +6,9 @@
   "ro": "Setări",
   "sw": "Mipangilio",
   "tl": "Mga Setting"
+ ,
+   "es": "Ajustes",
+   "pt": "Definições"
  },
  "settingsTabGeneral": {
   "en": "General",
@@ -14,6 +17,9 @@
   "ro": "General",
   "sw": "Jumla",
   "tl": "Pangkalahatan"
+ ,
+   "es": "General",
+   "pt": "Geral"
  },
  "settingsTabNavigation": {
   "en": "Navigation",
@@ -22,6 +28,9 @@
   "ro": "Navigare",
   "sw": "Urambazaji",
   "tl": "Nabigasyon"
+ ,
+   "es": "Navegación",
+   "pt": "Navegação"
  },
  "settingsTabReminders": {
   "en": "Reminders",
@@ -30,6 +39,9 @@
   "ro": "Mementouri",
   "sw": "Vikumbusho",
   "tl": "Mga Paalala"
+ ,
+   "es": "Recordatorios",
+   "pt": "Lembretes"
  },
  "settingsTabInfo": {
   "en": "Info",
@@ -38,6 +50,9 @@
   "ro": "Info",
   "sw": "Taarifa",
   "tl": "Impormasyon"
+ ,
+   "es": "Información",
+   "pt": "Informação"
  },
  "settingsWidgetsTitle": {
   "en": "Home screen widgets",
@@ -46,6 +61,9 @@
   "ro": "Widgeturi pe ecranul principal",
   "sw": "Wijeti za Skrini ya Nyumbani",
   "tl": "Mga Widget sa Home Screen"
+ ,
+   "es": "Home screen widgets",
+   "pt": "Home screen widgets"
  },
  "settingsWidgetsSubtitle": {
   "en": "Customize gradients, transparency, and live preview",
@@ -54,6 +72,9 @@
   "ro": "Degradeuri, transparență și previzualizare live",
   "sw": "Badilisha rangi, uwazi na hakikisho la moja kwa moja",
   "tl": "I-customize ang gradient, transparency at live preview"
+ ,
+   "es": "Personalizar degradados, transparencia y vista previa en vivo",
+   "pt": "Personalizar gradientes, transparência e pré-visualização ao vivo"
  },
  "settingsStartPageTitle": {
   "en": "Default start page",
@@ -62,6 +83,9 @@
   "ro": "Pagina de pornire",
   "sw": "Ukurasa wa kuanzia",
   "tl": "Panimulang pahina"
+ ,
+   "es": "Página de inicio predeterminada",
+   "pt": "Página inicial padrão"
  },
  "settingsStartPageSubtitle": {
   "en": "Choose which page the app opens to on launch",
@@ -70,6 +94,9 @@
   "ro": "Alege pagina afișată la pornire",
   "sw": "Chagua ukurasa programu inaofungua nao",
   "tl": "Piliin ang pahinang bubukas sa pagsisimula"
+ ,
+   "es": "Elije la página con la que abre la app",
+   "pt": "Escolha a página que o app abre ao iniciar"
  },
  "settingsPageHome": {
   "en": "Home",
@@ -78,6 +105,9 @@
   "ro": "Acasă",
   "sw": "Nyumbani",
   "tl": "Home"
+ ,
+   "es": "Home",
+   "pt": "Home"
  },
  "settingsPageRead": {
   "en": "Read",
@@ -86,6 +116,9 @@
   "ro": "Citește",
   "sw": "Soma",
   "tl": "Basahin"
+ ,
+   "es": "Leer",
+   "pt": "Ler"
  },
  "settingsPageStudy": {
   "en": "Study",
@@ -94,6 +127,9 @@
   "ro": "Studiu",
   "sw": "Jifunze",
   "tl": "Pag-aaral"
+ ,
+   "es": "Estudio",
+   "pt": "Estudo"
  },
  "settingsPageSearch": {
   "en": "Search",
@@ -102,6 +138,9 @@
   "ro": "Căutare",
   "sw": "Tafuta",
   "tl": "Hanapin"
+ ,
+   "es": "Buscar",
+   "pt": "Pesquisar"
  },
  "settingsImmersiveReading": {
   "en": "Immersive reading",
@@ -110,6 +149,9 @@
   "ro": "Lectură imersivă",
   "sw": "Usomaji wa Kuzama",
   "tl": "Malalim na Pagbabasa"
+ ,
+   "es": "Immersive reading",
+   "pt": "Immersive reading"
  },
  "settingsImmersiveOffTitle": {
   "en": "Anchored (off)",
@@ -118,6 +160,9 @@
   "ro": "Ancorat (oprit)",
   "sw": "Imetia nanga (Imezimwa)",
   "tl": "Nakaangkla (Off)"
+ ,
+   "es": "Anchored (off)",
+   "pt": "Anchored (off)"
  },
  "settingsImmersiveOffSubtitle": {
   "en": "Navigation remains visible at all times",
@@ -126,6 +171,9 @@
   "ro": "Navigarea rămâne mereu vizibilă",
   "sw": "Urambazaji unaonekana wakati wote",
   "tl": "Laging nakikita ang nabigasyon"
+ ,
+   "es": "La navegación permanece visible en todo momento",
+   "pt": "A navegação permanece sempre visível"
  },
  "settingsImmersivePartialTitle": {
   "en": "Guided (partial)",
@@ -134,6 +182,9 @@
   "ro": "Ghidat (parțial)",
   "sw": "Kuongozwa (Sehemu)",
   "tl": "Gabay (Bahagya)"
+ ,
+   "es": "Guided (partial)",
+   "pt": "Guided (partial)"
  },
  "settingsImmersivePartialSubtitle": {
   "en": "Auto-hides main navigation, but leaves the book & chapter pill",
@@ -142,6 +193,9 @@
   "ro": "Ascunde navigarea, dar păstrează pastila carte și capitol",
   "sw": "Huficha urambazaji, lakini huacha kitufe cha kitabu na sura",
   "tl": "Itinatago ang nabigasyon, pero iniiwan ang aklat at kabanata"
+ ,
+   "es": "Auto-hides main navigation, but leaves the book & chapter pill",
+   "pt": "Auto-hides main navigation, but leaves the book & chapter pill"
  },
  "settingsImmersiveFullTitle": {
   "en": "Deep Waters (Full)",
@@ -150,6 +204,9 @@
   "ro": "Ape adânci (complet)",
   "sw": "Maji Makuu (Kamili)",
   "tl": "Malalim na Tubig (Buo)"
+ ,
+   "es": "Aguas profundas (Completo)",
+   "pt": "Águas profundas (Completo)"
  },
  "settingsImmersiveFullSubtitle": {
   "en": "Total immersion. All menus hide when scrolling",
@@ -158,6 +215,9 @@
   "ro": "Imersiune totală. Toate meniurile se ascund la derulare",
   "sw": "Kuzama kabisa. Menyu zote hujificha unaposogeza",
   "tl": "Buong paglubog. Nagtatago ang lahat ng menu kapag nag-scroll"
+ ,
+   "es": "Inmersión total. Todos los menús se ocultan al desplazarse",
+   "pt": "Imersão total. Todos os menus ocultam-se ao deslocar"
  },
  "settingsShowStrongs": {
   "en": "Show Strong's numbers",
@@ -166,6 +226,9 @@
   "ro": "Afișează numerele Strong",
   "sw": "Onyesha Namba za Strong",
   "tl": "Ipakita ang mga Numero ng Strong"
+ ,
+   "es": "Show Strong's numbers",
+   "pt": "Show Strong's numbers"
  },
  "settingsShowStrongsSubtitle": {
   "en": "Displays original Hebrew/Greek identifiers alongside KJV text for deep word study",
@@ -174,6 +237,9 @@
   "ro": "Afișează codurile ebraice/grecești lângă textul KJV pentru studiul cuvintelor",
   "sw": "Huonyesha alama za Kiebrania/Kigiriki kando ya maandishi ya KJV kwa kujifunza maneno",
   "tl": "Ipinapakita ang orihinal na Hebreo/Griyego kasama ng KJV para sa pag-aaral ng salita"
+ ,
+   "es": "Muestra los identificadores hebreos/griegos originales junto al texto KJV para estudio profundo de palabras",
+   "pt": "Mostra os identificadores originais hebraicos/gregos ao lado do texto KJV para estudo profundo de palavras"
  },
  "settingsStrongsGetIt": {
   "en": "Get it",
@@ -182,6 +248,9 @@
   "ro": "Obține",
   "sw": "Pata",
   "tl": "Kunin"
+ ,
+   "es": "Obtenerlo",
+   "pt": "Obter"
  },
  "settingsStrongsMarkerAsterisk": {
   "en": "Asterisk (*)",
@@ -190,6 +259,9 @@
   "ro": "Asterisc (*)",
   "sw": "Nyota (*)",
   "tl": "Asterisk (*)"
+ ,
+   "es": "Asterisco (*)",
+   "pt": "Asterisco (*)"
  },
  "settingsStrongsMarkerChain": {
   "en": "Chain (🔗)",
@@ -198,6 +270,9 @@
   "ro": "Lanț (🔗)",
   "sw": "Mnyororo (🔗)",
   "tl": "Kadena (🔗)"
+ ,
+   "es": "Cadena (🔗)",
+   "pt": "Cadeia (🔗)"
  },
  "settingsStrongsMarkerNumber": {
   "en": "Number (H1234)",
@@ -206,6 +281,9 @@
   "ro": "Număr (H1234)",
   "sw": "Namba (H1234)",
   "tl": "Numero (H1234)"
+ ,
+   "es": "Número (H1234)",
+   "pt": "Número (H1234)"
  },
  "settingsReadingSpeed": {
   "en": "Reading speed",
@@ -214,6 +292,9 @@
   "ro": "Viteza de lectură",
   "sw": "Kasi ya kusoma",
   "tl": "Bilis ng pagbasa"
+ ,
+   "es": "Velocidad de lectura",
+   "pt": "Velocidade de leitura"
  },
  "settingsReadingSpeedSubtitle": {
   "en": "Pace estimates for plans (words per minute)",
@@ -222,6 +303,9 @@
   "ro": "Ritm estimat pentru planuri (cuvinte pe minut)",
   "sw": "Makadirio ya kasi kwa mipango (maneno kwa dakika)",
   "tl": "Tantiyang bilis para sa mga plano (salita kada minuto)"
+ ,
+   "es": "Estimaciones de ritmo para los planes (palabras por minuto)",
+   "pt": "Estimativas de ritmo para os planos (palavras por minuto)"
  },
  "settingsSpeedRelaxed": {
   "en": "Relaxed",
@@ -230,6 +314,9 @@
   "ro": "Relaxat",
   "sw": "Taratibu",
   "tl": "Maluwag"
+ ,
+   "es": "Relajado",
+   "pt": "Relaxado"
  },
  "settingsSpeedStandard": {
   "en": "Standard",
@@ -238,6 +325,9 @@
   "ro": "Standard",
   "sw": "Kawaida",
   "tl": "Karaniwan"
+ ,
+   "es": "Estándar",
+   "pt": "Padrão"
  },
  "settingsSpeedBrisk": {
   "en": "Brisk",
@@ -246,6 +336,9 @@
   "ro": "Alert",
   "sw": "Haraka",
   "tl": "Mabilis"
+ ,
+   "es": "Rápido",
+   "pt": "Ágil"
  },
  "settingsDictUnderlines": {
   "en": "Dictionary underlines",
@@ -254,6 +347,9 @@
   "ro": "Sublinieri din dicționar",
   "sw": "Mistari ya Kamusi",
   "tl": "Mga Salungguhit ng Diksiyonaryo"
+ ,
+   "es": "Dictionary underlines",
+   "pt": "Dictionary underlines"
  },
  "settingsDictUnderlinesSubtitle": {
   "en": "Dotted underlines on biblical terms and archaic words",
@@ -262,6 +358,9 @@
   "ro": "Sublinieri punctate pentru termeni biblici și cuvinte arhaice",
   "sw": "Mistari ya nukta chini ya maneno ya kibiblia na ya kale",
   "tl": "May tuldok na salungguhit sa mga terminong biblikal at lumang salita"
+ ,
+   "es": "Subrayados punteados en términos bíblicos y palabras arcaicas",
+   "pt": "Sublinhados pontilhados em termos bíblicos e palavras arcaicas"
  },
  "settingsUnderlineScope": {
   "en": "Underline scope",
@@ -270,6 +369,9 @@
   "ro": "Ce se subliniază",
   "sw": "Wigo wa Mistari",
   "tl": "Saklaw ng Salungguhit"
+ ,
+   "es": "Underline scope",
+   "pt": "Underline scope"
  },
  "settingsScopeNamesTitle": {
   "en": "Names & terms only",
@@ -278,6 +380,9 @@
   "ro": "Doar nume și termeni",
   "sw": "Majina na istilahi pekee",
   "tl": "Mga pangalan at termino lamang"
+ ,
+   "es": "Solo nombres y términos",
+   "pt": "Apenas nomes e termos"
  },
  "settingsScopeNamesSubtitle": {
   "en": "Proper nouns and specific biblical concepts",
@@ -286,6 +391,9 @@
   "ro": "Nume proprii și concepte biblice specifice",
   "sw": "Majina halisi na dhana maalum za kibiblia",
   "tl": "Mga pangngalang pantangi at tiyak na konseptong biblikal"
+ ,
+   "es": "Nombres propios y conceptos bíblicos específicos",
+   "pt": "Nomes próprios e conceitos bíblicos específicos"
  },
  "settingsScopeTrickyTitle": {
   "en": "Names + tricky words (recommended)",
@@ -294,6 +402,9 @@
   "ro": "Nume + cuvinte dificile (recomandat)",
   "sw": "Majina + maneno magumu (Inapendekezwa)",
   "tl": "Pangalan + mahirap na salita (Inirerekomenda)"
+ ,
+   "es": "Names + tricky words (recommended)",
+   "pt": "Names + tricky words (recommended)"
  },
  "settingsScopeTrickySubtitle": {
   "en": "Includes archaic words with changed meanings (e.g., let, prevent)",
@@ -302,6 +413,9 @@
   "ro": "Include cuvinte arhaice cu sens schimbat (ex. let, prevent)",
   "sw": "Inajumuisha maneno ya kale yaliyobadilika maana (k.m. let, prevent)",
   "tl": "Kasama ang lumang salitang nagbago ang kahulugan (hal. let, prevent)"
+ ,
+   "es": "Incluye palabras arcaicas con significado cambiado (p. ej. let, prevent)",
+   "pt": "Inclui palavras arcaicas com significado alterado (ex.: let, prevent)"
  },
  "settingsScopeEverythingTitle": {
   "en": "Everything",
@@ -310,6 +424,9 @@
   "ro": "Tot",
   "sw": "Kila kitu",
   "tl": "Lahat"
+ ,
+   "es": "Todo",
+   "pt": "Tudo"
  },
  "settingsScopeEverythingSubtitle": {
   "en": "Highlights all archaic grammar (e.g., thee, thou, hath, unto)",
@@ -318,6 +435,9 @@
   "ro": "Marchează toată gramatica arhaică (ex. thee, thou, hath, unto)",
   "sw": "Huangazia sarufi yote ya kale (k.m. thee, thou, hath, unto)",
   "tl": "Minamarkahan ang lahat ng lumang gramatika (hal. thee, thou, hath, unto)"
+ ,
+   "es": "Resalta toda la gramática arcaica (ej.: thee, thou, hath, unto)",
+   "pt": "Realça toda a gramática arcaica (ex.: thee, thou, hath, unto)"
  },
  "settingsScopeDifficultTitle": {
   "en": "Difficult words only",
@@ -326,6 +446,9 @@
   "ro": "Doar cuvinte dificile",
   "sw": "Maneno magumu pekee",
   "tl": "Mahirap na salita lamang"
+ ,
+   "es": "Solo palabras difíciles",
+   "pt": "Somente palavras difíceis"
  },
  "settingsScopeDifficultSubtitle": {
   "en": "Archaic, misleading and contested words — easy words like god and son stay unmarked",
@@ -334,6 +457,9 @@
   "ro": "Cuvinte arhaice, înșelătoare și disputate — cele simple ca god și son rămân nemarcate",
   "sw": "Maneno ya kale, yanayopotosha na yenye utata — maneno rahisi kama god na son hayawekwi alama",
   "tl": "Luma, nakalilito at pinagtatalunang salita — hindi minamarkahan ang madadali gaya ng god at son"
+ ,
+   "es": "Archaic, misleading and contested words — easy words like god and son stay unmarked",
+   "pt": "Archaic, misleading and contested words — easy words like god and son stay unmarked"
  },
  "settingsScopeDifficultNamesTitle": {
   "en": "Difficult + names",
@@ -342,6 +468,9 @@
   "ro": "Dificile + nume",
   "sw": "Magumu + majina",
   "tl": "Mahirap + pangalan"
+ ,
+   "es": "Difíciles + nombres",
+   "pt": "Difíceis + nomes"
  },
  "settingsScopeDifficultNamesSubtitle": {
   "en": "Adds people and places (e.g., David, Jerusalem) to difficult words",
@@ -350,6 +479,9 @@
   "ro": "Adaugă persoane și locuri (ex. David, Ierusalim) la cuvintele dificile",
   "sw": "Huongeza watu na mahali (k.m. Daudi, Yerusalemu) kwa maneno magumu",
   "tl": "Idinadagdag ang tao at lugar (hal. David, Jerusalem) sa mahirap na salita"
+ ,
+   "es": "Adds people and places (e.g., David, Jerusalem) to difficult words",
+   "pt": "Adds people and places (e.g., David, Jerusalem) to difficult words"
  },
  "settingsOtherEnglishVersions": {
   "en": "Other English versions",
@@ -358,6 +490,9 @@
   "ro": "Alte versiuni în engleză",
   "sw": "Matoleo mengine ya Kiingereza",
   "tl": "Ibang bersyong Ingles"
+ ,
+   "es": "Otras versiones en inglés",
+   "pt": "Outras versões em inglês"
  },
  "settingsContestedOnlyTitle": {
   "en": "Contested words only",
@@ -366,6 +501,9 @@
   "ro": "Doar cuvinte disputate",
   "sw": "Maneno yenye utata pekee",
   "tl": "Pinagtatalunang salita lamang"
+ ,
+   "es": "Solo palabras controvertidas",
+   "pt": "Somente palavras contestadas"
  },
  "settingsContestedOnlySubtitle": {
   "en": "BBE, WEB and other English versions mark disputed words (e.g., hell, baptism)",
@@ -374,6 +512,9 @@
   "ro": "BBE, WEB și alte versiuni în engleză marchează cuvintele disputate (ex. hell, baptism)",
   "sw": "BBE, WEB na matoleo mengine ya Kiingereza huweka alama maneno yenye utata (k.m. hell, baptism)",
   "tl": "Minamarkahan ng BBE, WEB at ibang bersyong Ingles ang pinagtatalunang salita (hal. hell, baptism)"
+ ,
+   "es": "BBE, WEB and other English versions mark disputed words (e.g., hell, baptism)",
+   "pt": "BBE, WEB and other English versions mark disputed words (e.g., hell, baptism)"
  },
  "settingsFollowScopeTitle": {
   "en": "Follow underline scope",
@@ -382,6 +523,9 @@
   "ro": "Urmează setarea de subliniere",
   "sw": "Fuata wigo wa mistari",
   "tl": "Sundin ang saklaw ng salungguhit"
+ ,
+   "es": "Seguir el ámbito de subrayado",
+   "pt": "Seguir o âmbito de sublinhado"
  },
  "settingsFollowScopeSubtitle": {
   "en": "Same marking as KJV in every English version",
@@ -390,6 +534,9 @@
   "ro": "Același marcaj ca KJV în fiecare versiune în engleză",
   "sw": "Alama sawa na KJV katika kila toleo la Kiingereza",
   "tl": "Kaparehong marka ng KJV sa bawat bersyong Ingles"
+ ,
+   "es": "Same marking as KJV in every English version",
+   "pt": "Same marking as KJV in every English version"
  },
  "settingsNoUnderlinesTitle": {
   "en": "No underlines",
@@ -398,6 +545,9 @@
   "ro": "Fără sublinieri",
   "sw": "Hakuna mistari",
   "tl": "Walang salungguhit"
+ ,
+   "es": "Sin subrayados",
+   "pt": "Sem sublinhados"
  },
  "settingsNoUnderlinesSubtitle": {
   "en": "Other English versions show no dictionary marks",
@@ -406,6 +556,9 @@
   "ro": "Celelalte versiuni în engleză nu au marcaje",
   "sw": "Matoleo mengine ya Kiingereza hayaonyeshi alama za kamusi",
   "tl": "Walang marka ng diksiyonaryo sa ibang bersyong Ingles"
+ ,
+   "es": "Las otras versiones en inglés no muestran marcas de diccionario",
+   "pt": "As outras versões em inglês não mostram marcas de dicionário"
  },
  "settingsPopupStyle": {
   "en": "Popup style",
@@ -414,6 +567,9 @@
   "ro": "Stil fereastră",
   "sw": "Mtindo wa Dirisha",
   "tl": "Estilo ng Popup"
+ ,
+   "es": "Popup style",
+   "pt": "Popup style"
  },
  "settingsPopupStyleSubtitle": {
   "en": "How dictionary definitions and Strong's numbers are displayed",
@@ -422,6 +578,9 @@
   "ro": "Cum se afișează definițiile și numerele Strong",
   "sw": "Jinsi maana za kamusi na namba za Strong zinavyoonyeshwa",
   "tl": "Paano ipinapakita ang kahulugan at numero ng Strong"
+ ,
+   "es": "How dictionary definitions and Strong's numbers are displayed",
+   "pt": "How dictionary definitions and Strong's numbers are displayed"
  },
  "settingsPopupFloating": {
   "en": "Floating",
@@ -430,6 +589,9 @@
   "ro": "Flotant",
   "sw": "Inayoelea",
   "tl": "Lumulutang"
+ ,
+   "es": "Floating",
+   "pt": "Floating"
  },
  "settingsPopupBottomSheet": {
   "en": "Bottom sheet",
@@ -438,6 +600,9 @@
   "ro": "Panou inferior",
   "sw": "Paneli ya chini",
   "tl": "Bottom sheet"
+ ,
+   "es": "Bottom sheet",
+   "pt": "Bottom sheet"
  },
  "settingsSavedInMyLanguage": {
   "en": "Show saved items in my language",
@@ -446,6 +611,9 @@
   "ro": "Elemente salvate în limba mea",
   "sw": "Onyesha vilivyohifadhiwa kwa lugha yangu",
   "tl": "Ipakita ang naka-save sa aking wika"
+ ,
+   "es": "Mostrar los elementos guardados en mi idioma",
+   "pt": "Mostrar os itens guardados no meu idioma"
  },
  "settingsSavedInMyLanguageSubtitle": {
   "en": "Display Bookmarks, Highlights, and Commentary verses in your active primary translation",
@@ -454,6 +622,9 @@
   "ro": "Afișează semnele de carte, evidențierile și versetele comentate în traducerea principală",
   "sw": "Onyesha alamisho, maangazio na mistari ya maelezo katika tafsiri yako kuu",
   "tl": "Ipakita ang bookmark, highlight at talatang may komentaryo sa iyong pangunahing salin"
+ ,
+   "es": "Mostrar marcadores, resaltados y versos de comentario en tu traducción principal activa",
+   "pt": "Mostrar favoritos, realces e versículos de comentário na sua tradução principal ativa"
  },
  "settingsTranslationChips": {
   "en": "Show translation options on saved items",
@@ -462,6 +633,9 @@
   "ro": "Opțiuni de traducere pe elementele salvate",
   "sw": "Onyesha chaguo za tafsiri kwenye vilivyohifadhiwa",
   "tl": "Ipakita ang opsyon ng salin sa naka-save"
+ ,
+   "es": "Mostrar opciones de traducción en los elementos guardados",
+   "pt": "Mostrar opções de tradução nos itens guardados"
  },
  "settingsTranslationChipsSubtitle": {
   "en": "Adds a compact translation chip row to view saved verses in other translations",
@@ -470,6 +644,9 @@
   "ro": "Adaugă un rând compact pentru a vedea versetele salvate în alte traduceri",
   "sw": "Huongeza safu fupi ya kuona mistari iliyohifadhiwa katika tafsiri nyingine",
   "tl": "Nagdaragdag ng hanay para makita ang naka-save na talata sa ibang salin"
+ ,
+   "es": "Añade una fila compacta de chips de traducción para ver los versos guardados en otras traducciones",
+   "pt": "Adiciona uma fileira compacta de chips de tradução para ver os versículos salvos em outras traduções"
  },
  "settingsVerseActionStyle": {
   "en": "Verse action style",
@@ -478,6 +655,9 @@
   "ro": "Stilul acțiunilor pe verset",
   "sw": "Mtindo wa Vitendo vya Mstari",
   "tl": "Estilo ng Aksyon sa Talata"
+ ,
+   "es": "Verse action style",
+   "pt": "Verse action style"
  },
  "settingsVerseActionStyleSubtitle": {
   "en": "Sheet (compact) or Classic (tall dock) when verses are selected; Radial moves the long-press menu to a circular ring",
@@ -486,6 +666,9 @@
   "ro": "Panou (compact) sau Clasic (bară înaltă) la selectare; Radial afișează meniul de apăsare lungă în cerc",
   "sw": "Paneli (fupi) au Kawaida (ndefu) ukichagua mistari; Mviringo huweka menyu ya kubonyeza kwa muda katika duara",
   "tl": "Sheet (siksik) o Classic (mataas) kapag pumili ng talata; inilalagay ng Radial ang long-press menu sa bilog"
+ ,
+   "es": "Sheet (compact) or Classic (tall dock) when verses are selected; Radial moves the long-press menu to a circular ring",
+   "pt": "Sheet (compact) or Classic (tall dock) when verses are selected; Radial moves the long-press menu to a circular ring"
  },
  "settingsCommentaryStyle": {
   "en": "Commentary look",
@@ -494,6 +677,9 @@
   "ro": "Aspectul comentariului",
   "sw": "Muonekano wa ufafanuzi",
   "tl": "Itsura ng komentaryo"
+ ,
+   "es": "Commentary look",
+   "pt": "Commentary look"
  },
  "settingsCommentaryStyleSubtitle": {
   "en": "How commentary pages are laid out. Classic keeps the previous design.",
@@ -502,6 +688,9 @@
   "ro": "Aspectul paginilor de comentariu. Clasic păstrează designul anterior.",
   "sw": "Mpangilio wa kurasa za ufafanuzi. Ya kawaida huhifadhi muundo wa awali.",
   "tl": "Layout ng mga pahina ng komentaryo. Pinapanatili ng Klasiko ang dating disenyo."
+ ,
+   "es": "How commentary pages are laid out. Classic keeps the previous design.",
+   "pt": "How commentary pages are laid out. Classic keeps the previous design."
  },
  "settingsCommentaryRefined": {
   "en": "Refined",
@@ -510,6 +699,9 @@
   "ro": "Rafinat",
   "sw": "Imeboreshwa",
   "tl": "Pinino"
+ ,
+   "es": "Refined",
+   "pt": "Refined"
  },
  "settingsCommentaryClassic": {
   "en": "Classic",
@@ -518,6 +710,9 @@
   "ro": "Clasic",
   "sw": "Ya kawaida",
   "tl": "Klasiko"
+ ,
+   "es": "Classic",
+   "pt": "Classic"
  },
  "settingsActionSheet": {
   "en": "Sheet",
@@ -526,6 +721,9 @@
   "ro": "Panou",
   "sw": "Paneli",
   "tl": "Sheet"
+ ,
+   "es": "Sheet",
+   "pt": "Sheet"
  },
  "settingsActionClassic": {
   "en": "Classic",
@@ -534,6 +732,9 @@
   "ro": "Clasic",
   "sw": "Kawaida",
   "tl": "Classic"
+ ,
+   "es": "Classic",
+   "pt": "Classic"
  },
  "settingsActionMinimal": {
   "en": "Minimal",
@@ -542,6 +743,9 @@
   "ro": "Minimal",
   "sw": "Rahisi",
   "tl": "Minimal"
+ ,
+   "es": "Minimal",
+   "pt": "Minimal"
  },
  "settingsActionRaindrop": {
   "en": "Raindrop",
@@ -550,6 +754,9 @@
   "ro": "Picătură",
   "sw": "Tone la mvua",
   "tl": "Patak"
+ ,
+   "es": "Raindrop",
+   "pt": "Raindrop"
  },
  "settingsActionRadial": {
   "en": "Radial",
@@ -558,6 +765,9 @@
   "ro": "Radial",
   "sw": "Mviringo",
   "tl": "Radial"
+ ,
+   "es": "Radial",
+   "pt": "Radial"
  },
  "settingsKeepAwake": {
   "en": "Keep screen awake",
@@ -566,6 +776,9 @@
   "ro": "Ecran mereu aprins",
   "sw": "Skrini Ibaki Imewaka",
   "tl": "Panatilihing Bukas ang Screen"
+ ,
+   "es": "Keep screen awake",
+   "pt": "Keep screen awake"
  },
  "settingsKeepAwakeSubtitle": {
   "en": "Prevent device from sleeping while reading",
@@ -574,6 +787,9 @@
   "ro": "Împiedică intrarea în repaus în timpul lecturii",
   "sw": "Zuia kifaa kulala unaposoma",
   "tl": "Pigilan ang pag-sleep habang nagbabasa"
+ ,
+   "es": "Evitar que el dispositivo se duerma mientras lees",
+   "pt": "Impedir que o dispositivo adormeça enquanto lê"
  },
  "settingsRestartOnboarding": {
   "en": "Restart onboarding",
@@ -582,6 +798,9 @@
   "ro": "Reia configurarea",
   "sw": "Anza upya utangulizi",
   "tl": "Ulitin ang onboarding"
+ ,
+   "es": "Reiniciar la incorporación",
+   "pt": "Reiniciar a introdução"
  },
  "settingsRestartOnboardingSubtitle": {
   "en": "Replay the first-time setup",
@@ -590,6 +809,9 @@
   "ro": "Reia configurarea inițială",
   "sw": "Rudia mpangilio wa mara ya kwanza",
   "tl": "Ulitin ang unang setup"
+ ,
+   "es": "Repetir la configuración inicial",
+   "pt": "Repetir a configuração inicial"
  },
  "settingsRestartOnboardingDialogTitle": {
   "en": "Restart onboarding?",
@@ -598,6 +820,9 @@
   "ro": "Reiei configurarea?",
   "sw": "Anza upya utangulizi?",
   "tl": "Ulitin ang onboarding?"
+ ,
+   "es": "¿Reiniciar la incorporación?",
+   "pt": "Reiniciar a introdução?"
  },
  "settingsRestartOnboardingDialogBody": {
   "en": "This will replay the first-time setup. Your current theme, font, and translation stay unless you change them.",
@@ -606,6 +831,9 @@
   "ro": "Configurarea inițială va fi reluată. Tema, fontul și traducerea rămân la fel dacă nu le schimbi.",
   "sw": "Hii itarudia mpangilio wa mara ya kwanza. Mandhari, fonti na tafsiri yako vitabaki isipokuwa uvibadilishe.",
   "tl": "Uulitin nito ang unang setup. Mananatili ang iyong tema, font at salin maliban kung baguhin mo."
+ ,
+   "es": "Esto repetirá la configuración inicial. Tu tema, fuente y traducción actuales se mantienen salvo que los cambies.",
+   "pt": "Isto repete a configuração inicial. O seu tema, tipo de letra e tradução atuais mantêm-se, a menos que os altere."
  },
  "settingsRestart": {
   "en": "Restart",
@@ -614,6 +842,9 @@
   "ro": "Reia",
   "sw": "Anza upya",
   "tl": "Ulitin"
+ ,
+   "es": "Reiniciar",
+   "pt": "Reiniciar"
  },
  "settingsAppearanceText": {
   "en": "Appearance & text",
@@ -622,6 +853,9 @@
   "ro": "Aspect și text",
   "sw": "Mwonekano na maandishi",
   "tl": "Itsura at teksto"
+ ,
+   "es": "Apariencia y texto",
+   "pt": "Aparência e texto"
  },
  "settingsAppearanceTextSubtitle": {
   "en": "Theme, fonts, sizes and reading colors",
@@ -630,6 +864,9 @@
   "ro": "Temă, fonturi, mărimi și culori",
   "sw": "Mandhari, fonti, ukubwa na rangi",
   "tl": "Tema, font, laki at kulay"
+ ,
+   "es": "Tema, fuentes, tamaños y colores de lectura",
+   "pt": "Tema, tipos de letra, tamanhos e cores de leitura"
  },
  "settingsSabbathTitle": {
   "en": "Friday sunset reminder",
@@ -638,6 +875,9 @@
   "ro": "Memento apus de vineri",
   "sw": "Kikumbusho cha Machweo ya Ijumaa",
   "tl": "Paalala sa Paglubog ng Araw tuwing Biyernes"
+ ,
+   "es": "Friday sunset reminder",
+   "pt": "Friday sunset reminder"
  },
  "settingsSabbathSubtitle": {
   "en": "Welcome the Sabbath at your local sunset time.",
@@ -646,6 +886,9 @@
   "ro": "Primește Sabatul la apusul soarelui local.",
   "sw": "Karibisha Sabato wakati wa machweo mahali ulipo.",
   "tl": "Salubungin ang Sabbath sa paglubog ng araw sa inyong lugar."
+ ,
+   "es": "Bienvenido al sábado a la hora del atardecer local.",
+   "pt": "Bem-vindo ao sábado à hora do pôr do sol local."
  },
  "settingsLocation": {
   "en": "Location",
@@ -654,6 +897,9 @@
   "ro": "Locație",
   "sw": "Mahali",
   "tl": "Lokasyon"
+ ,
+   "es": "Ubicación",
+   "pt": "Localização"
  },
  "settingsLocationNotSet": {
   "en": "Not set (tap to set)",
@@ -662,6 +908,9 @@
   "ro": "Nesetată (atinge pentru a seta)",
   "sw": "Haijawekwa (Gusa kuweka)",
   "tl": "Hindi nakatakda (I-tap para itakda)"
+ ,
+   "es": "Not set (tap to set)",
+   "pt": "Not set (tap to set)"
  },
  "settingsDailyReminderTitle": {
   "en": "Daily reading reminder",
@@ -670,6 +919,9 @@
   "ro": "Memento lectură zilnică",
   "sw": "Kikumbusho cha Kusoma Kila Siku",
   "tl": "Paalala sa Araw-araw na Pagbasa"
+ ,
+   "es": "Daily reading reminder",
+   "pt": "Daily reading reminder"
  },
  "settingsDailyReminderSubtitle": {
   "en": "A daily nudge to spend time in the Word.",
@@ -678,6 +930,9 @@
   "ro": "Un îndemn zilnic să petreci timp în Cuvânt.",
   "sw": "Kikumbusho cha kila siku kutumia muda katika Neno.",
   "tl": "Araw-araw na paalala na maglaan ng oras sa Salita."
+ ,
+   "es": "Un recordatorio diario para pasar tiempo en la Palabra.",
+   "pt": "Um lembrete diário para dedicar tempo à Palabra."
  },
  "settingsTime": {
   "en": "Time",
@@ -686,6 +941,9 @@
   "ro": "Ora",
   "sw": "Saa",
   "tl": "Oras"
+ ,
+   "es": "Hora",
+   "pt": "Hora"
  },
  "settingsWeeklyReminderTitle": {
   "en": "Custom weekly reminder",
@@ -694,6 +952,9 @@
   "ro": "Memento săptămânal",
   "sw": "Kikumbusho cha Kila Wiki",
   "tl": "Lingguhang Paalala"
+ ,
+   "es": "Custom weekly reminder",
+   "pt": "Custom weekly reminder"
  },
  "settingsWeeklyReminderSubtitle": {
   "en": "Set a specific day and time each week for deeper study.",
@@ -702,6 +963,9 @@
   "ro": "Alege o zi și o oră în fiecare săptămână pentru studiu aprofundat.",
   "sw": "Weka siku na saa maalum kila wiki kwa kujifunza zaidi.",
   "tl": "Pumili ng araw at oras bawat linggo para sa mas malalim na pag-aaral."
+ ,
+   "es": "Fija un día y una hora cada semana para un estudio más profundo.",
+   "pt": "Defina um dia e uma hora específica cada semana para um estudo mais profundo."
  },
  "settingsDayAndTime": {
   "en": "Day & time",
@@ -710,6 +974,9 @@
   "ro": "Zi și oră",
   "sw": "Siku na Saa",
   "tl": "Araw at Oras"
+ ,
+   "es": "Day & time",
+   "pt": "Day & time"
  },
  "settingsChooseDay": {
   "en": "Choose day",
@@ -718,6 +985,9 @@
   "ro": "Alege ziua",
   "sw": "Chagua Siku",
   "tl": "Pumili ng Araw"
+ ,
+   "es": "Choose day",
+   "pt": "Choose day"
  },
  "settingsShowReadingTips": {
   "en": "Show reading tips",
@@ -726,6 +996,9 @@
   "ro": "Afișează sfaturi de lectură",
   "sw": "Onyesha vidokezo vya kusoma",
   "tl": "Ipakita ang mga tip sa pagbasa"
+ ,
+   "es": "Mostrar consejos de lectura",
+   "pt": "Mostrar dicas de leitura"
  },
  "settingsShowReadingTipsSubtitle": {
   "en": "Show guided hints for reading actions like highlighting and swiping",
@@ -734,6 +1007,9 @@
   "ro": "Indicii pentru acțiuni precum evidențierea și glisarea",
   "sw": "Vidokezo vya vitendo kama kuangazia na kutelezesha",
   "tl": "Gabay para sa pag-highlight, pag-swipe at iba pa"
+ ,
+   "es": "Mostrar consejos guiados para acciones de lectura como resaltar y deslizar",
+   "pt": "Mostrar dicas guiadas para ações de leitura como realçar e deslizar"
  },
  "settingsNavSteps": {
   "en": "Navigation steps",
@@ -742,6 +1018,9 @@
   "ro": "Pași de navigare",
   "sw": "Hatua za Urambazaji",
   "tl": "Mga Hakbang sa Nabigasyon"
+ ,
+   "es": "Navigation steps",
+   "pt": "Navigation steps"
  },
  "settingsNavStepsSubtitle": {
   "en": "How many steps to reach a verse. 2-step: Book → Chapter. 3-step: Book → Chapter → Verse. 4-step: Testament → Book → Chapter → Verse.",
@@ -750,6 +1029,9 @@
   "ro": "Câți pași până la un verset. 2: Carte → Capitol. 3: Carte → Capitol → Verset. 4: Testament → Carte → Capitol → Verset.",
   "sw": "Hatua ngapi kufikia mstari. 2: Kitabu → Sura. 3: Kitabu → Sura → Mstari. 4: Agano → Kitabu → Sura → Mstari.",
   "tl": "Ilang hakbang bago marating ang talata. 2: Aklat → Kabanata. 3: Aklat → Kabanata → Talata. 4: Tipan → Aklat → Kabanata → Talata."
+ ,
+   "es": "How many steps to reach a verse. 2-step: Book → Chapter. 3-step: Book → Chapter → Verse. 4-step: Testament → Book → Chapter → Verse.",
+   "pt": "How many steps to reach a verse. 2-step: Book → Chapter. 3-step: Book → Chapter → Verse. 4-step: Testament → Book → Chapter → Verse."
  },
  "settingsAutoClose": {
   "en": "Auto-close sheet on final selection",
@@ -758,6 +1040,9 @@
   "ro": "Închide după ultima selecție",
   "sw": "Funga paneli baada ya chaguo la mwisho",
   "tl": "Isara pagkatapos ng huling pili"
+ ,
+   "es": "Cerrar automáticamente el panel en la selección final",
+   "pt": "Fechar automaticamente o painel na seleção final"
  },
  "settingsAutoCloseSubtitle": {
   "en": "Automatically dismiss the picker after the last step",
@@ -766,6 +1051,9 @@
   "ro": "Închide automat selectorul după ultimul pas",
   "sw": "Funga kiteuzi kiotomatiki baada ya hatua ya mwisho",
   "tl": "Kusang isara ang picker pagkatapos ng huling hakbang"
+ ,
+   "es": "Descartar automáticamente el selector tras el último paso",
+   "pt": "Dispensar automaticamente o seletor após o último passo"
  },
  "settingsSelectorHeight": {
   "en": "Book selector height",
@@ -774,6 +1062,9 @@
   "ro": "Înălțimea selectorului de cărți",
   "sw": "Urefu wa kiteuzi cha kitabu",
   "tl": "Taas ng pagpili ng aklat"
+ ,
+   "es": "Altura del selector de libro",
+   "pt": "Altura do seletor de livro"
  },
  "settingsSelectorHeightSubtitle": {
   "en": "Control how far up the book/chapter sheet opens",
@@ -782,6 +1073,9 @@
   "ro": "Cât de sus se deschide panoul carte/capitol",
   "sw": "Jinsi paneli ya kitabu/sura inavyofunguka juu",
   "tl": "Gaano kataas bubukas ang aklat/kabanata"
+ ,
+   "es": "Controla cuánto se abre la hoja de libro/capítulo",
+   "pt": "Controle quão alto o painel de livro/capítulo abre"
  },
  "settingsHeightHalf": {
   "en": "Half",
@@ -790,6 +1084,9 @@
   "ro": "Jumătate",
   "sw": "Nusu",
   "tl": "Kalahati"
+ ,
+   "es": "Mitad",
+   "pt": "Metade"
  },
  "settingsHeightFull": {
   "en": "Full",
@@ -798,6 +1095,9 @@
   "ro": "Complet",
   "sw": "Kamili",
   "tl": "Buo"
+ ,
+   "es": "Full",
+   "pt": "Full"
  },
  "settingsAutoOpenSingle": {
   "en": "Auto-open single search result",
@@ -806,6 +1106,9 @@
   "ro": "Deschide rezultatul unic",
   "sw": "Fungua tokeo moja moja kwa moja",
   "tl": "Kusang buksan ang iisang resulta"
+ ,
+   "es": "Abrir automáticamente el único resultado de búsqueda",
+   "pt": "Abrir automaticamente o único resultado de busca"
  },
  "settingsAutoOpenSingleSubtitle": {
   "en": "Automatically navigate when a search returns exactly one result",
@@ -814,6 +1117,9 @@
   "ro": "Mergi direct când căutarea are un singur rezultat",
   "sw": "Nenda moja kwa moja utafutaji ukipata tokeo moja tu",
   "tl": "Direktang pumunta kapag iisa lang ang resulta"
+ ,
+   "es": "Navegar automáticamente cuando una búsqueda devuelve exactamente un resultado",
+   "pt": "Navegar automaticamente quando uma busca retorna exatamente um resultado"
  },
  "settingsIncludeNotes": {
   "en": "Include personal notes in search",
@@ -822,6 +1128,9 @@
   "ro": "Include notițele în căutare",
   "sw": "Jumuisha maelezo yangu kwenye utafutaji",
   "tl": "Isama ang personal na tala sa paghahanap"
+ ,
+   "es": "Incluir tus notas personales en la búsqueda",
+   "pt": "Incluir as suas notas pessoais na pesquisa"
  },
  "settingsIncludeNotesSubtitle": {
   "en": "Allow search to look through your personal notes",
@@ -830,6 +1139,9 @@
   "ro": "Permite căutarea în notițele tale",
   "sw": "Ruhusu utafutaji kupitia maelezo yako",
   "tl": "Payagang hanapin sa iyong mga tala"
+ ,
+   "es": "Permitir que la búsqueda busque en tus notas personales",
+   "pt": "Permitir que a busca pesquise nas suas notas pessoais"
  },
  "settingsWholeWords": {
   "en": "Match whole words only",
@@ -838,6 +1150,9 @@
   "ro": "Doar cuvinte întregi",
   "sw": "Maneno kamili pekee",
   "tl": "Buong salita lamang"
+ ,
+   "es": "Coincidir solo palabras completas",
+   "pt": "Correspondência apenas de palavras inteiras"
  },
  "settingsWholeWordsSubtitle": {
   "en": "Only find exact word matches (disables partial/prefix matching)",
@@ -846,6 +1161,9 @@
   "ro": "Doar cuvinte exacte (dezactivează potrivirea parțială)",
   "sw": "Tafuta maneno kamili tu (huzima ulinganisho wa sehemu)",
   "tl": "Eksaktong salita lamang (walang bahagyang tugma)"
+ ,
+   "es": "Buscar solo coincidencias exactas de palabras (desactiva las coincidencias parciales o por prefijo)",
+   "pt": "Procurar apenas correspondências exatas de palavras (desativa as correspondências parciais ou por prefixo)"
  },
  "settingsFuzzySearch": {
   "en": "Forgiving search",
@@ -854,6 +1172,9 @@
   "ro": "Căutare tolerantă",
   "sw": "Utafutaji wenye uvumilivu",
   "tl": "Mapagpatawad na paghahanap"
+ ,
+   "es": "Búsqueda indulgente",
+   "pt": "Busca indulgente"
  },
  "settingsFuzzySearchSubtitle": {
   "en": "Also show close matches for typos (e.g. Jhon finds John)",
@@ -862,6 +1183,9 @@
   "ro": "Arată și potriviri apropiate la greșeli (ex. Jhon găsește John)",
   "sw": "Onyesha pia yanayokaribiana kwa makosa ya tahajia (k.m. Jhon hupata John)",
   "tl": "Ipakita rin ang malapit na tugma sa mali (hal. Jhon → John)"
+ ,
+   "es": "Mostrar también coincidencias cercanas para errores de escritura (ej.: Jhon encuentra John)",
+   "pt": "Mostrar também correspondências próximas para erros de digitação (ex.: Jhon encontra John)"
  },
  "settingsDefaultScopes": {
   "en": "Default search scopes",
@@ -870,6 +1194,9 @@
   "ro": "Domenii de căutare implicite",
   "sw": "Wigo wa Utafutaji wa Msingi",
   "tl": "Default na Saklaw ng Paghahanap"
+ ,
+   "es": "Default search scopes",
+   "pt": "Default search scopes"
  },
  "settingsOldTestament": {
   "en": "Old Testament",
@@ -878,6 +1205,9 @@
   "ro": "Vechiul Testament",
   "sw": "Agano la Kale",
   "tl": "Lumang Tipan"
+ ,
+   "es": "Antiguo Testamento",
+   "pt": "Antigo Testamento"
  },
  "settingsNewTestament": {
   "en": "New Testament",
@@ -886,6 +1216,9 @@
   "ro": "Noul Testament",
   "sw": "Agano Jipya",
   "tl": "Bagong Tipan"
+ ,
+   "es": "Nuevo Testamento",
+   "pt": "Novo Testamento"
  },
  "settingsCommentary": {
   "en": "Commentary",
@@ -894,6 +1227,9 @@
   "ro": "Comentariu",
   "sw": "Maelezo",
   "tl": "Komentaryo"
+ ,
+   "es": "Comentario",
+   "pt": "Comentário"
  },
  "settingsGestures": {
   "en": "Gestures",
@@ -902,6 +1238,9 @@
   "ro": "Gesturi",
   "sw": "Ishara",
   "tl": "Mga Kumpas"
+ ,
+   "es": "Gestos",
+   "pt": "Gestos"
  },
  "settingsPullDownHome": {
   "en": "Pull down on Home",
@@ -910,6 +1249,9 @@
   "ro": "Trage în jos pe Acasă",
   "sw": "Vuta chini Nyumbani",
   "tl": "Hilahin pababa sa Home"
+ ,
+   "es": "Desliza hacia abajo en Inicio",
+   "pt": "Puxar para baixo no Início"
  },
  "settingsPullDownHomeSubtitle": {
   "en": "Pull down past the top to open Settings or Appearance",
@@ -918,6 +1260,9 @@
   "ro": "Trage peste partea de sus pentru Setări sau Aspect",
   "sw": "Vuta chini kupita juu kufungua Mipangilio au Mwonekano",
   "tl": "Hilahin lampas sa itaas para buksan ang Settings o Itsura"
+ ,
+   "es": "Desliza hacia abajo más allá del borde superior para abrir Ajustes o Apariencia",
+   "pt": "Puxe para baixo para além do topo para abrir Definições ou Aparência"
  },
  "settingsPullDownOpens": {
   "en": "Pull-down opens",
@@ -926,6 +1271,9 @@
   "ro": "Gestul deschide",
   "sw": "Kuvuta hufungua",
   "tl": "Binubuksan ng paghila"
+ ,
+   "es": "Deslizar hacia abajo abre",
+   "pt": "Puxar para baixo abre"
  },
  "settingsPullDownOpensSubtitle": {
   "en": "Destination of the Home pull-down gesture",
@@ -934,6 +1282,9 @@
   "ro": "Destinația gestului pe Acasă",
   "sw": "Mahali ishara ya kuvuta Nyumbani inapofungua",
   "tl": "Patutunguhan ng paghila sa Home"
+ ,
+   "es": "Destino del gesto de arrastrar hacia abajo en Inicio",
+   "pt": "Destino do gesto de puxar para baixo na página inicial"
  },
  "settingsAppearance": {
   "en": "Appearance",
@@ -942,6 +1293,9 @@
   "ro": "Aspect",
   "sw": "Mwonekano",
   "tl": "Itsura"
+ ,
+   "es": "Apariencia",
+   "pt": "Aparência"
  },
  "settingsSwipeLeftHome": {
   "en": "Swipe left on Home",
@@ -950,6 +1304,9 @@
   "ro": "Glisează la stânga pe Acasă",
   "sw": "Telezesha kushoto Nyumbani",
   "tl": "Mag-swipe pakaliwa sa Home"
+ ,
+   "es": "Desliza a la izquierda en Inicio",
+   "pt": "Deslize para a esquerda no Início"
  },
  "settingsSwipeLeftHomeSubtitle": {
   "en": "Swipe left to jump to the Read tab",
@@ -958,6 +1315,9 @@
   "ro": "Glisează la stânga pentru Citește",
   "sw": "Telezesha kushoto kwenda Soma",
   "tl": "Mag-swipe pakaliwa papunta sa Basahin"
+ ,
+   "es": "Desliza a la izquierda para ir a la pestaña Leer",
+   "pt": "Deslize para a esquerda para ir para o separador Ler"
  },
  "settingsLongPressNav": {
   "en": "Long-press button to open navigation",
@@ -966,6 +1326,9 @@
   "ro": "Apăsare lungă pentru navigare",
   "sw": "Bonyeza kwa muda kufungua urambazaji",
   "tl": "Pindutin nang matagal para sa nabigasyon"
+ ,
+   "es": "Mantén pulsado para abrir la navegación",
+   "pt": "Prima longamente para abrir a navegação"
  },
  "settingsLongPressNavSubtitle": {
   "en": "Long-press the bottom-right button to quickly open the Book/Chapter selector.",
@@ -974,6 +1337,9 @@
   "ro": "Apasă lung butonul din dreapta jos pentru selectorul Carte/Capitol.",
   "sw": "Bonyeza kwa muda kitufe cha chini kulia kufungua kiteuzi cha Kitabu/Sura.",
   "tl": "Pindutin nang matagal ang button sa kanang ibaba para sa Aklat/Kabanata."
+ ,
+   "es": "Mantén pulsado el botón inferior derecho para abrir rápido el selector de Libro/Capítulo.",
+   "pt": "Prima longamente o botão inferior direito para abrir rapidamente o seletor Livro/Capítulo."
  },
  "settingsBbeNoteTitle": {
   "en": "BBE translation note",
@@ -982,6 +1348,9 @@
   "ro": "Notă despre traducerea BBE",
   "sw": "Dokezo la Tafsiri ya BBE",
   "tl": "Tala sa Salin ng BBE"
+ ,
+   "es": "BBE translation note",
+   "pt": "BBE translation note"
  },
  "settingsBackup": {
   "en": "Back up my data",
@@ -990,6 +1359,9 @@
   "ro": "Salvează datele mele",
   "sw": "Hifadhi nakala ya data yangu",
   "tl": "I-back up ang aking data"
+ ,
+   "es": "Copia de seguridad de mis datos",
+   "pt": "Fazer backup dos meus dados"
  },
  "settingsBackupSubtitle": {
   "en": "Export notes, highlights, and settings",
@@ -998,6 +1370,9 @@
   "ro": "Exportă notițe, evidențieri și setări",
   "sw": "Hamisha maelezo, maangazio na mipangilio",
   "tl": "I-export ang tala, highlight at setting"
+ ,
+   "es": "Exportar notas, resaltados y ajustes",
+   "pt": "Exportar notas, realces e configurações"
  },
  "settingsRestoreBackup": {
   "en": "Restore from backup",
@@ -1006,6 +1381,9 @@
   "ro": "Restaurează din copie",
   "sw": "Rejesha kutoka nakala",
   "tl": "I-restore mula sa backup"
+ ,
+   "es": "Restaurar desde una copia de seguridad",
+   "pt": "Restaurar a partir de uma cópia de segurança"
  },
  "settingsRestoreBackupSubtitle": {
   "en": "Import your data from a backup JSON",
@@ -1014,6 +1392,9 @@
   "ro": "Importă datele dintr-o copie JSON",
   "sw": "Leta data yako kutoka nakala ya JSON",
   "tl": "I-import ang data mula sa backup JSON"
+ ,
+   "es": "Importa tus datos desde una copia de seguridad JSON",
+   "pt": "Importe os seus dados a partir de uma cópia de segurança JSON"
  },
  "settingsRestoreBackupDialogTitle": {
   "en": "Restore from backup",
@@ -1022,6 +1403,9 @@
   "ro": "Restaurează din copie",
   "sw": "Rejesha kutoka Nakala",
   "tl": "I-restore mula sa Backup"
+ ,
+   "es": "Restaurar desde una copia de seguridad",
+   "pt": "Restaurar a partir de uma cópia de segurança"
  },
  "settingsRestoreHint": {
   "en": "Paste your backup JSON here...",
@@ -1030,6 +1414,9 @@
   "ro": "Lipește aici copia JSON…",
   "sw": "Bandika JSON ya nakala hapa…",
   "tl": "I-paste dito ang backup JSON…"
+ ,
+   "es": "Pega aquí tu copia de seguridad JSON...",
+   "pt": "Cole aqui a sua cópia de segurança JSON..."
  },
  "settingsRestore": {
   "en": "Restore",
@@ -1038,6 +1425,9 @@
   "ro": "Restaurează",
   "sw": "Rejesha",
   "tl": "I-restore"
+ ,
+   "es": "Restaurar",
+   "pt": "Restaurar"
  },
  "settingsClearCache": {
   "en": "Clear cache/downloaded data",
@@ -1046,6 +1436,9 @@
   "ro": "Golește cache-ul și descărcările",
   "sw": "Futa akiba/data iliyopakuliwa",
   "tl": "I-clear ang cache/na-download"
+ ,
+   "es": "Borrar caché/datos descargados",
+   "pt": "Limpar cache/dados baixados"
  },
  "settingsClearCacheSubtitle": {
   "en": "Free up space by removing cached files",
@@ -1054,6 +1447,9 @@
   "ro": "Eliberează spațiu ștergând fișierele din cache",
   "sw": "Ongeza nafasi kwa kufuta faili za akiba",
   "tl": "Magbakante ng espasyo sa pagbura ng cache"
+ ,
+   "es": "Libre espacio eliminando archivos en caché",
+   "pt": "Libere espaço removendo arquivos em cache"
  },
  "settingsNotImplemented": {
   "en": "Not yet implemented",
@@ -1062,6 +1458,9 @@
   "ro": "Încă nu este disponibil",
   "sw": "Bado haipatikani",
   "tl": "Hindi pa available"
+ ,
+   "es": "Aún no implementado",
+   "pt": "Ainda não implementado"
  },
  "settingsResetSettings": {
   "en": "Reset settings",
@@ -1070,6 +1469,9 @@
   "ro": "Resetează setările",
   "sw": "Weka upya mipangilio",
   "tl": "I-reset ang mga setting"
+ ,
+   "es": "Restablecer los ajustes",
+   "pt": "Repor as definições"
  },
  "settingsResetSettingsSubtitle": {
   "en": "Restore original app settings (content is kept)",
@@ -1078,6 +1480,9 @@
   "ro": "Revino la setările inițiale (conținutul rămâne)",
   "sw": "Rejesha mipangilio asili (maudhui yanabaki)",
   "tl": "Ibalik ang orihinal na setting (mananatili ang nilalaman)"
+ ,
+   "es": "Restaurar los ajustes originales de la aplicación (se conserva el contenido)",
+   "pt": "Restaurar as definições originais da aplicação (o conteúdo é mantido)"
  },
  "settingsResetDialogTitle": {
   "en": "Reset settings?",
@@ -1086,6 +1491,9 @@
   "ro": "Resetezi setările?",
   "sw": "Weka upya mipangilio?",
   "tl": "I-reset ang mga setting?"
+ ,
+   "es": "¿Restablecer los ajustes?",
+   "pt": "Repor as definições?"
  },
  "settingsResetDialogBody": {
   "en": "Reset all settings to default? This won't affect your bookmarks, notes, or highlights.",
@@ -1094,6 +1502,9 @@
   "ro": "Resetezi toate setările? Semnele de carte, notițele și evidențierile nu vor fi afectate.",
   "sw": "Weka upya mipangilio yote? Alamisho, maelezo na maangazio yako hayataathirika.",
   "tl": "I-reset ang lahat ng setting? Hindi maaapektuhan ang iyong bookmark, tala o highlight."
+ ,
+   "es": "Reset all settings to default? This won't affect your bookmarks, notes, or highlights.",
+   "pt": "Reset all settings to default? This won't affect your bookmarks, notes, or highlights."
  },
  "settingsResetDone": {
   "en": "Settings reset to default.",
@@ -1102,6 +1513,9 @@
   "ro": "Setările au fost resetate.",
   "sw": "Mipangilio imewekwa upya.",
   "tl": "Na-reset ang mga setting."
+ ,
+   "es": "Ajustes restablecidos a los valores predeterminados.",
+   "pt": "Definições repostas para o predefinido."
  },
  "settingsReset": {
   "en": "Reset",
@@ -1110,6 +1524,9 @@
   "ro": "Resetează",
   "sw": "Weka upya",
   "tl": "I-reset"
+ ,
+   "es": "Restablecer",
+   "pt": "Repor"
  },
  "settingsVersion": {
   "en": "Version",
@@ -1118,6 +1535,9 @@
   "ro": "Versiune",
   "sw": "Toleo",
   "tl": "Bersyon"
+ ,
+   "es": "Versión",
+   "pt": "Versão"
  },
  "settingsUnknown": {
   "en": "Unknown",
@@ -1126,6 +1546,9 @@
   "ro": "Necunoscut",
   "sw": "Haijulikani",
   "tl": "Hindi alam"
+ ,
+   "es": "Desconocido",
+   "pt": "Desconhecido"
  },
  "settingsStorage": {
   "en": "Storage & downloads",
@@ -1134,6 +1557,9 @@
   "ro": "Stocare și descărcări",
   "sw": "Hifadhi na vipakuliwa",
   "tl": "Storage at download"
+ ,
+   "es": "Almacenamiento y descargas",
+   "pt": "Armazenamento e transferências"
  },
  "settingsStorageSubtitle": {
   "en": "Cache, downloaded translations and what can be freed",
@@ -1142,6 +1568,9 @@
   "ro": "Cache, traduceri descărcate și spațiu eliberabil",
   "sw": "Akiba, tafsiri zilizopakuliwa na nafasi inayoweza kuachiliwa",
   "tl": "Cache, na-download na salin at maaaring bakantehin"
+ ,
+   "es": "Caché, traducciones descargadas y lo que se puede liberar",
+   "pt": "Cache, traduções baixadas e o que pode ser liberado"
  },
  "settingsSendFeedback": {
   "en": "Send feedback",
@@ -1150,6 +1579,9 @@
   "ro": "Trimite feedback",
   "sw": "Tuma Maoni",
   "tl": "Magpadala ng Feedback"
+ ,
+   "es": "Send feedback",
+   "pt": "Send feedback"
  },
  "settingsCrashReports": {
   "en": "Send crash reports",
@@ -1158,6 +1590,9 @@
   "ro": "Trimite rapoarte de erori",
   "sw": "Tuma ripoti za hitilafu",
   "tl": "Magpadala ng crash report"
+ ,
+   "es": "Send crash reports",
+   "pt": "Send crash reports"
  },
  "settingsCrashReportsSubtitle": {
   "en": "Anonymous crash details help fix bugs. No Bible reading, notes or personal content is included.",
@@ -1166,6 +1601,9 @@
   "ro": "Detaliile anonime ajută la remedierea erorilor. Nu se includ lecturi biblice, notițe sau date personale.",
   "sw": "Maelezo yasiyo na jina husaidia kurekebisha hitilafu. Hakuna usomaji wa Biblia, maelezo wala maudhui binafsi.",
   "tl": "Nakatutulong ang anonimong detalye sa pag-aayos ng bug. Walang pagbasa ng Biblia, tala o personal na nilalaman."
+ ,
+   "es": "Anonymous crash details help fix bugs. No Bible reading, notes or personal content is included.",
+   "pt": "Anonymous crash details help fix bugs. No Bible reading, notes or personal content is included."
  },
  "settingsPrivacyPolicy": {
   "en": "Privacy policy",
@@ -1174,6 +1612,9 @@
   "ro": "Politica de confidențialitate",
   "sw": "Sera ya Faragha",
   "tl": "Patakaran sa Privacy"
+ ,
+   "es": "Privacy policy",
+   "pt": "Privacy policy"
  },
  "settingsCredits": {
   "en": "Credits & sources",
@@ -1182,6 +1623,9 @@
   "ro": "Credite și surse",
   "sw": "Shukrani na vyanzo",
   "tl": "Credits at pinagmulan"
+ ,
+   "es": "Credits & sources",
+   "pt": "Credits & sources"
  },
  "settingsCreditsSubtitle": {
   "en": "Bible translations, commentary, study data, fonts and licenses",
@@ -1190,6 +1634,9 @@
   "ro": "Traduceri biblice, comentarii, date de studiu, fonturi și licențe",
   "sw": "Tafsiri za Biblia, maelezo, data ya kujifunza, fonti na leseni",
   "tl": "Salin ng Biblia, komentaryo, datos sa pag-aaral, font at lisensya"
+ ,
+   "es": "Bible translations, commentary, study data, fonts and licenses",
+   "pt": "Bible translations, commentary, study data, fonts and licenses"
  },
  "settingsSetSunsetLocation": {
   "en": "Set location for sunset",
@@ -1198,6 +1645,9 @@
   "ro": "Locația pentru apus",
   "sw": "Weka Mahali pa Machweo",
   "tl": "Itakda ang Lokasyon ng Paglubog ng Araw"
+ ,
+   "es": "Set location for sunset",
+   "pt": "Set location for sunset"
  },
  "settingsCurrentLocationGps": {
   "en": "Current location (GPS)",
@@ -1206,6 +1656,9 @@
   "ro": "Locația actuală (GPS)",
   "sw": "Mahali Ulipo (GPS)",
   "tl": "Kasalukuyang Lokasyon (GPS)"
+ ,
+   "es": "Current location (GPS)",
+   "pt": "Current location (GPS)"
  },
  "settingsUseMyLocation": {
   "en": "Use my current location",
@@ -1214,6 +1667,9 @@
   "ro": "Folosește locația mea",
   "sw": "Tumia mahali nilipo",
   "tl": "Gamitin ang aking lokasyon"
+ ,
+   "es": "Usar mi ubicación actual",
+   "pt": "Usar a minha localização atual"
  },
  "settingsOrSelectCity": {
   "en": "OR select a major city",
@@ -1222,6 +1678,9 @@
   "ro": "SAU alege un oraș mare",
   "sw": "AU chagua jiji kubwa",
   "tl": "O pumili ng malaking lungsod"
+ ,
+   "es": "O selecciona una ciudad importante",
+   "pt": "OU selecione uma cidade importante"
  },
  "settingsTypography": {
   "en": "Typography",
@@ -1230,6 +1689,9 @@
   "ro": "Tipografie",
   "sw": "Mpangilio wa Herufi",
   "tl": "Tipograpiya"
+ ,
+   "es": "Tipografía",
+   "pt": "Tipografia"
  },
  "settingsTheme": {
   "en": "Theme",
@@ -1238,6 +1700,9 @@
   "ro": "Temă",
   "sw": "Mandhari",
   "tl": "Tema"
+ ,
+   "es": "Tema",
+   "pt": "Tema"
  },
  "settingsSearchSettings": {
   "en": "Search settings",
@@ -1246,6 +1711,9 @@
   "ro": "Setări de căutare",
   "sw": "Mipangilio ya Utafutaji",
   "tl": "Mga Setting sa Paghahanap"
+ ,
+   "es": "Search settings",
+   "pt": "Search settings"
  },
  "settingsMatchTypeHeader": {
   "en": "MATCH TYPE",
@@ -1254,6 +1722,9 @@
   "ro": "POTRIVIRE",
   "sw": "AINA YA ULINGANISHO",
   "tl": "URI NG TUGMA"
+ ,
+   "es": "TIPO DE COINCIDENCIA",
+   "pt": "TIPO DE CORRESPONDÊNCIA"
  },
  "settingsExactMatch": {
   "en": "Exact match",
@@ -1262,6 +1733,9 @@
   "ro": "Potrivire exactă",
   "sw": "Ulinganisho Kamili",
   "tl": "Eksaktong Tugma"
+ ,
+   "es": "Exact match",
+   "pt": "Exact match"
  },
  "settingsExactMatchSubtitle": {
   "en": "Only match the exact phrase",
@@ -1270,6 +1744,9 @@
   "ro": "Doar expresia exactă",
   "sw": "Kifungu kamili pekee",
   "tl": "Eksaktong parirala lamang"
+ ,
+   "es": "Coincidir solo la frase exacta",
+   "pt": "Correspondência apenas da frase exata"
  },
  "settingsScopeHeader": {
   "en": "SCOPE",
@@ -1278,6 +1755,9 @@
   "ro": "DOMENIU",
   "sw": "WIGO",
   "tl": "SAKLAW"
+ ,
+   "es": "ÁMBITO",
+   "pt": "ÂMBITO"
  },
  "settingsDisabledBookFilter": {
   "en": "Disabled (book filter active)",
@@ -1286,6 +1766,9 @@
   "ro": "Dezactivat (filtru de carte activ)",
   "sw": "Imezimwa (Kichujio cha Kitabu Kipo)",
   "tl": "Naka-off (May filter ng aklat)"
+ ,
+   "es": "Disabled (book filter active)",
+   "pt": "Disabled (book filter active)"
  },
  "settingsMyNotes": {
   "en": "My notes",
@@ -1294,6 +1777,9 @@
   "ro": "Notițele mele",
   "sw": "Maelezo Yangu",
   "tl": "Aking mga Tala"
+ ,
+   "es": "My notes",
+   "pt": "My notes"
  },
  "settingsBehaviorHeader": {
   "en": "BEHAVIOR",
@@ -1302,6 +1788,9 @@
   "ro": "COMPORTAMENT",
   "sw": "TABIA",
   "tl": "PAG-UUGALI"
+ ,
+   "es": "COMPORTAMIENTO",
+   "pt": "COMPORTAMENTO"
  },
  "settingsAutoOpenSingleShort": {
   "en": "Auto-open single result",
@@ -1310,6 +1799,9 @@
   "ro": "Deschide rezultatul unic",
   "sw": "Fungua Tokeo Moja",
   "tl": "Kusang Buksan ang Iisang Resulta"
+ ,
+   "es": "Auto-open single result",
+   "pt": "Auto-open single result"
  },
  "settingsAutoOpenSingleShortSubtitle": {
   "en": "Jump directly if only one result is found",
@@ -1318,6 +1810,9 @@
   "ro": "Mergi direct dacă există un singur rezultat",
   "sw": "Ruka moja kwa moja tokeo moja likipatikana",
   "tl": "Direktang pumunta kung iisa ang resulta"
+ ,
+   "es": "Ir directamente si solo se encuentra un resultado",
+   "pt": "Ir direto se for encontrado apenas um resultado"
  },
  "settingsBackgroundGlow": {
   "en": "Enable background glow",
@@ -1326,6 +1821,9 @@
   "ro": "Activează strălucirea de fundal",
   "sw": "Washa Mng'ao wa Nyuma",
   "tl": "I-on ang Liwanag sa Background"
+ ,
+   "es": "Enable background glow",
+   "pt": "Enable background glow"
  },
  "settingsBackgroundGlowSubtitle": {
   "en": "Renders a subtle animated light behind the reader",
@@ -1334,6 +1832,9 @@
   "ro": "O lumină animată discretă în spatele textului",
   "sw": "Mwanga hafifu unaosonga nyuma ya msomaji",
   "tl": "Banayad na gumagalaw na liwanag sa likod ng teksto"
+ ,
+   "es": "Muestra una sutil luz animada detrás del lector",
+   "pt": "Mostra uma subtil luz animada por trás do leitor"
  },
  "settingsThemeGroupFoundations": {
   "en": "FOUNDATIONS",
@@ -1342,6 +1843,9 @@
   "ro": "TEMELII",
   "sw": "MISINGI",
   "tl": "MGA SALIGAN"
+ ,
+   "es": "FUNDAMENTOS",
+   "pt": "FUNDAMENTOS"
  },
  "settingsThemeDawn": {
   "en": "Dawn",
@@ -1350,6 +1854,9 @@
   "ro": "Zori",
   "sw": "Alfajiri",
   "tl": "Bukang-liwayway"
+ ,
+   "es": "Amanecer",
+   "pt": "Alvor"
  },
  "settingsThemeFresh": {
   "en": "Fresh",
@@ -1358,6 +1865,9 @@
   "ro": "Proaspăt",
   "sw": "Safi",
   "tl": "Sariwa"
+ ,
+   "es": "Fresco",
+   "pt": "Fresco"
  },
  "settingsThemeGroupFirmament": {
   "en": "FIRMAMENT",
@@ -1366,6 +1876,9 @@
   "ro": "FIRMAMENT",
   "sw": "ANGA",
   "tl": "KALAWAKAN"
+ ,
+   "es": "FIRMAMENTO",
+   "pt": "FIRMAMENTO"
  },
  "settingsThemeSun": {
   "en": "Sun",
@@ -1374,6 +1887,9 @@
   "ro": "Soare",
   "sw": "Jua",
   "tl": "Araw"
+ ,
+   "es": "dom",
+   "pt": "dom"
  },
  "settingsThemeMoon": {
   "en": "Moon",
@@ -1382,6 +1898,9 @@
   "ro": "Lună",
   "sw": "Mwezi",
   "tl": "Buwan"
+ ,
+   "es": "Luna",
+   "pt": "Lua"
  },
  "settingsThemeStars": {
   "en": "Stars",
@@ -1390,6 +1909,9 @@
   "ro": "Stele",
   "sw": "Nyota",
   "tl": "Bituin"
+ ,
+   "es": "Estrellas",
+   "pt": "Estrelas"
  },
  "settingsThemeGroupEden": {
   "en": "EDEN",
@@ -1398,6 +1920,9 @@
   "ro": "EDEN",
   "sw": "EDENI",
   "tl": "EDEN"
+ ,
+   "es": "EDEN",
+   "pt": "EDEN"
  },
  "settingsThemeLilies": {
   "en": "Lilies",
@@ -1406,6 +1931,9 @@
   "ro": "Crini",
   "sw": "Mayungiyungi",
   "tl": "Liryo"
+ ,
+   "es": "Lirios",
+   "pt": "Lírios"
  },
  "settingsThemeRoses": {
   "en": "Roses",
@@ -1414,6 +1942,9 @@
   "ro": "Trandafiri",
   "sw": "Waridi",
   "tl": "Rosas"
+ ,
+   "es": "Rosas",
+   "pt": "Rosas"
  },
  "settingsThemeOlives": {
   "en": "Olives",
@@ -1422,6 +1953,9 @@
   "ro": "Măslini",
   "sw": "Mizeituni",
   "tl": "Olibo"
+ ,
+   "es": "Olivos",
+   "pt": "Oliveiras"
  },
  "settingsThemeGroupSanctuary": {
   "en": "SANCTUARY",
@@ -1430,6 +1964,9 @@
   "ro": "SANCTUAR",
   "sw": "PATAKATIFU",
   "tl": "SANTUWARYO"
+ ,
+   "es": "SANTUARIO",
+   "pt": "SANTUÁRIO"
  },
  "settingsThemePurple": {
   "en": "Priestly\nPurple",
@@ -1438,6 +1975,9 @@
   "ro": "Purpuriu\npreoțesc",
   "sw": "Zambarau\nya Kikuhani",
   "tl": "Lilang\nPari"
+ ,
+   "es": "Priestly\nPurple",
+   "pt": "Priestly\nPurple"
  },
  "settingsThemeBlue": {
   "en": "Galilee\nBlue",
@@ -1446,6 +1986,9 @@
   "ro": "Albastru\nGalileea",
   "sw": "Buluu\nya Galilaya",
   "tl": "Bughaw\nng Galilea"
+ ,
+   "es": "Galilee\nBlue",
+   "pt": "Galilee\nBlue"
  },
  "settingsThemeRed": {
   "en": "Scarlet\nRed",
@@ -1454,6 +1997,9 @@
   "ro": "Roșu\nstacojiu",
   "sw": "Nyekundu\nsana",
   "tl": "Pulang\nEskarlata"
+ ,
+   "es": "Scarlet\nRed",
+   "pt": "Scarlet\nRed"
  },
  "settingsSurpriseMe": {
   "en": "Surprise me",
@@ -1462,6 +2008,9 @@
   "ro": "Surprinde-mă",
   "sw": "Nishangaze",
   "tl": "Sorpresahin ako"
+ ,
+   "es": "Sorpréndeme",
+   "pt": "Surpreenda-me"
  },
  "settingsThemeOledDark": {
   "en": "OLED\nDark",
@@ -1470,6 +2019,9 @@
   "ro": "OLED\nîntunecat",
   "sw": "OLED\nGiza",
   "tl": "OLED\nMadilim"
+ ,
+   "es": "OLED\nDark",
+   "pt": "OLED\nDark"
  },
  "settingsThemeDuskOled": {
   "en": "Dusk\nOLED",
@@ -1478,6 +2030,9 @@
   "ro": "Amurg\nOLED",
   "sw": "Jioni\nOLED",
   "tl": "Takipsilim\nOLED"
+ ,
+   "es": "Dusk\nOLED",
+   "pt": "Dusk\nOLED"
  },
  "settingsSurfaceStyle": {
   "en": "Surface style",
@@ -1486,6 +2041,9 @@
   "ro": "Stil suprafață",
   "sw": "Mtindo wa Uso",
   "tl": "Estilo ng Surface"
+ ,
+   "es": "Surface style",
+   "pt": "Surface style"
  },
  "settingsSurfaceStyleSubtitle": {
   "en": "Visual depth and material rendering",
@@ -1494,6 +2052,9 @@
   "ro": "Profunzime vizuală și redarea materialelor",
   "sw": "Kina cha mwonekano na umbile",
   "tl": "Lalim ng biswal at materyal"
+ ,
+   "es": "Profundidad visual y renderizado de materiales",
+   "pt": "Profundidade visual e renderização de materiais"
  },
  "settingsSurfaceEarth": {
   "en": "Earth",
@@ -1502,6 +2063,9 @@
   "ro": "Pământ",
   "sw": "Dunia",
   "tl": "Lupa"
+ ,
+   "es": "Tierra",
+   "pt": "Terra"
  },
  "settingsSurfaceEarthSubtitle": {
   "en": "Flat surface",
@@ -1510,6 +2074,9 @@
   "ro": "Suprafață plată",
   "sw": "Uso tambarare",
   "tl": "Patag na surface"
+ ,
+   "es": "Superficie plana",
+   "pt": "Superfície plana"
  },
  "settingsSurfaceHeaven": {
   "en": "Heaven",
@@ -1518,6 +2085,9 @@
   "ro": "Cer",
   "sw": "Mbingu",
   "tl": "Langit"
+ ,
+   "es": "Cielos",
+   "pt": "Céus"
  },
  "settingsSurfaceHeavenSubtitle": {
   "en": "Frosted depth",
@@ -1526,6 +2096,9 @@
   "ro": "Adâncime mată",
   "sw": "Kina cha barafu",
   "tl": "Malabong lalim"
+ ,
+   "es": "Profundidad helada",
+   "pt": "Profundidade gelada"
  },
  "settingsSurfacePaper": {
   "en": "Paper",
@@ -1534,6 +2107,9 @@
   "ro": "Hârtie",
   "sw": "Karatasi",
   "tl": "Papel"
+ ,
+   "es": "Papel",
+   "pt": "Papel"
  },
  "settingsSurfacePaperSubtitle": {
   "en": "Warm e-reader",
@@ -1542,6 +2118,9 @@
   "ro": "E-reader cald",
   "sw": "Kisomaji chenye joto",
   "tl": "Mainit na e-reader"
+ ,
+   "es": "Lector electrónico cálido",
+   "pt": "Leitor eletrónico quente"
  },
  "settingsSurfaceClay": {
   "en": "Clay",
@@ -1550,6 +2129,9 @@
   "ro": "Lut",
   "sw": "Udongo",
   "tl": "Luwad"
+ ,
+   "es": "Arcilla",
+   "pt": "Argila"
  },
  "settingsSurfaceClaySubtitle": {
   "en": "Pillowy 3-D",
@@ -1558,6 +2140,9 @@
   "ro": "3D moale",
   "sw": "3-D laini",
   "tl": "Malambot na 3-D"
+ ,
+   "es": "Acolchado 3D",
+   "pt": "Acolchoado 3D"
  },
  "settingsWidgetsLivePreview": {
   "en": "Live preview & style customization",
@@ -1566,6 +2151,9 @@
   "ro": "Previzualizare live și personalizare",
   "sw": "Hakikisho la moja kwa moja na mtindo",
   "tl": "Live preview at pag-customize ng estilo"
+ ,
+   "es": "Vista previa en vivo y personalización de estilo",
+   "pt": "Pré-visualização ao vivo e personalização do estilo"
  },
  "settingsWidgetPreviewHeader": {
   "en": "LIVE WIDGET PREVIEW",
@@ -1574,6 +2162,9 @@
   "ro": "PREVIZUALIZARE WIDGET",
   "sw": "HAKIKISHO LA WIJETI",
   "tl": "LIVE PREVIEW NG WIDGET"
+ ,
+   "es": "VISTA PREVIA EN VIVO DEL WIDGET",
+   "pt": "PRÉ-VISUALIZAÇÃO AO VIVO DO WIDGET"
  },
  "settingsWidgetStreak": {
   "en": "Streak active! • Daily goal",
@@ -1582,6 +2173,9 @@
   "ro": "Serie activă! • Obiectiv zilnic",
   "sw": "Mfululizo Unaendelea! • Lengo la Siku",
   "tl": "Tuloy-tuloy! • Layunin sa Araw"
+ ,
+   "es": "Streak active! • Daily goal",
+   "pt": "Streak active! • Daily goal"
  },
  "settingsWidgetWotd": {
   "en": "WORD OF THE DAY",
@@ -1590,6 +2184,9 @@
   "ro": "CUVÂNTUL ZILEI",
   "sw": "NENO LA SIKU",
   "tl": "SALITA NG ARAW"
+ ,
+   "es": "PALABRA DEL DÍA",
+   "pt": "PALAVRA DO DIA"
  },
  "settingsWidgetVotd": {
   "en": "VERSE OF THE DAY",
@@ -1598,6 +2195,9 @@
   "ro": "VERSETUL ZILEI",
   "sw": "MSTARI WA SIKU",
   "tl": "TALATA NG ARAW"
+ ,
+   "es": "VERSÍCULO DEL DÍA",
+   "pt": "VERSÍCULO DO DIA"
  },
  "settingsWidgetBackgroundHeader": {
   "en": "BACKGROUND THEME & GRADIENTS",
@@ -1606,6 +2206,9 @@
   "ro": "FUNDAL ȘI DEGRADEURI",
   "sw": "MANDHARI YA NYUMA NA RANGI",
   "tl": "BACKGROUND AT GRADIENT"
+ ,
+   "es": "TEMA Y DEGRADADOS DE FONDO",
+   "pt": "TEMA E GRADIENTES DE FUNDO"
  },
  "settingsWidgetContrastHeader": {
   "en": "TEXT CONTRAST",
@@ -1614,6 +2217,9 @@
   "ro": "CONTRAST TEXT",
   "sw": "UTOFAUTI WA MAANDISHI",
   "tl": "CONTRAST NG TEKSTO"
+ ,
+   "es": "CONTRASTE DEL TEXTO",
+   "pt": "CONTRASTE DO TEXTO"
  },
  "settingsWidgetTextAuto": {
   "en": "Auto ✨",
@@ -1622,6 +2228,9 @@
   "ro": "Auto ✨",
   "sw": "Otomatiki ✨",
   "tl": "Auto ✨"
+ ,
+   "es": "Auto ✨",
+   "pt": "Auto ✨"
  },
  "settingsWidgetTextDark": {
   "en": "Dark text ☀️",
@@ -1630,6 +2239,9 @@
   "ro": "Text închis ☀️",
   "sw": "Maandishi Meusi ☀️",
   "tl": "Madilim na Teksto ☀️"
+ ,
+   "es": "Dark text ☀️",
+   "pt": "Dark text ☀️"
  },
  "settingsWidgetTextWhite": {
   "en": "White text 🌙",
@@ -1638,6 +2250,9 @@
   "ro": "Text alb 🌙",
   "sw": "Maandishi Meupe 🌙",
   "tl": "Puting Teksto 🌙"
+ ,
+   "es": "White text 🌙",
+   "pt": "White text 🌙"
  },
  "settingsWidgetSynced": {
   "en": "Widgets synced with new style! ✨",
@@ -1646,6 +2261,9 @@
   "ro": "Widgeturile au fost sincronizate! ✨",
   "sw": "Wijeti zimesawazishwa na mtindo mpya! ✨",
   "tl": "Na-sync ang mga widget sa bagong estilo! ✨"
+ ,
+   "es": "Widgets synced with new style! ✨",
+   "pt": "Widgets synced with new style! ✨"
  },
  "settingsWidgetApply": {
   "en": "Apply & sync to home screen",
@@ -1654,6 +2272,9 @@
   "ro": "Aplică pe ecranul principal",
   "sw": "Tumia na Sawazisha Skrini ya Nyumbani",
   "tl": "I-apply at i-sync sa Home Screen"
+ ,
+   "es": "Apply & sync to home screen",
+   "pt": "Apply & sync to home screen"
  },
  "settingsFontSizeHeader": {
   "en": "FONT SIZE",
@@ -1662,6 +2283,9 @@
   "ro": "MĂRIME",
   "sw": "UKUBWA WA HERUFI",
   "tl": "LAKI NG FONT"
+ ,
+   "es": "TAMAÑO DE FUENTE",
+   "pt": "TAMANHO DA FONTE"
  },
  "settingsFontWeightHeader": {
   "en": "FONT WEIGHT",
@@ -1670,6 +2294,9 @@
   "ro": "GROSIME",
   "sw": "UNENE WA HERUFI",
   "tl": "KAPAL NG FONT"
+ ,
+   "es": "GROSOR DE FUENTE",
+   "pt": "PESO DA FONTE"
  },
  "settingsWeightLight": {
   "en": "Light",
@@ -1678,6 +2305,9 @@
   "ro": "Subțire",
   "sw": "Nyembamba",
   "tl": "Manipis"
+ ,
+   "es": "Light",
+   "pt": "Light"
  },
  "settingsWeightRegular": {
   "en": "Regular",
@@ -1686,6 +2316,9 @@
   "ro": "Normal",
   "sw": "Kawaida",
   "tl": "Regular"
+ ,
+   "es": "Regular",
+   "pt": "Regular"
  },
  "settingsWeightMedium": {
   "en": "Medium",
@@ -1694,6 +2327,9 @@
   "ro": "Mediu",
   "sw": "Wastani",
   "tl": "Katamtaman"
+ ,
+   "es": "Medium",
+   "pt": "Medium"
  },
  "settingsWeightBold": {
   "en": "Bold",
@@ -1702,6 +2338,9 @@
   "ro": "Aldin",
   "sw": "Nene",
   "tl": "Makapal"
+ ,
+   "es": "Bold",
+   "pt": "Bold"
  },
  "settingsLineSpacingHeader": {
   "en": "LINE SPACING",
@@ -1710,6 +2349,9 @@
   "ro": "SPAȚIERE",
   "sw": "NAFASI YA MISTARI",
   "tl": "PAGITAN NG LINYA"
+ ,
+   "es": "INTERLINEADO",
+   "pt": "ESPAÇAMENTO DE LINHA"
  },
  "settingsSpacingCompact": {
   "en": "Compact",
@@ -1718,6 +2360,9 @@
   "ro": "Compact",
   "sw": "Kubana",
   "tl": "Siksik"
+ ,
+   "es": "Compact",
+   "pt": "Compact"
  },
  "settingsSpacingNormal": {
   "en": "Normal",
@@ -1726,6 +2371,9 @@
   "ro": "Normal",
   "sw": "Kawaida",
   "tl": "Normal"
+ ,
+   "es": "Normal",
+   "pt": "Normal"
  },
  "settingsMarginsHeader": {
   "en": "MARGINS",
@@ -1734,6 +2382,9 @@
   "ro": "MARGINI",
   "sw": "PAMBIZO",
   "tl": "MARGIN"
+ ,
+   "es": "MÁRGENES",
+   "pt": "MARGENS"
  },
  "settingsAlignmentHeader": {
   "en": "ALIGNMENT",
@@ -1742,6 +2393,9 @@
   "ro": "ALINIERE",
   "sw": "MPANGILIO",
   "tl": "PAGHAHANAY"
+ ,
+   "es": "ALINEACIÓN",
+   "pt": "ALINHAMENTO"
  },
  "settingsAlignLeft": {
   "en": "Left",
@@ -1750,6 +2404,9 @@
   "ro": "Stânga",
   "sw": "Kushoto",
   "tl": "Kaliwa"
+ ,
+   "es": "Left",
+   "pt": "Left"
  },
  "settingsAlignCenter": {
   "en": "Center",
@@ -1758,6 +2415,9 @@
   "ro": "Centru",
   "sw": "Katikati",
   "tl": "Gitna"
+ ,
+   "es": "Center",
+   "pt": "Center"
  },
  "settingsAlignRight": {
   "en": "Right",
@@ -1766,6 +2426,9 @@
   "ro": "Dreapta",
   "sw": "Kulia",
   "tl": "Kanan"
+ ,
+   "es": "Right",
+   "pt": "Right"
  },
  "settingsAlignJustified": {
   "en": "Justified",
@@ -1774,6 +2437,9 @@
   "ro": "Justificat",
   "sw": "Pande zote",
   "tl": "Justified"
+ ,
+   "es": "Justified",
+   "pt": "Justified"
  },
  "settingsFontFamilyHeader": {
   "en": "FONT FAMILY",
@@ -1782,6 +2448,9 @@
   "ro": "FONT",
   "sw": "AINA YA HERUFI",
   "tl": "URI NG FONT"
+ ,
+   "es": "FAMILIA DE FUENTES",
+   "pt": "FAMÍLIA DE FONTES"
  },
  "settingsItalicHeader": {
   "en": "ITALIC READING TEXT",
@@ -1790,6 +2459,9 @@
   "ro": "TEXT CURSIV",
   "sw": "MAANDISHI YA MLALO",
   "tl": "ITALIC NA TEKSTO"
+ ,
+   "es": "TEXTO DE LECTURA EN CURSIVA",
+   "pt": "TEXTO DE LEITURA EM ITÁLICO"
  },
  "settingsDailyReading": {
   "en": "Daily reading",
@@ -1798,6 +2470,9 @@
   "ro": "Lectură zilnică",
   "sw": "Kusoma Kila Siku",
   "tl": "Araw-araw na Pagbasa"
+ ,
+   "es": "Daily reading",
+   "pt": "Daily reading"
  },
  "settingsCustomReminder": {
   "en": "Custom reminder",
@@ -1806,6 +2481,9 @@
   "ro": "Memento personalizat",
   "sw": "Kikumbusho Maalum",
   "tl": "Sariling Paalala"
+ ,
+   "es": "Custom reminder",
+   "pt": "Custom reminder"
  },
  "settingsMonday": {
   "en": "Monday",
@@ -1814,6 +2492,9 @@
   "ro": "Luni",
   "sw": "Jumatatu",
   "tl": "Lunes"
+ ,
+   "es": "Lunes",
+   "pt": "Segunda-feira"
  },
  "settingsTuesday": {
   "en": "Tuesday",
@@ -1822,6 +2503,9 @@
   "ro": "Marți",
   "sw": "Jumanne",
   "tl": "Martes"
+ ,
+   "es": "Martes",
+   "pt": "Terça-feira"
  },
  "settingsWednesday": {
   "en": "Wednesday",
@@ -1830,6 +2514,9 @@
   "ro": "Miercuri",
   "sw": "Jumatano",
   "tl": "Miyerkules"
+ ,
+   "es": "Miércoles",
+   "pt": "Quarta-feira"
  },
  "settingsThursday": {
   "en": "Thursday",
@@ -1838,6 +2525,9 @@
   "ro": "Joi",
   "sw": "Alhamisi",
   "tl": "Huwebes"
+ ,
+   "es": "Jueves",
+   "pt": "Quinta-feira"
  },
  "settingsFriday": {
   "en": "Friday",
@@ -1846,6 +2536,9 @@
   "ro": "Vineri",
   "sw": "Ijumaa",
   "tl": "Biyernes"
+ ,
+   "es": "Viernes",
+   "pt": "Sexta-feira"
  },
  "settingsSaturday": {
   "en": "Saturday",
@@ -1854,6 +2547,9 @@
   "ro": "Sâmbătă",
   "sw": "Jumamosi",
   "tl": "Sabado"
+ ,
+   "es": "Sábado",
+   "pt": "Sábado"
  },
  "settingsSunday": {
   "en": "Sunday",
@@ -1862,6 +2558,9 @@
   "ro": "Duminică",
   "sw": "Jumapili",
   "tl": "Linggo"
+ ,
+   "es": "Domingo",
+   "pt": "Domingo"
  },
  "settingsStrongsPackRequired": {
   "en": "Requires the “KJV with Strong's” pack ({size} download).",
@@ -1877,6 +2576,9 @@
     }
    }
   }
+ ,
+   "es": "Requires the “KJV with Strong's” pack ({size} download).",
+   "pt": "Requires the “KJV with Strong's” pack ({size} download)."
  },
  "settingsBbeNoteBody": {
   "en": "The Bible in Basic English originally left some verses untranslated or heavily truncated. For those ({count} verses), the World English Bible (WEB) text is shown instead and marked with a WEB badge.",
@@ -1892,6 +2594,9 @@
     }
    }
   }
+ ,
+   "es": "La Biblia en inglés sencillo dejó sin traducir algunos versículos o muy truncados. Para esos ({count} versículos), se muestra el texto de la World English Bible (WEB) marcado con una insignia WEB.",
+   "pt": "A Bíblia em inglês simples deixou inicialmente alguns versículos por traduzir ou muito truncados. Para esses ({count} versículos), é mostrado o texto da World English Bible (WEB), marcado com um emblema WEB."
  },
  "settingsDayAtTime": {
   "en": "{day} at {time}",
@@ -1910,5 +2615,8 @@
     }
    }
   }
+ ,
+   "es": "{day} at {time}",
+   "pt": "{day} at {time}"
  }
 }

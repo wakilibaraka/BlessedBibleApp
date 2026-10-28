@@ -1,151 +1,598 @@
 {
-  "notifDailyTitle": {"en": "Time to Read", "fr": "C'est l'heure de lire", "it": "È ora di leggere", "ro": "E timpul să citești", "sw": "Wakati wa Kusoma", "tl": "Oras na para Magbasa"},
-  "notifDailyBody": {"en": "Take a moment to read and reflect today.", "fr": "Prenez un moment pour lire et méditer aujourd'hui.", "it": "Prenditi un momento per leggere e riflettere oggi.", "ro": "Ia-ți un moment azi să citești și să reflectezi.", "sw": "Chukua muda leo kusoma na kutafakari.", "tl": "Maglaan ng sandali ngayon para magbasa at magnilay."},
-  "notifDailyChannel": {"en": "Daily reminders", "fr": "Rappels quotidiens", "it": "Promemoria giornalieri", "ro": "Mementouri zilnice", "sw": "Vikumbusho vya Kila Siku", "tl": "Mga Araw-araw na Paalala"},
-  "notifDailyChannelDesc": {"en": "Reminders for daily reading", "fr": "Rappels pour la lecture quotidienne", "it": "Promemoria per la lettura quotidiana", "ro": "Mementouri pentru citirea zilnică", "sw": "Vikumbusho vya kusoma kila siku", "tl": "Mga paalala para sa araw-araw na pagbasa"},
-  "notifPrayerTitle": {"en": "Time for prayer", "fr": "C'est l'heure de prier", "it": "È ora di pregare", "ro": "E timpul pentru rugăciune", "sw": "Wakati wa Maombi", "tl": "Oras na para Manalangin"},
-  "notifPrayerBody": {"en": "Pause for a moment of reflection and prayer.", "fr": "Faites une pause pour un moment de méditation et de prière.", "it": "Fermati per un momento di riflessione e preghiera.", "ro": "Oprește-te pentru un moment de reflecție și rugăciune.", "sw": "Tulia kwa muda wa kutafakari na kuomba.", "tl": "Huminto sandali para magnilay at manalangin."},
-  "notifPrayerChannel": {"en": "Prayer reminders", "fr": "Rappels de prière", "it": "Promemoria di preghiera", "ro": "Mementouri de rugăciune", "sw": "Vikumbusho vya Maombi", "tl": "Mga Paalala sa Panalangin"},
-  "notifPrayerChannelDesc": {"en": "Daily prayer reminders", "fr": "Rappels de prière quotidiens", "it": "Promemoria giornalieri di preghiera", "ro": "Mementouri zilnice de rugăciune", "sw": "Vikumbusho vya maombi kila siku", "tl": "Mga araw-araw na paalala sa panalangin"},
-  "notifWeeklyTitle": {"en": "Weekly study time", "fr": "Temps d'étude hebdomadaire", "it": "Studio settimanale", "ro": "Timpul de studiu săptămânal", "sw": "Wakati wa Kujifunza wa Wiki", "tl": "Lingguhang Oras ng Pag-aaral"},
-  "notifWeeklyBody": {"en": "It's your scheduled time for study and reflection.", "fr": "C'est votre moment prévu pour l'étude et la méditation.", "it": "È il momento che hai scelto per lo studio e la riflessione.", "ro": "Este momentul tău programat pentru studiu și reflecție.", "sw": "Ni wakati wako uliopangwa wa kujifunza na kutafakari.", "tl": "Ito ang nakatakda mong oras para mag-aral at magnilay."},
-  "notifWeeklyChannel": {"en": "Weekly reminders", "fr": "Rappels hebdomadaires", "it": "Promemoria settimanali", "ro": "Mementouri săptămânale", "sw": "Vikumbusho vya Kila Wiki", "tl": "Mga Lingguhang Paalala"},
-  "notifWeeklyChannelDesc": {"en": "Custom weekly study reminders", "fr": "Rappels d'étude hebdomadaires personnalisés", "it": "Promemoria settimanali di studio personalizzati", "ro": "Mementouri personalizate de studiu săptămânal", "sw": "Vikumbusho maalum vya kujifunza kila wiki", "tl": "Mga pasadyang lingguhang paalala sa pag-aaral"},
-  "notifSabbathTitle": {"en": "The Sabbath is approaching", "fr": "Le sabbat approche", "it": "Il sabato si avvicina", "ro": "Se apropie Sabatul", "sw": "Sabato Inakaribia", "tl": "Malapit na ang Sabbath"},
-  "notifSabbathBody": {"en": "Welcome the day of rest.", "fr": "Accueillez le jour du repos.", "it": "Accogli il giorno del riposo.", "ro": "Primește ziua de odihnă.", "sw": "Karibisha siku ya mapumziko.", "tl": "Salubungin ang araw ng kapahingahan."},
-  "notifSabbathChannel": {"en": "Sabbath reminders", "fr": "Rappels du sabbat", "it": "Promemoria del sabato", "ro": "Mementouri de Sabat", "sw": "Vikumbusho vya Sabato", "tl": "Mga Paalala sa Sabbath"},
-  "notifSabbathChannelDesc": {"en": "Weekly sunset reminders for Sabbath", "fr": "Rappels hebdomadaires au coucher du soleil pour le sabbat", "it": "Promemoria settimanali al tramonto per il sabato", "ro": "Mementouri săptămânale la apus pentru Sabat", "sw": "Vikumbusho vya kila wiki vya machweo kwa Sabato", "tl": "Lingguhang paalala sa paglubog ng araw para sa Sabbath"},
-  "notifPlanBody": {"en": "Take a moment to read your daily passage.", "fr": "Prenez un moment pour lire votre passage du jour.", "it": "Prenditi un momento per leggere il brano di oggi.", "ro": "Ia-ți un moment să citești pasajul zilei.", "sw": "Chukua muda kusoma kifungu chako cha leo.", "tl": "Maglaan ng sandali para basahin ang iyong talata ngayong araw."},
-  "notifPlanChannel": {"en": "Reading plan", "fr": "Plan de lecture", "it": "Piano di lettura", "ro": "Plan de citire", "sw": "Mpango wa Kusoma", "tl": "Plano sa Pagbasa"},
-  "notifPlanChannelDesc": {"en": "Reading plan reminders", "fr": "Rappels du plan de lecture", "it": "Promemoria del piano di lettura", "ro": "Mementouri pentru planul de citire", "sw": "Vikumbusho vya mpango wa kusoma", "tl": "Mga paalala sa plano sa pagbasa"},
-  "widgetStreakActive": {"en": "Streak active!", "fr": "Série en cours !", "it": "Serie attiva!", "ro": "Serie activă!", "sw": "Mfululizo unaendelea!", "tl": "Tuloy ang streak!"},
-  "widgetStreakInactive": {"en": "Read today to keep your streak", "fr": "Lisez aujourd'hui pour garder votre série", "it": "Leggi oggi per mantenere la serie", "ro": "Citește astăzi ca să-ți păstrezi seria", "sw": "Soma leo kudumisha mfululizo wako", "tl": "Magbasa ngayon para mapanatili ang streak"},
-  "widgetFallbackWord": {"en": "Grace (Charis)", "fr": "Grâce (Charis)", "it": "Grazia (Charis)", "ro": "Har (Charis)", "sw": "Neema (Charis)", "tl": "Biyaya (Charis)"},
-  "widgetFallbackDefinition": {"en": "The unmerited favor and divine love of God bestowed upon humanity.", "fr": "La faveur imméritée et l'amour divin de Dieu accordés à l'humanité.", "it": "Il favore immeritato e l'amore divino di Dio donati all'umanità.", "ro": "Favoarea nemeritată și dragostea divină a lui Dumnezeu revărsate asupra omenirii.", "sw": "Upendeleo usiostahiliwa na upendo wa Mungu uliotolewa kwa wanadamu.", "tl": "Ang di-karapat-dapat na kagandahang-loob at banal na pag-ibig ng Diyos na ipinagkaloob sa sangkatauhan."},
-  "widgetStyleDusk": {"en": "Celestial Dusk", "fr": "Crépuscule céleste", "it": "Crepuscolo celeste", "ro": "Amurg celest", "sw": "Machweo ya Mbinguni", "tl": "Makalangit na Takipsilim"},
-  "widgetStyleDawn": {"en": "Morning Dawn", "fr": "Aube matinale", "it": "Alba mattutina", "ro": "Zori de dimineață", "sw": "Mapambazuko", "tl": "Bukang-liwayway"},
-  "widgetStyleEmerald": {"en": "Sanctuary Emerald", "fr": "Émeraude du sanctuaire", "it": "Smeraldo del santuario", "ro": "Smarald de sanctuar", "sw": "Zumaridi ya Patakatifu", "tl": "Esmeralda ng Santuwaryo"},
-  "widgetStyleGolden": {"en": "Sacred Amber", "fr": "Ambre sacré", "it": "Ambra sacra", "ro": "Chihlimbar sacru", "sw": "Kaharabu Takatifu", "tl": "Banal na Amber"},
-  "widgetStyleRoyal": {"en": "Royal Sapphire", "fr": "Saphir royal", "it": "Zaffiro reale", "ro": "Safir regal", "sw": "Yakuti ya Kifalme", "tl": "Maharlikang Zafiro"},
-  "widgetStyleGlassLight": {"en": "Frosted Glass", "fr": "Verre givré", "it": "Vetro smerigliato", "ro": "Sticlă mată", "sw": "Kioo cha Barafu", "tl": "Frosted na Salamin"},
-  "widgetStyleGlassDark": {"en": "Obsidian Glass", "fr": "Verre d'obsidienne", "it": "Vetro d'ossidiana", "ro": "Sticlă de obsidian", "sw": "Kioo cha Obsidiani", "tl": "Obsidian na Salamin"},
-  "widgetStyleSolidLight": {"en": "Clean Paper", "fr": "Papier blanc", "it": "Carta bianca", "ro": "Hârtie curată", "sw": "Karatasi Safi", "tl": "Malinis na Papel"},
-  "widgetStyleSolidDark": {"en": "Deep Charcoal", "fr": "Charbon profond", "it": "Carbone intenso", "ro": "Cărbune adânc", "sw": "Mkaa Mzito", "tl": "Malalim na Uling"},
-  "widgetStyleTransparent": {"en": "Clear Wallpaper", "fr": "Fond d'écran visible", "it": "Sfondo trasparente", "ro": "Fundal transparent", "sw": "Mandhari Wazi", "tl": "Malinaw na Wallpaper"},
-  "backupShareSubject": {"en": "The Blessed Bible Backup", "fr": "Sauvegarde The Blessed Bible", "it": "Backup di The Blessed Bible", "ro": "Copie de rezervă The Blessed Bible", "sw": "Nakala Rudufu ya The Blessed Bible", "tl": "Backup ng The Blessed Bible"},
-  "backupExportFailed": {"en": "Export failed: {error}", "fr": "Échec de l'exportation : {error}", "it": "Esportazione non riuscita: {error}", "ro": "Exportul a eșuat: {error}", "sw": "Imeshindwa kuhamisha: {error}", "tl": "Nabigo ang pag-export: {error}", "@": {"placeholders": {"error": {"type": "String"}}}},
-  "backupNewerVersion": {"en": "This backup is from a newer app version (v{version}). Update the app first.", "fr": "Cette sauvegarde provient d'une version plus récente de l'application (v{version}). Mettez d'abord l'application à jour.", "it": "Questo backup proviene da una versione più recente dell'app (v{version}). Aggiorna prima l'app.", "ro": "Această copie provine dintr-o versiune mai nouă a aplicației (v{version}). Actualizează mai întâi aplicația.", "sw": "Nakala hii ni ya toleo jipya zaidi la programu (v{version}). Sasisha programu kwanza.", "tl": "Galing ang backup na ito sa mas bagong bersyon ng app (v{version}). I-update muna ang app.", "@": {"placeholders": {"version": {"type": "int"}}}},
-  "backupConfirmTitle": {"en": "Confirm restore", "fr": "Confirmer la restauration", "it": "Conferma ripristino", "ro": "Confirmă restaurarea", "sw": "Thibitisha Kurejesha", "tl": "Kumpirmahin ang Pag-restore"},
-  "backupConfirmBody": {"en": "This will overwrite all existing notes, highlights, bookmarks, and settings. Are you sure?", "fr": "Cela remplacera toutes vos notes, surlignages, signets et réglages existants. Voulez-vous continuer ?", "it": "Verranno sovrascritti note, evidenziazioni, segnalibri e impostazioni esistenti. Sei sicuro?", "ro": "Toate notițele, evidențierile, marcajele și setările existente vor fi suprascrise. Ești sigur?", "sw": "Hii itabadilisha madokezo, alama za kuangazia, alamisho na mipangilio yote iliyopo. Una uhakika?", "tl": "Papalitan nito ang lahat ng kasalukuyang tala, highlight, bookmark at setting. Sigurado ka ba?"},
-  "backupSkippedValues": {"en": "{count, plural, =1{1 value skipped} other{{count} values skipped}}", "fr": "{count, plural, =1{1 valeur ignorée} other{{count} valeurs ignorées}}", "it": "{count, plural, =1{1 valore saltato} other{{count} valori saltati}}", "ro": "{count, plural, =1{1 valoare omisă} few{{count} valori omise} other{{count} de valori omise}}", "sw": "{count, plural, =1{Thamani 1 imerukwa} other{Thamani {count} zimerukwa}}", "tl": "{count, plural, =1{1 value ang nilaktawan} other{{count} value ang nilaktawan}}", "@": {"placeholders": {"count": {"type": "int"}}}},
-  "backupRedownload": {"en": "{count, plural, =1{re-download 1 translation: {list}} other{re-download {count} translations: {list}}}", "fr": "{count, plural, =1{retéléchargez 1 traduction : {list}} other{retéléchargez {count} traductions : {list}}}", "it": "{count, plural, =1{scarica di nuovo 1 traduzione: {list}} other{scarica di nuovo {count} traduzioni: {list}}}", "ro": "{count, plural, =1{descarcă din nou 1 traducere: {list}} few{descarcă din nou {count} traduceri: {list}} other{descarcă din nou {count} de traduceri: {list}}}", "sw": "{count, plural, =1{pakua tena tafsiri 1: {list}} other{pakua tena tafsiri {count}: {list}}}", "tl": "{count, plural, =1{i-download muli ang 1 salin: {list}} other{i-download muli ang {count} salin: {list}}}", "@": {"placeholders": {"count": {"type": "int"}, "list": {"type": "String"}}}},
-  "backupRestored": {"en": "Backup restored successfully", "fr": "Sauvegarde restaurée avec succès", "it": "Backup ripristinato correttamente", "ro": "Copia de rezervă a fost restaurată cu succes", "sw": "Nakala rudufu imerejeshwa kikamilifu", "tl": "Matagumpay na na-restore ang backup"},
-  "backupRestoredWithDetails": {"en": "Backup restored ({details})", "fr": "Sauvegarde restaurée ({details})", "it": "Backup ripristinato ({details})", "ro": "Copia de rezervă a fost restaurată ({details})", "sw": "Nakala rudufu imerejeshwa ({details})", "tl": "Na-restore ang backup ({details})", "@": {"placeholders": {"details": {"type": "String"}}}},
-  "backupRestoreFailed": {"en": "Restore failed: invalid or corrupted backup ({error})", "fr": "Échec de la restauration : sauvegarde invalide ou corrompue ({error})", "it": "Ripristino non riuscito: backup non valido o danneggiato ({error})", "ro": "Restaurarea a eșuat: copie de rezervă invalidă sau coruptă ({error})", "sw": "Imeshindwa kurejesha: nakala rudufu si sahihi au imeharibika ({error})", "tl": "Nabigo ang pag-restore: di-wasto o sirang backup ({error})", "@": {"placeholders": {"error": {"type": "String"}}}},
-  "greetingDaily1Title": {"en": "Peace be with you.", "fr": "La paix soit avec vous.", "it": "Pace a te.", "ro": "Pace ție.", "sw": "Amani iwe nawe.", "tl": "Sumaiyo ang kapayapaan."},
-  "greetingDaily1Subtitle": {"en": "Let His word bring you rest.", "fr": "Que sa parole vous apporte le repos.", "it": "La sua parola ti doni riposo.", "ro": "Cuvântul Lui să-ți aducă odihnă.", "sw": "Neno lake likupe pumziko.", "tl": "Bigyan ka nawa ng kapahingahan ng Kanyang salita."},
-  "greetingDaily2Title": {"en": "Walk in the light.", "fr": "Marchez dans la lumière.", "it": "Cammina nella luce.", "ro": "Umblă în lumină.", "sw": "Enenda nuruni.", "tl": "Lumakad sa liwanag."},
-  "greetingDaily2Subtitle": {"en": "His word is a lamp for your path.", "fr": "Sa parole est une lampe sur votre sentier.", "it": "La sua parola è una lampada al tuo cammino.", "ro": "Cuvântul Lui este o candelă pentru cărarea ta.", "sw": "Neno lake ni taa ya njia yako.", "tl": "Ang Kanyang salita ay ilawan sa iyong landas."},
-  "greetingDaily3Title": {"en": "Grace and peace to you.", "fr": "Que la grâce et la paix vous soient données.", "it": "Grazia e pace a te.", "ro": "Har și pace ție.", "sw": "Neema na amani kwako.", "tl": "Biyaya at kapayapaan sa iyo."},
-  "greetingDaily3Subtitle": {"en": "Rest in the Vine today.", "fr": "Demeurez dans le Cep aujourd'hui.", "it": "Rimani nella Vite oggi.", "ro": "Odihnește-te azi în Viță.", "sw": "Pumzika ndani ya Mzabibu leo.", "tl": "Manahan sa Puno ng Ubas ngayon."},
-  "greetingDaily4Title": {"en": "Come to the waters.", "fr": "Venez aux eaux.", "it": "Vieni alle acque.", "ro": "Vino la ape.", "sw": "Njoo majini.", "tl": "Halika sa tubigan."},
-  "greetingDaily4Subtitle": {"en": "Jesus is the light of the world.", "fr": "Jésus est la lumière du monde.", "it": "Gesù è la luce del mondo.", "ro": "Isus este lumina lumii.", "sw": "Yesu ni nuru ya ulimwengu.", "tl": "Si Jesus ang ilaw ng sanlibutan."},
-  "greetingDaily5Title": {"en": "The Lord bless you.", "fr": "Que l'Éternel vous bénisse.", "it": "Il Signore ti benedica.", "ro": "Domnul să te binecuvânteze.", "sw": "Bwana akubariki.", "tl": "Pagpalain ka nawa ng Panginoon."},
-  "greetingDaily5Subtitle": {"en": "Keep His promises close to your heart.", "fr": "Gardez ses promesses près de votre cœur.", "it": "Custodisci le sue promesse nel cuore.", "ro": "Păstrează-I promisiunile aproape de inimă.", "sw": "Shika ahadi zake karibu na moyo wako.", "tl": "Ingatan ang Kanyang mga pangako sa iyong puso."},
-  "greetingDaily6Title": {"en": "Be still and know.", "fr": "Arrêtez, et sachez.", "it": "Fermati e riconosci.", "ro": "Oprește-te și să știi.", "sw": "Tulia ujue.", "tl": "Tumahimik ka at kilalanin."},
-  "greetingDaily6Subtitle": {"en": "Dwell in His quiet presence.", "fr": "Demeurez dans sa paisible présence.", "it": "Dimora nella sua quieta presenza.", "ro": "Rămâi în prezența Lui liniștită.", "sw": "Kaa katika uwepo wake wa utulivu.", "tl": "Manahan sa Kanyang tahimik na presensya."},
-  "greetingDaily7Title": {"en": "Morning mercies anew.", "fr": "Ses bontés se renouvellent chaque matin.", "it": "Misericordie nuove ogni mattina.", "ro": "Îndurări noi în fiecare dimineață.", "sw": "Rehema mpya kila asubuhi.", "tl": "Bagong kahabagan tuwing umaga."},
-  "greetingDaily7Subtitle": {"en": "His compassions never fail.", "fr": "Ses compassions ne sont pas à leur terme.", "it": "Le sue compassioni non vengono meno.", "ro": "Îndurările Lui nu se sfârșesc.", "sw": "Rehema zake hazikomi.", "tl": "Hindi nagkukulang ang Kanyang mga habag."},
-  "greetingDaily8Title": {"en": "Rooted in love.", "fr": "Enracinés dans l'amour.", "it": "Radicato nell'amore.", "ro": "Înrădăcinat în dragoste.", "sw": "Ukiwa na mizizi katika upendo.", "tl": "Nakaugat sa pag-ibig."},
-  "greetingDaily8Subtitle": {"en": "Grow in grace and truth.", "fr": "Grandissez dans la grâce et la vérité.", "it": "Cresci nella grazia e nella verità.", "ro": "Crește în har și adevăr.", "sw": "Kua katika neema na kweli.", "tl": "Lumago sa biyaya at katotohanan."},
-  "greetingDaily9Title": {"en": "Let your light shine.", "fr": "Que votre lumière brille.", "it": "Risplenda la tua luce.", "ro": "Să lumineze lumina ta.", "sw": "Nuru yako iangaze.", "tl": "Paliwanagin ang iyong ilaw."},
-  "greetingDaily9Subtitle": {"en": "A city on a hill cannot be hidden.", "fr": "Une ville située sur une montagne ne peut être cachée.", "it": "Una città posta sopra un monte non può restare nascosta.", "ro": "O cetate așezată pe un munte nu poate să rămână ascunsă.", "sw": "Mji ulio juu ya mlima hauwezi kusitirika.", "tl": "Hindi maitatago ang bayang nakatayo sa ibabaw ng bundok."},
-  "greetingDaily10Title": {"en": "Draw near to God.", "fr": "Approchez-vous de Dieu.", "it": "Avvicinati a Dio.", "ro": "Apropie-te de Dumnezeu.", "sw": "Mkaribie Mungu.", "tl": "Lumapit sa Diyos."},
-  "greetingDaily10Subtitle": {"en": "He is already reaching for you.", "fr": "Il vous tend déjà la main.", "it": "Ti sta già tendendo la mano.", "ro": "El Își întinde deja mâna spre tine.", "sw": "Tayari anakufikia.", "tl": "Inaabot ka na Niya."},
-  "greetingDaily11Title": {"en": "The Word became flesh.", "fr": "La Parole a été faite chair.", "it": "La Parola si è fatta carne.", "ro": "Cuvântul S-a făcut trup.", "sw": "Neno alifanyika mwili.", "tl": "Ang Salita ay nagkatawang-tao."},
-  "greetingDaily11Subtitle": {"en": "He understands your journey.", "fr": "Il comprend votre chemin.", "it": "Egli comprende il tuo cammino.", "ro": "El îți înțelege drumul.", "sw": "Anaelewa safari yako.", "tl": "Nauunawaan Niya ang iyong paglalakbay."},
-  "greetingDaily12Title": {"en": "Taste and see.", "fr": "Goûtez et voyez.", "it": "Gusta e vedi.", "ro": "Gustă și vezi.", "sw": "Onjeni mwone.", "tl": "Tikman at tingnan."},
-  "greetingDaily12Subtitle": {"en": "The Lord is incredibly good.", "fr": "Combien l'Éternel est bon.", "it": "Quanto è buono il Signore.", "ro": "Cât de bun este Domnul.", "sw": "Ya kuwa Bwana yu mwema.", "tl": "Ang Panginoon ay napakabuti."},
-  "greetingMorning1Title": {"en": "Awake, O sleeper.", "fr": "Réveille-toi, toi qui dors.", "it": "Svegliati, o tu che dormi.", "ro": "Deșteaptă-te, tu care dormi.", "sw": "Amka, wewe usinziaye.", "tl": "Gumising ka, ikaw na natutulog."},
-  "greetingMorning1Subtitle": {"en": "Christ will shine on you.", "fr": "Christ t'éclairera.", "it": "Cristo ti illuminerà.", "ro": "Hristos te va lumina.", "sw": "Kristo atakuangaza.", "tl": "Liliwanagan ka ni Cristo."},
-  "greetingMorning2Title": {"en": "Joy comes in the morning.", "fr": "Le matin vient l'allégresse.", "it": "Al mattino viene la gioia.", "ro": "Dimineața vine bucuria.", "sw": "Furaha huja asubuhi.", "tl": "Darating ang kagalakan sa umaga."},
-  "greetingMorning2Subtitle": {"en": "Step into His new day.", "fr": "Entrez dans son jour nouveau.", "it": "Entra nel suo nuovo giorno.", "ro": "Pășește în ziua Lui cea nouă.", "sw": "Ingia katika siku yake mpya.", "tl": "Pumasok sa Kanyang bagong araw."},
-  "greetingMorning3Title": {"en": "This is the day the Lord has made.", "fr": "Voici la journée que l'Éternel a faite.", "it": "Questo è il giorno che il Signore ha fatto.", "ro": "Aceasta este ziua pe care a făcut-o Domnul.", "sw": "Siku hii ndiyo aliyoifanya Bwana.", "tl": "Ito ang araw na ginawa ng Panginoon."},
-  "greetingMorning3Subtitle": {"en": "Let us rejoice in it.", "fr": "Qu'elle soit pour nous un sujet d'allégresse.", "it": "Rallegriamoci ed esultiamo in esso.", "ro": "Să ne bucurăm și să ne veselim în ea.", "sw": "Tushangilie na kuifurahia.", "tl": "Tayo'y magalak at magsaya rito."},
-  "greetingEvening1Title": {"en": "The day is done.", "fr": "La journée s'achève.", "it": "Il giorno è finito.", "ro": "Ziua s-a sfârșit.", "sw": "Siku imekwisha.", "tl": "Tapos na ang araw."},
-  "greetingEvening1Subtitle": {"en": "He gives sleep to those He loves.", "fr": "Il donne le sommeil à ses bien-aimés.", "it": "Egli dà il sonno ai suoi amati.", "ro": "El dă somn preaiubiților Lui.", "sw": "Huwapa wapenzi wake usingizi.", "tl": "Binibigyan Niya ng tulog ang Kanyang minamahal."},
-  "greetingEvening2Title": {"en": "Under His wings.", "fr": "Sous ses ailes.", "it": "Sotto le sue ali.", "ro": "Sub aripile Lui.", "sw": "Chini ya mabawa yake.", "tl": "Sa ilalim ng Kanyang mga pakpak."},
-  "greetingEvening2Subtitle": {"en": "You will find refuge tonight.", "fr": "Vous trouverez refuge cette nuit.", "it": "Troverai rifugio stanotte.", "ro": "Vei găsi adăpost în noaptea aceasta.", "sw": "Utapata kimbilio usiku huu.", "tl": "Makasusumpong ka ng kanlungan ngayong gabi."},
-  "greetingEvening3Title": {"en": "Come to Me, you who are weary.", "fr": "Venez à moi, vous tous qui êtes fatigués.", "it": "Venite a me, voi tutti che siete affaticati.", "ro": "Veniți la Mine, toți cei trudiți.", "sw": "Njooni kwangu, ninyi nyote msumbukao.", "tl": "Lumapit kayo sa Akin, kayong nahihirapan."},
-  "greetingEvening3Subtitle": {"en": "And I will give you rest.", "fr": "Et je vous donnerai du repos.", "it": "E io vi darò riposo.", "ro": "Și Eu vă voi da odihnă.", "sw": "Nami nitawapumzisha.", "tl": "At kayo'y Aking bibigyan ng kapahingahan."},
-  "greetingGrace1Title": {"en": "Cast all your anxiety on Him.", "fr": "Déchargez-vous sur lui de tous vos soucis.", "it": "Getta su di Lui ogni tua preoccupazione.", "ro": "Aruncă asupra Lui toate îngrijorările tale.", "sw": "Mtwike yeye fadhaika zako zote.", "tl": "Ilagak mo sa Kanya ang lahat ng iyong alalahanin."},
-  "greetingGrace1Subtitle": {"en": "Because He cares for you.", "fr": "Car lui-même prend soin de vous.", "it": "Perché Egli ha cura di te.", "ro": "Căci El Însuși îngrijește de tine.", "sw": "Kwa maana yeye hujishughulisha sana kwa mambo yako.", "tl": "Sapagkat Siya'y nagmamalasakit sa iyo."},
-  "greetingGrace2Title": {"en": "My peace I give you.", "fr": "Je vous donne ma paix.", "it": "Vi do la mia pace.", "ro": "Vă dau pacea Mea.", "sw": "Amani yangu nawapa.", "tl": "Ang Aking kapayapaan ay ibinibigay Ko sa inyo."},
-  "greetingGrace2Subtitle": {"en": "Let not your heart be troubled.", "fr": "Que votre cœur ne se trouble point.", "it": "Il vostro cuore non sia turbato.", "ro": "Să nu vi se tulbure inima.", "sw": "Msifadhaike mioyoni mwenu.", "tl": "Huwag mabagabag ang inyong puso."},
-  "greetingGrace3Title": {"en": "He heals the brokenhearted.", "fr": "Il guérit ceux qui ont le cœur brisé.", "it": "Egli guarisce chi ha il cuore spezzato.", "ro": "El vindecă pe cei cu inima zdrobită.", "sw": "Huwaponya waliovunjika moyo.", "tl": "Pinagagaling Niya ang mga bagbag ang puso."},
-  "greetingGrace3Subtitle": {"en": "And binds up their wounds.", "fr": "Et il panse leurs blessures.", "it": "E fascia le loro ferite.", "ro": "Și le leagă rănile.", "sw": "Na kuziganga jeraha zao.", "tl": "At tinatalian ang kanilang mga sugat."},
-  "greetingGrace4Title": {"en": "Nothing can separate us.", "fr": "Rien ne pourra nous séparer.", "it": "Nulla potrà separarci.", "ro": "Nimic nu ne va putea despărți.", "sw": "Hakuna kitakachoweza kututenga.", "tl": "Walang makapaghihiwalay sa atin."},
-  "greetingGrace4Subtitle": {"en": "From the love of God.", "fr": "De l'amour de Dieu.", "it": "Dall'amore di Dio.", "ro": "De dragostea lui Dumnezeu.", "sw": "Na upendo wa Mungu.", "tl": "Sa pag-ibig ng Diyos."},
-  "greetingCheer1Title": {"en": "Be strong and courageous.", "fr": "Fortifiez-vous et ayez du courage.", "it": "Sii forte e coraggioso.", "ro": "Întărește-te și îmbărbătează-te.", "sw": "Uwe hodari na moyo wa ushujaa.", "tl": "Magpakalakas ka at magpakatapang."},
-  "greetingCheer1Subtitle": {"en": "The Lord your God goes with you.", "fr": "L'Éternel, votre Dieu, marche avec vous.", "it": "Il Signore, il tuo Dio, è con te.", "ro": "Domnul, Dumnezeul tău, merge cu tine.", "sw": "Bwana, Mungu wako, yu pamoja nawe.", "tl": "Ang Panginoon mong Diyos ay sumasaiyo."},
-  "greetingCheer2Title": {"en": "Run with endurance.", "fr": "Courez avec persévérance.", "it": "Corri con perseveranza.", "ro": "Aleargă cu stăruință.", "sw": "Piga mbio kwa saburi.", "tl": "Tumakbo nang may pagtitiis."},
-  "greetingCheer2Subtitle": {"en": "Keep your eyes fixed on Jesus.", "fr": "Gardez les yeux fixés sur Jésus.", "it": "Tieni lo sguardo fisso su Gesù.", "ro": "Ține-ți ochii pironiți asupra lui Isus.", "sw": "Ukimtazama Yesu.", "tl": "Ituon ang iyong paningin kay Jesus."},
-  "greetingCheer3Title": {"en": "Iron sharpens iron.", "fr": "Le fer aiguise le fer.", "it": "Il ferro affila il ferro.", "ro": "Fierul ascute fierul.", "sw": "Chuma hunoa chuma.", "tl": "Ang bakal ay nagpapatalas sa bakal."},
-  "greetingCheer3Subtitle": {"en": "Grow together in the Word.", "fr": "Grandissez ensemble dans la Parole.", "it": "Crescete insieme nella Parola.", "ro": "Creșteți împreună în Cuvânt.", "sw": "Kueni pamoja katika Neno.", "tl": "Lumago nang sama-sama sa Salita."},
-  "greetingEyebrowMorning": {"en": "{day} morning", "fr": "{day} matin", "it": "{day} mattina", "ro": "{day} dimineața", "sw": "{day} asubuhi", "tl": "{day} ng umaga", "@": {"placeholders": {"day": {"type": "String"}}}},
-  "greetingEyebrowAfternoon": {"en": "{day} afternoon", "fr": "{day} après-midi", "it": "{day} pomeriggio", "ro": "{day} după-amiaza", "sw": "{day} mchana", "tl": "{day} ng hapon", "@": {"placeholders": {"day": {"type": "String"}}}},
-  "greetingEyebrowEvening": {"en": "{day} evening", "fr": "{day} soir", "it": "{day} sera", "ro": "{day} seara", "sw": "{day} jioni", "tl": "{day} ng gabi", "@": {"placeholders": {"day": {"type": "String"}}}},
-  "greetingEyebrowNight": {"en": "{day} night", "fr": "{day} nuit", "it": "{day} notte", "ro": "{day} noaptea", "sw": "{day} usiku", "tl": "{day} ng madaling-araw", "@": {"placeholders": {"day": {"type": "String"}}}},
-  "creditsScripture": {"en": "Scripture", "fr": "Écritures", "it": "Scrittura", "ro": "Scriptura", "sw": "Maandiko", "tl": "Kasulatan"},
-  "creditsCommentary": {"en": "Commentary", "fr": "Commentaires", "it": "Commentario", "ro": "Comentariu", "sw": "Maelezo", "tl": "Komentaryo"},
-  "creditsStudyTools": {"en": "Study tools", "fr": "Outils d'étude", "it": "Strumenti di studio", "ro": "Instrumente de studiu", "sw": "Zana za kujifunza", "tl": "Mga kagamitan sa pag-aaral"},
-  "creditsBibleStories": {"en": "Bible stories", "fr": "Histoires bibliques", "it": "Storie bibliche", "ro": "Povestiri biblice", "sw": "Hadithi za Biblia", "tl": "Mga Kuwento sa Bibliya"},
-  "creditsFonts": {"en": "Fonts", "fr": "Polices", "it": "Caratteri", "ro": "Fonturi", "sw": "Fonti", "tl": "Mga font"},
-  "creditsCommentaryPerspective": {"en": "The library includes Seventh-day Adventist pioneer works and general Christian commentaries from other traditions. Interpretive perspectives vary; all are study aids alongside Scripture, not part of it.", "fr": "La bibliothèque comprend des ouvrages de pionniers adventistes du septième jour et des commentaires chrétiens d'autres traditions. Les perspectives d'interprétation varient ; tous sont des aides à l'étude, à côté des Écritures, et n'en font pas partie.", "it": "La biblioteca include opere dei pionieri avventisti del settimo giorno e commentari cristiani di altre tradizioni. Le prospettive interpretative variano; tutti sono strumenti di studio accanto alla Scrittura, non parte di essa.", "ro": "Biblioteca include lucrări ale pionierilor adventiști de ziua a șaptea și comentarii creștine din alte tradiții. Perspectivele de interpretare diferă; toate sunt ajutoare de studiu alături de Scriptură, nu parte din ea.", "sw": "Maktaba inajumuisha kazi za waanzilishi Waadventista Wasabato na fafanuzi za Kikristo kutoka mapokeo mengine. Mitazamo ya ufasiri hutofautiana; zote ni nyenzo za kujifunza pamoja na Maandiko, si sehemu yake.", "tl": "Kasama sa aklatan ang mga akda ng mga Adventistang pioneer at mga komentaryong Kristiyano mula sa ibang tradisyon. Nagkakaiba ang mga pananaw sa pagpapakahulugan; lahat ay pantulong sa pag-aaral kasama ng Kasulatan, hindi bahagi nito."},
-  "creditsPublicDomain": {"en": "Public domain.", "fr": "Domaine public.", "it": "Pubblico dominio.", "ro": "Domeniu public.", "sw": "Haki za umma (public domain).", "tl": "Pampublikong domain."},
-  "creditsPublicDomainUs": {"en": "Public domain in the US.", "fr": "Domaine public aux États-Unis.", "it": "Pubblico dominio negli Stati Uniti.", "ro": "Domeniu public în SUA.", "sw": "Haki za umma nchini Marekani.", "tl": "Pampublikong domain sa US."},
-  "creditsKjvDetail": {"en": "Public domain. Strong's-tagged edition also public domain.", "fr": "Domaine public. L'édition annotée avec les numéros Strong l'est aussi.", "it": "Pubblico dominio. Anche l'edizione con i numeri Strong è di pubblico dominio.", "ro": "Domeniu public. Ediția cu numerele Strong este, de asemenea, în domeniul public.", "sw": "Haki za umma. Toleo lenye namba za Strong pia ni la umma.", "tl": "Pampublikong domain. Pampublikong domain din ang edisyong may numerong Strong's."},
-  "creditsSelectedWriting": {"en": "Selected writing.", "fr": "Écrits choisis.", "it": "Scritti scelti.", "ro": "Scrieri alese.", "sw": "Maandishi teule.", "tl": "Mga piling akda."},
-  "creditsAdditionalTranslationsDetail": {"en": "Downloaded from the Free Use Bible API (bible.helloao.org) and open-bibles (github.com/seven1m/open-bibles).", "fr": "Téléchargées depuis la Free Use Bible API (bible.helloao.org) et open-bibles (github.com/seven1m/open-bibles).", "it": "Scaricate dalla Free Use Bible API (bible.helloao.org) e da open-bibles (github.com/seven1m/open-bibles).", "ro": "Descărcate din Free Use Bible API (bible.helloao.org) și open-bibles (github.com/seven1m/open-bibles).", "sw": "Zimepakuliwa kutoka Free Use Bible API (bible.helloao.org) na open-bibles (github.com/seven1m/open-bibles).", "tl": "Na-download mula sa Free Use Bible API (bible.helloao.org) at open-bibles (github.com/seven1m/open-bibles)."},
-  "creditsNarrativeDetail": {"en": "Adapted from The Graham Bible (grahambible.com), AI-assisted and human reviewed.", "fr": "Adaptés de The Graham Bible (grahambible.com), avec l'aide de l'IA et relus par des humains.", "it": "Adattati da The Graham Bible (grahambible.com), con l'aiuto dell'IA e revisionati da persone.", "ro": "Adaptate după The Graham Bible (grahambible.com), cu ajutorul IA și verificate de oameni.", "sw": "Zimetoholewa kutoka The Graham Bible (grahambible.com), kwa msaada wa AI na kukaguliwa na watu.", "tl": "Hinango mula sa The Graham Bible (grahambible.com), sa tulong ng AI at sinuri ng tao."},
-  "creditsFontsDetail": {"en": "SIL Open Font License 1.1. Full notices under {licenses}.", "fr": "SIL Open Font License 1.1. Avis complets dans {licenses}.", "it": "SIL Open Font License 1.1. Avvisi completi in {licenses}.", "ro": "SIL Open Font License 1.1. Notificările complete se află la {licenses}.", "sw": "SIL Open Font License 1.1. Taarifa kamili ziko chini ya {licenses}.", "tl": "SIL Open Font License 1.1. Kumpletong abiso sa ilalim ng {licenses}.", "@": {"placeholders": {"licenses": {"type": "String"}}}},
-  "miscPlanNotFound": {"en": "Plan not found.", "fr": "Plan introuvable.", "it": "Piano non trovato.", "ro": "Planul nu a fost găsit.", "sw": "Mpango haukupatikana.", "tl": "Hindi nahanap ang plano."},
-  "miscPaceUnsupported": {"en": "This plan was created before pace adjustment was supported. Recreate it to enable this feature.", "fr": "Ce plan a été créé avant que l'ajustement du rythme soit possible. Recréez-le pour activer cette fonction.", "it": "Questo piano è stato creato prima che fosse possibile regolare il ritmo. Ricrealo per attivare questa funzione.", "ro": "Acest plan a fost creat înainte ca ajustarea ritmului să fie disponibilă. Creează-l din nou pentru a activa această funcție.", "sw": "Mpango huu uliundwa kabla ya kuwezesha kurekebisha kasi. Uunde upya ili kuwasha kipengele hiki.", "tl": "Ginawa ang planong ito bago pa suportado ang pag-aayos ng bilis. Gawin itong muli para magamit ang feature na ito."},
-  "miscPaceFailed": {"en": "Pace adjustment failed: {error}", "fr": "Échec de l'ajustement du rythme : {error}", "it": "Regolazione del ritmo non riuscita: {error}", "ro": "Ajustarea ritmului a eșuat: {error}", "sw": "Imeshindwa kurekebisha kasi: {error}", "tl": "Nabigo ang pag-aayos ng bilis: {error}", "@": {"placeholders": {"error": {"type": "String"}}}},
-  "miscPlanLoadFailed": {"en": "Could not load this plan ({error}).", "fr": "Impossible de charger ce plan ({error}).", "it": "Impossibile caricare questo piano ({error}).", "ro": "Planul nu a putut fi încărcat ({error}).", "sw": "Imeshindwa kupakia mpango huu ({error}).", "tl": "Hindi ma-load ang planong ito ({error}).", "@": {"placeholders": {"error": {"type": "String"}}}},
-  "miscFolderSermon": {"en": "Sermon prep", "fr": "Préparation de sermon", "it": "Preparazione sermoni", "ro": "Pregătire de predici", "sw": "Maandalizi ya mahubiri", "tl": "Paghahanda ng sermon"},
-  "miscFolderMemorize": {"en": "Memorize", "fr": "À mémoriser", "it": "Da memorizzare", "ro": "De memorat", "sw": "Kukariri", "tl": "Isaulo"},
-  "miscFolderComfort": {"en": "Comfort", "fr": "Réconfort", "it": "Conforto", "ro": "Mângâiere", "sw": "Faraja", "tl": "Kaaliwan"},
-  "miscFolderStudy": {"en": "Study", "fr": "Étude", "it": "Studio", "ro": "Studiu", "sw": "Kujifunza", "tl": "Pag-aaral"},
-  "miscColorPurple": {"en": "Purple", "fr": "Violet", "it": "Viola", "ro": "Mov", "sw": "Zambarau", "tl": "Lila"},
-  "miscColorGreen": {"en": "Green", "fr": "Vert", "it": "Verde", "ro": "Verde", "sw": "Kijani", "tl": "Berde"},
-  "miscColorBlue": {"en": "Blue", "fr": "Bleu", "it": "Blu", "ro": "Albastru", "sw": "Bluu", "tl": "Asul"},
-  "miscColorPink": {"en": "Pink", "fr": "Rose", "it": "Rosa", "ro": "Roz", "sw": "Waridi", "tl": "Rosas"},
-  "miscColorRed": {"en": "Red", "fr": "Rouge", "it": "Rosso", "ro": "Roșu", "sw": "Nyekundu", "tl": "Pula"},
-  "miscSearchBibleVerse": {"en": "Bible verse", "fr": "Verset biblique", "it": "Versetto biblico", "ro": "Verset biblic", "sw": "Mstari wa Biblia", "tl": "Talata sa Bibliya"},
-  "miscSearchCommentary": {"en": "Commentary", "fr": "Commentaire", "it": "Commento", "ro": "Comentariu", "sw": "Maelezo", "tl": "Komentaryo"},
-  "miscSearchCommentaryBy": {"en": "{author} Commentary", "fr": "Commentaire de {author}", "it": "Commento di {author}", "ro": "Comentariul lui {author}", "sw": "Maelezo ya {author}", "tl": "Komentaryo ni {author}", "@": {"placeholders": {"author": {"type": "String"}}}},
-  "miscSearchNote": {"en": "Note • {date}", "fr": "Note • {date}", "it": "Nota • {date}", "ro": "Notiță • {date}", "sw": "Dokezo • {date}", "tl": "Tala • {date}", "@": {"placeholders": {"date": {"type": "String"}}}},
-  "miscSearchJumpTo": {"en": "Jump to", "fr": "Aller à", "it": "Vai a", "ro": "Salt la", "sw": "Nenda kwa", "tl": "Pumunta sa"},
-  "miscSearchGoToChapter": {"en": "Go to {book} chapter {chapter}", "fr": "Aller à {book}, chapitre {chapter}", "it": "Vai a {book}, capitolo {chapter}", "ro": "Mergi la {book}, capitolul {chapter}", "sw": "Nenda kwa {book} sura ya {chapter}", "tl": "Pumunta sa {book} kabanata {chapter}", "@": {"placeholders": {"book": {"type": "String"}, "chapter": {"type": "int"}}}},
-  "miscSearchGoToVerse": {"en": "Go to {book} chapter {chapter}, verse {verse}", "fr": "Aller à {book}, chapitre {chapter}, verset {verse}", "it": "Vai a {book}, capitolo {chapter}, versetto {verse}", "ro": "Mergi la {book}, capitolul {chapter}, versetul {verse}", "sw": "Nenda kwa {book} sura ya {chapter}, mstari wa {verse}", "tl": "Pumunta sa {book} kabanata {chapter}, talata {verse}", "@": {"placeholders": {"book": {"type": "String"}, "chapter": {"type": "int"}, "verse": {"type": "int"}}}},
-  "miscSearchDictionary": {"en": "Dictionary ({sources})", "fr": "Dictionnaire ({sources})", "it": "Dizionario ({sources})", "ro": "Dicționar ({sources})", "sw": "Kamusi ({sources})", "tl": "Diksiyonaryo ({sources})", "@": {"placeholders": {"sources": {"type": "String"}}}},
-  "miscMostReadSnippet": {"en": "{count, plural, =1{Frequently read passage (1 visit)} other{Frequently read passage ({count} visits)}}", "fr": "{count, plural, =1{Passage souvent lu (1 visite)} other{Passage souvent lu ({count} visites)}}", "it": "{count, plural, =1{Brano letto spesso (1 visita)} other{Brano letto spesso ({count} visite)}}", "ro": "{count, plural, =1{Pasaj citit des (1 vizită)} few{Pasaj citit des ({count} vizite)} other{Pasaj citit des ({count} de vizite)}}", "sw": "{count, plural, =1{Kifungu kinachosomwa mara nyingi (ziara 1)} other{Kifungu kinachosomwa mara nyingi (ziara {count})}}", "tl": "{count, plural, =1{Madalas basahing talata (1 pagbisita)} other{Madalas basahing talata ({count} pagbisita)}}", "@": {"placeholders": {"count": {"type": "int"}}}},
-  "miscEmotionAnxiety": {"en": "anxiety", "fr": "anxiété", "it": "ansia", "ro": "anxietate", "sw": "wasiwasi", "tl": "pagkabalisa"},
-  "miscEmotionFear": {"en": "fear", "fr": "peur", "it": "paura", "ro": "frică", "sw": "hofu", "tl": "takot"},
-  "miscEmotionSadness": {"en": "sadness", "fr": "tristesse", "it": "tristezza", "ro": "tristețe", "sw": "huzuni", "tl": "kalungkutan"},
-  "miscEmotionLoneliness": {"en": "loneliness", "fr": "solitude", "it": "solitudine", "ro": "singurătate", "sw": "upweke", "tl": "pag-iisa"},
-  "miscEmotionAnger": {"en": "anger", "fr": "colère", "it": "rabbia", "ro": "mânie", "sw": "hasira", "tl": "galit"},
-  "miscEmotionTemptation": {"en": "temptation", "fr": "tentation", "it": "tentazione", "ro": "ispită", "sw": "jaribu", "tl": "tukso"},
-  "miscEmotionGuilt": {"en": "guilt", "fr": "culpabilité", "it": "senso di colpa", "ro": "vinovăție", "sw": "hatia", "tl": "pagkakasala"},
-  "miscEmotionHopelessness": {"en": "hopelessness", "fr": "désespoir", "it": "sconforto", "ro": "deznădejde", "sw": "kukata tamaa", "tl": "kawalan ng pag-asa"},
-  "miscEmotionConfusion": {"en": "confusion", "fr": "confusion", "it": "confusione", "ro": "confuzie", "sw": "kuchanganyikiwa", "tl": "kalituhan"},
-  "miscEmotionDoubt": {"en": "doubt", "fr": "doute", "it": "dubbio", "ro": "îndoială", "sw": "shaka", "tl": "pag-aalinlangan"},
-  "miscEmotionExhaustion": {"en": "exhaustion", "fr": "épuisement", "it": "sfinimento", "ro": "epuizare", "sw": "uchovu", "tl": "pagod"},
-  "miscEmotionGratitude": {"en": "gratitude", "fr": "gratitude", "it": "gratitudine", "ro": "recunoștință", "sw": "shukrani", "tl": "pasasalamat"},
-  "miscEmotionJoy": {"en": "joy", "fr": "joie", "it": "gioia", "ro": "bucurie", "sw": "furaha", "tl": "kagalakan"},
-  "miscEmotionPeace": {"en": "peace", "fr": "paix", "it": "pace", "ro": "pace", "sw": "amani", "tl": "kapayapaan"},
-  "miscPrayerComfort": {"en": "Lord, bring comfort and strength as I navigate feelings of {emotion} today.", "fr": "Seigneur, apporte-moi réconfort et force face à ce sentiment de {emotion} aujourd'hui.", "it": "Signore, donami conforto e forza mentre oggi affronto sentimenti di {emotion}.", "ro": "Doamne, dă-mi mângâiere și putere în fața sentimentelor de {emotion} de astăzi.", "sw": "Bwana, nipe faraja na nguvu ninapopitia hisia za {emotion} leo.", "tl": "Panginoon, bigyan Mo ako ng aliw at lakas habang dinaranas ko ang {emotion} ngayon.", "@": {"placeholders": {"emotion": {"type": "String"}}}},
-  "miscPrayerScripture": {"en": "Grant me the grace to reflect on scripture, especially {verse}.", "fr": "Accorde-moi la grâce de méditer les Écritures, en particulier {verse}.", "it": "Concedimi la grazia di meditare la Scrittura, in particolare {verse}.", "ro": "Dă-mi harul să cuget la Scriptură, mai ales la {verse}.", "sw": "Nijalie neema ya kutafakari Maandiko, hasa {verse}.", "tl": "Ipagkaloob Mo sa akin ang biyayang pagnilayan ang Kasulatan, lalo na ang {verse}.", "@": {"placeholders": {"verse": {"type": "String"}}}},
-  "miscPrayerGuide": {"en": "Guide my steps in hope and peace, trusting in Your faithful promises.", "fr": "Guide mes pas dans l'espérance et la paix, confiant en tes promesses fidèles.", "it": "Guida i miei passi nella speranza e nella pace, confidando nelle tue promesse fedeli.", "ro": "Călăuzește-mi pașii în nădejde și pace, încrezându-mă în promisiunile Tale credincioase.", "sw": "Uongoze hatua zangu katika tumaini na amani, nikitumaini ahadi zako za uaminifu.", "tl": "Gabayan Mo ang aking mga hakbang sa pag-asa at kapayapaan, nagtitiwala sa Iyong tapat na mga pangako."}
+  "notifDailyTitle": {"en": "Time to Read", "fr": "C'est l'heure de lire", "it": "È ora di leggere", "ro": "E timpul să citești", "sw": "Wakati wa Kusoma", "tl": "Oras na para Magbasa",
+    "es": "Hora de leer",
+    "pt": "Hora de ler"
+  },
+  "notifDailyBody": {"en": "Take a moment to read and reflect today.", "fr": "Prenez un moment pour lire et méditer aujourd'hui.", "it": "Prenditi un momento per leggere e riflettere oggi.", "ro": "Ia-ți un moment azi să citești și să reflectezi.", "sw": "Chukua muda leo kusoma na kutafakari.", "tl": "Maglaan ng sandali ngayon para magbasa at magnilay.",
+    "es": "Tómate un momento para leer y reflexionar hoy.",
+    "pt": "Reserve um momento para ler e refletir hoje."
+  },
+  "notifDailyChannel": {"en": "Daily reminders", "fr": "Rappels quotidiens", "it": "Promemoria giornalieri", "ro": "Mementouri zilnice", "sw": "Vikumbusho vya Kila Siku", "tl": "Mga Araw-araw na Paalala",
+    "es": "Daily reminders",
+    "pt": "Daily reminders"
+  },
+  "notifDailyChannelDesc": {"en": "Reminders for daily reading", "fr": "Rappels pour la lecture quotidienne", "it": "Promemoria per la lettura quotidiana", "ro": "Mementouri pentru citirea zilnică", "sw": "Vikumbusho vya kusoma kila siku", "tl": "Mga paalala para sa araw-araw na pagbasa",
+    "es": "Recordatorios para la lectura diaria",
+    "pt": "Lembretes para a leitura diária"
+  },
+  "notifPrayerTitle": {"en": "Time for prayer", "fr": "C'est l'heure de prier", "it": "È ora di pregare", "ro": "E timpul pentru rugăciune", "sw": "Wakati wa Maombi", "tl": "Oras na para Manalangin",
+    "es": "Time for prayer",
+    "pt": "Time for prayer"
+  },
+  "notifPrayerBody": {"en": "Pause for a moment of reflection and prayer.", "fr": "Faites une pause pour un moment de méditation et de prière.", "it": "Fermati per un momento di riflessione e preghiera.", "ro": "Oprește-te pentru un moment de reflecție și rugăciune.", "sw": "Tulia kwa muda wa kutafakari na kuomba.", "tl": "Huminto sandali para magnilay at manalangin.",
+    "es": "Haz una pausa para un momento de reflexión y oración.",
+    "pt": "Faça uma pausa para um momento de reflexão e oração."
+  },
+  "notifPrayerChannel": {"en": "Prayer reminders", "fr": "Rappels de prière", "it": "Promemoria di preghiera", "ro": "Mementouri de rugăciune", "sw": "Vikumbusho vya Maombi", "tl": "Mga Paalala sa Panalangin",
+    "es": "Prayer reminders",
+    "pt": "Prayer reminders"
+  },
+  "notifPrayerChannelDesc": {"en": "Daily prayer reminders", "fr": "Rappels de prière quotidiens", "it": "Promemoria giornalieri di preghiera", "ro": "Mementouri zilnice de rugăciune", "sw": "Vikumbusho vya maombi kila siku", "tl": "Mga araw-araw na paalala sa panalangin",
+    "es": "Recordatorios diarios de oración",
+    "pt": "Lembretes diários de oração"
+  },
+  "notifWeeklyTitle": {"en": "Weekly study time", "fr": "Temps d'étude hebdomadaire", "it": "Studio settimanale", "ro": "Timpul de studiu săptămânal", "sw": "Wakati wa Kujifunza wa Wiki", "tl": "Lingguhang Oras ng Pag-aaral",
+    "es": "Weekly study time",
+    "pt": "Weekly study time"
+  },
+  "notifWeeklyBody": {"en": "It's your scheduled time for study and reflection.", "fr": "C'est votre moment prévu pour l'étude et la méditation.", "it": "È il momento che hai scelto per lo studio e la riflessione.", "ro": "Este momentul tău programat pentru studiu și reflecție.", "sw": "Ni wakati wako uliopangwa wa kujifunza na kutafakari.", "tl": "Ito ang nakatakda mong oras para mag-aral at magnilay.",
+    "es": "It's your scheduled time for study and reflection.",
+    "pt": "It's your scheduled time for study and reflection."
+  },
+  "notifWeeklyChannel": {"en": "Weekly reminders", "fr": "Rappels hebdomadaires", "it": "Promemoria settimanali", "ro": "Mementouri săptămânale", "sw": "Vikumbusho vya Kila Wiki", "tl": "Mga Lingguhang Paalala",
+    "es": "Weekly reminders",
+    "pt": "Weekly reminders"
+  },
+  "notifWeeklyChannelDesc": {"en": "Custom weekly study reminders", "fr": "Rappels d'étude hebdomadaires personnalisés", "it": "Promemoria settimanali di studio personalizzati", "ro": "Mementouri personalizate de studiu săptămânal", "sw": "Vikumbusho maalum vya kujifunza kila wiki", "tl": "Mga pasadyang lingguhang paalala sa pag-aaral",
+    "es": "Lembretes de estudo semanais personalizados",
+    "pt": "Lembretes de estudo semanais personalizados"
+  },
+  "notifSabbathTitle": {"en": "The Sabbath is approaching", "fr": "Le sabbat approche", "it": "Il sabato si avvicina", "ro": "Se apropie Sabatul", "sw": "Sabato Inakaribia", "tl": "Malapit na ang Sabbath",
+    "es": "The Sabbath is approaching",
+    "pt": "The Sabbath is approaching"
+  },
+  "notifSabbathBody": {"en": "Welcome the day of rest.", "fr": "Accueillez le jour du repos.", "it": "Accogli il giorno del riposo.", "ro": "Primește ziua de odihnă.", "sw": "Karibisha siku ya mapumziko.", "tl": "Salubungin ang araw ng kapahingahan.",
+    "es": "Bienvenido al día de descanso.",
+    "pt": "Bem-vindo ao dia de descanso."
+  },
+  "notifSabbathChannel": {"en": "Sabbath reminders", "fr": "Rappels du sabbat", "it": "Promemoria del sabato", "ro": "Mementouri de Sabat", "sw": "Vikumbusho vya Sabato", "tl": "Mga Paalala sa Sabbath",
+    "es": "Sabbath reminders",
+    "pt": "Sabbath reminders"
+  },
+  "notifSabbathChannelDesc": {"en": "Weekly sunset reminders for Sabbath", "fr": "Rappels hebdomadaires au coucher du soleil pour le sabbat", "it": "Promemoria settimanali al tramonto per il sabato", "ro": "Mementouri săptămânale la apus pentru Sabat", "sw": "Vikumbusho vya kila wiki vya machweo kwa Sabato", "tl": "Lingguhang paalala sa paglubog ng araw para sa Sabbath",
+    "es": "Recordatorios semanales del atardecer para el sábado",
+    "pt": "Lembretes semanais do pôr do sol para o sábado"
+  },
+  "notifPlanBody": {"en": "Take a moment to read your daily passage.", "fr": "Prenez un moment pour lire votre passage du jour.", "it": "Prenditi un momento per leggere il brano di oggi.", "ro": "Ia-ți un moment să citești pasajul zilei.", "sw": "Chukua muda kusoma kifungu chako cha leo.", "tl": "Maglaan ng sandali para basahin ang iyong talata ngayong araw.",
+    "es": "Tómate un momento para leer tu pasaje diario.",
+    "pt": "Reserve um momento para ler a sua passagem diária."
+  },
+  "notifPlanChannel": {"en": "Reading plan", "fr": "Plan de lecture", "it": "Piano di lettura", "ro": "Plan de citire", "sw": "Mpango wa Kusoma", "tl": "Plano sa Pagbasa",
+    "es": "Plan de lectura",
+    "pt": "Plano de leitura"
+  },
+  "notifPlanChannelDesc": {"en": "Reading plan reminders", "fr": "Rappels du plan de lecture", "it": "Promemoria del piano di lettura", "ro": "Mementouri pentru planul de citire", "sw": "Vikumbusho vya mpango wa kusoma", "tl": "Mga paalala sa plano sa pagbasa",
+    "es": "Reading plan reminders",
+    "pt": "Reading plan reminders"
+  },
+  "widgetStreakActive": {"en": "Streak active!", "fr": "Série en cours !", "it": "Serie attiva!", "ro": "Serie activă!", "sw": "Mfululizo unaendelea!", "tl": "Tuloy ang streak!",
+    "es": "Streak active!",
+    "pt": "Streak active!"
+  },
+  "widgetStreakInactive": {"en": "Read today to keep your streak", "fr": "Lisez aujourd'hui pour garder votre série", "it": "Leggi oggi per mantenere la serie", "ro": "Citește astăzi ca să-ți păstrezi seria", "sw": "Soma leo kudumisha mfululizo wako", "tl": "Magbasa ngayon para mapanatili ang streak",
+    "es": "Read today to keep your streak",
+    "pt": "Read today to keep your streak"
+  },
+  "widgetFallbackWord": {"en": "Grace (Charis)", "fr": "Grâce (Charis)", "it": "Grazia (Charis)", "ro": "Har (Charis)", "sw": "Neema (Charis)", "tl": "Biyaya (Charis)",
+    "es": "Grace (Charis)",
+    "pt": "Grace (Charis)"
+  },
+  "widgetFallbackDefinition": {"en": "The unmerited favor and divine love of God bestowed upon humanity.", "fr": "La faveur imméritée et l'amour divin de Dieu accordés à l'humanité.", "it": "Il favore immeritato e l'amore divino di Dio donati all'umanità.", "ro": "Favoarea nemeritată și dragostea divină a lui Dumnezeu revărsate asupra omenirii.", "sw": "Upendeleo usiostahiliwa na upendo wa Mungu uliotolewa kwa wanadamu.", "tl": "Ang di-karapat-dapat na kagandahang-loob at banal na pag-ibig ng Diyos na ipinagkaloob sa sangkatauhan.",
+    "es": "The unmerited favor and divine love of God bestowed upon humanity.",
+    "pt": "The unmerited favor and divine love of God bestowed upon humanity."
+  },
+  "widgetStyleDusk": {"en": "Celestial Dusk", "fr": "Crépuscule céleste", "it": "Crepuscolo celeste", "ro": "Amurg celest", "sw": "Machweo ya Mbinguni", "tl": "Makalangit na Takipsilim",
+    "es": "Celestial Dusk",
+    "pt": "Celestial Dusk"
+  },
+  "widgetStyleDawn": {"en": "Morning Dawn", "fr": "Aube matinale", "it": "Alba mattutina", "ro": "Zori de dimineață", "sw": "Mapambazuko", "tl": "Bukang-liwayway",
+    "es": "Morning Dawn",
+    "pt": "Morning Dawn"
+  },
+  "widgetStyleEmerald": {"en": "Sanctuary Emerald", "fr": "Émeraude du sanctuaire", "it": "Smeraldo del santuario", "ro": "Smarald de sanctuar", "sw": "Zumaridi ya Patakatifu", "tl": "Esmeralda ng Santuwaryo",
+    "es": "Sanctuary Emerald",
+    "pt": "Sanctuary Emerald"
+  },
+  "widgetStyleGolden": {"en": "Sacred Amber", "fr": "Ambre sacré", "it": "Ambra sacra", "ro": "Chihlimbar sacru", "sw": "Kaharabu Takatifu", "tl": "Banal na Amber",
+    "es": "Sacred Amber",
+    "pt": "Sacred Amber"
+  },
+  "widgetStyleRoyal": {"en": "Royal Sapphire", "fr": "Saphir royal", "it": "Zaffiro reale", "ro": "Safir regal", "sw": "Yakuti ya Kifalme", "tl": "Maharlikang Zafiro",
+    "es": "Royal Sapphire",
+    "pt": "Royal Sapphire"
+  },
+  "widgetStyleGlassLight": {"en": "Frosted Glass", "fr": "Verre givré", "it": "Vetro smerigliato", "ro": "Sticlă mată", "sw": "Kioo cha Barafu", "tl": "Frosted na Salamin",
+    "es": "Frosted Glass",
+    "pt": "Frosted Glass"
+  },
+  "widgetStyleGlassDark": {"en": "Obsidian Glass", "fr": "Verre d'obsidienne", "it": "Vetro d'ossidiana", "ro": "Sticlă de obsidian", "sw": "Kioo cha Obsidiani", "tl": "Obsidian na Salamin",
+    "es": "Obsidian Glass",
+    "pt": "Obsidian Glass"
+  },
+  "widgetStyleSolidLight": {"en": "Clean Paper", "fr": "Papier blanc", "it": "Carta bianca", "ro": "Hârtie curată", "sw": "Karatasi Safi", "tl": "Malinis na Papel",
+    "es": "Clean Paper",
+    "pt": "Clean Paper"
+  },
+  "widgetStyleSolidDark": {"en": "Deep Charcoal", "fr": "Charbon profond", "it": "Carbone intenso", "ro": "Cărbune adânc", "sw": "Mkaa Mzito", "tl": "Malalim na Uling",
+    "es": "Deep Charcoal",
+    "pt": "Deep Charcoal"
+  },
+  "widgetStyleTransparent": {"en": "Clear Wallpaper", "fr": "Fond d'écran visible", "it": "Sfondo trasparente", "ro": "Fundal transparent", "sw": "Mandhari Wazi", "tl": "Malinaw na Wallpaper",
+    "es": "Clear Wallpaper",
+    "pt": "Clear Wallpaper"
+  },
+  "backupShareSubject": {"en": "The Blessed Bible Backup", "fr": "Sauvegarde The Blessed Bible", "it": "Backup di The Blessed Bible", "ro": "Copie de rezervă The Blessed Bible", "sw": "Nakala Rudufu ya The Blessed Bible", "tl": "Backup ng The Blessed Bible",
+    "es": "The Blessed Bible Backup",
+    "pt": "The Blessed Bible Backup"
+  },
+  "backupExportFailed": {"en": "Export failed: {error}", "fr": "Échec de l'exportation : {error}", "it": "Esportazione non riuscita: {error}", "ro": "Exportul a eșuat: {error}", "sw": "Imeshindwa kuhamisha: {error}", "tl": "Nabigo ang pag-export: {error}", "@": {"placeholders": {"error": {"type": "String"}}},
+    "es": "Error al exportar: {error}",
+    "pt": "Falha na exportação: {error}"
+  },
+  "backupNewerVersion": {"en": "This backup is from a newer app version (v{version}). Update the app first.", "fr": "Cette sauvegarde provient d'une version plus récente de l'application (v{version}). Mettez d'abord l'application à jour.", "it": "Questo backup proviene da una versione più recente dell'app (v{version}). Aggiorna prima l'app.", "ro": "Această copie provine dintr-o versiune mai nouă a aplicației (v{version}). Actualizează mai întâi aplicația.", "sw": "Nakala hii ni ya toleo jipya zaidi la programu (v{version}). Sasisha programu kwanza.", "tl": "Galing ang backup na ito sa mas bagong bersyon ng app (v{version}). I-update muna ang app.", "@": {"placeholders": {"version": {"type": "int"}}},
+    "es": "This backup is from a newer app version (v{version}). Update the app first.",
+    "pt": "This backup is from a newer app version (v{version}). Update the app first."
+  },
+  "backupConfirmTitle": {"en": "Confirm restore", "fr": "Confirmer la restauration", "it": "Conferma ripristino", "ro": "Confirmă restaurarea", "sw": "Thibitisha Kurejesha", "tl": "Kumpirmahin ang Pag-restore",
+    "es": "Confirm restore",
+    "pt": "Confirm restore"
+  },
+  "backupConfirmBody": {"en": "This will overwrite all existing notes, highlights, bookmarks, and settings. Are you sure?", "fr": "Cela remplacera toutes vos notes, surlignages, signets et réglages existants. Voulez-vous continuer ?", "it": "Verranno sovrascritti note, evidenziazioni, segnalibri e impostazioni esistenti. Sei sicuro?", "ro": "Toate notițele, evidențierile, marcajele și setările existente vor fi suprascrise. Ești sigur?", "sw": "Hii itabadilisha madokezo, alama za kuangazia, alamisho na mipangilio yote iliyopo. Una uhakika?", "tl": "Papalitan nito ang lahat ng kasalukuyang tala, highlight, bookmark at setting. Sigurado ka ba?",
+    "es": "Esto sobrescribirá todas las notas, resaltados, marcadores y ajustes existentes. ¿Seguro?",
+    "pt": "Isto substituirá todas as notas, realces, marcadores e definições existentes. Tem a certeza?"
+  },
+  "backupSkippedValues": {"en": "{count, plural, =1{1 value skipped} other{{count} values skipped}}", "fr": "{count, plural, =1{1 valeur ignorée} other{{count} valeurs ignorées}}", "it": "{count, plural, =1{1 valore saltato} other{{count} valori saltati}}", "ro": "{count, plural, =1{1 valoare omisă} few{{count} valori omise} other{{count} de valori omise}}", "sw": "{count, plural, =1{Thamani 1 imerukwa} other{Thamani {count} zimerukwa}}", "tl": "{count, plural, =1{1 value ang nilaktawan} other{{count} value ang nilaktawan}}", "@": {"placeholders": {"count": {"type": "int"}}},
+    "es": "{count, plural, =1{1 value skipped} other{{count} values skipped}}",
+    "pt": "{count, plural, =1{1 value skipped} other{{count} values skipped}}"
+  },
+  "backupRedownload": {"en": "{count, plural, =1{re-download 1 translation: {list}} other{re-download {count} translations: {list}}}", "fr": "{count, plural, =1{retéléchargez 1 traduction : {list}} other{retéléchargez {count} traductions : {list}}}", "it": "{count, plural, =1{scarica di nuovo 1 traduzione: {list}} other{scarica di nuovo {count} traduzioni: {list}}}", "ro": "{count, plural, =1{descarcă din nou 1 traducere: {list}} few{descarcă din nou {count} traduceri: {list}} other{descarcă din nou {count} de traduceri: {list}}}", "sw": "{count, plural, =1{pakua tena tafsiri 1: {list}} other{pakua tena tafsiri {count}: {list}}}", "tl": "{count, plural, =1{i-download muli ang 1 salin: {list}} other{i-download muli ang {count} salin: {list}}}", "@": {"placeholders": {"count": {"type": "int"}, "list": {"type": "String"}}},
+    "es": "{count, plural, =1{re-download 1 translation: {list}} other{re-download {count} translations: {list}}}",
+    "pt": "{count, plural, =1{re-download 1 translation: {list}} other{re-download {count} translations: {list}}}"
+  },
+  "backupRestored": {"en": "Backup restored successfully", "fr": "Sauvegarde restaurée avec succès", "it": "Backup ripristinato correttamente", "ro": "Copia de rezervă a fost restaurată cu succes", "sw": "Nakala rudufu imerejeshwa kikamilifu", "tl": "Matagumpay na na-restore ang backup",
+    "es": "Backup restored successfully",
+    "pt": "Backup restored successfully"
+  },
+  "backupRestoredWithDetails": {"en": "Backup restored ({details})", "fr": "Sauvegarde restaurée ({details})", "it": "Backup ripristinato ({details})", "ro": "Copia de rezervă a fost restaurată ({details})", "sw": "Nakala rudufu imerejeshwa ({details})", "tl": "Na-restore ang backup ({details})", "@": {"placeholders": {"details": {"type": "String"}}},
+    "es": "Backup restored ({details})",
+    "pt": "Backup restored ({details})"
+  },
+  "backupRestoreFailed": {"en": "Restore failed: invalid or corrupted backup ({error})", "fr": "Échec de la restauration : sauvegarde invalide ou corrompue ({error})", "it": "Ripristino non riuscito: backup non valido o danneggiato ({error})", "ro": "Restaurarea a eșuat: copie de rezervă invalidă sau coruptă ({error})", "sw": "Imeshindwa kurejesha: nakala rudufu si sahihi au imeharibika ({error})", "tl": "Nabigo ang pag-restore: di-wasto o sirang backup ({error})", "@": {"placeholders": {"error": {"type": "String"}}},
+    "es": "Restore failed: invalid or corrupted backup ({error})",
+    "pt": "Restore failed: invalid or corrupted backup ({error})"
+  },
+  "greetingDaily1Title": {"en": "Peace be with you.", "fr": "La paix soit avec vous.", "it": "Pace a te.", "ro": "Pace ție.", "sw": "Amani iwe nawe.", "tl": "Sumaiyo ang kapayapaan.",
+    "es": "La paz sea con vosotros.",
+    "pt": "A paz seja convosco."
+  },
+  "greetingDaily1Subtitle": {"en": "Let His word bring you rest.", "fr": "Que sa parole vous apporte le repos.", "it": "La sua parola ti doni riposo.", "ro": "Cuvântul Lui să-ți aducă odihnă.", "sw": "Neno lake likupe pumziko.", "tl": "Bigyan ka nawa ng kapahingahan ng Kanyang salita.",
+    "es": "Deja que su palabra te traiga reposo.",
+    "pt": "Deixe que a sua palavra lhe traga descanso."
+  },
+  "greetingDaily2Title": {"en": "Walk in the light.", "fr": "Marchez dans la lumière.", "it": "Cammina nella luce.", "ro": "Umblă în lumină.", "sw": "Enenda nuruni.", "tl": "Lumakad sa liwanag.",
+    "es": "Camina en la luz.",
+    "pt": "Caminhe na luz."
+  },
+  "greetingDaily2Subtitle": {"en": "His word is a lamp for your path.", "fr": "Sa parole est une lampe sur votre sentier.", "it": "La sua parola è una lampada al tuo cammino.", "ro": "Cuvântul Lui este o candelă pentru cărarea ta.", "sw": "Neno lake ni taa ya njia yako.", "tl": "Ang Kanyang salita ay ilawan sa iyong landas.",
+    "es": "Su palabra es una lámpara para tu camino.",
+    "pt": "A Sua palavra é uma lâmpada para o teu caminho."
+  },
+  "greetingDaily3Title": {"en": "Grace and peace to you.", "fr": "Que la grâce et la paix vous soient données.", "it": "Grazia e pace a te.", "ro": "Har și pace ție.", "sw": "Neema na amani kwako.", "tl": "Biyaya at kapayapaan sa iyo.",
+    "es": "Gracia y paz para ti",
+    "pt": "Graça e paz para ti."
+  },
+  "greetingDaily3Subtitle": {"en": "Rest in the Vine today.", "fr": "Demeurez dans le Cep aujourd'hui.", "it": "Rimani nella Vite oggi.", "ro": "Odihnește-te azi în Viță.", "sw": "Pumzika ndani ya Mzabibu leo.", "tl": "Manahan sa Puno ng Ubas ngayon.",
+    "es": "Descansa hoy en la vid.",
+    "pt": "Descansa hoje na vinha."
+  },
+  "greetingDaily4Title": {"en": "Come to the waters.", "fr": "Venez aux eaux.", "it": "Vieni alle acque.", "ro": "Vino la ape.", "sw": "Njoo majini.", "tl": "Halika sa tubigan.",
+    "es": "Venid a las aguas.",
+    "pt": "Vinde às águas."
+  },
+  "greetingDaily4Subtitle": {"en": "Jesus is the light of the world.", "fr": "Jésus est la lumière du monde.", "it": "Gesù è la luce del mondo.", "ro": "Isus este lumina lumii.", "sw": "Yesu ni nuru ya ulimwengu.", "tl": "Si Jesus ang ilaw ng sanlibutan.",
+    "es": "Jesús es la luz del mundo.",
+    "pt": "Jesus é a luz do mundo."
+  },
+  "greetingDaily5Title": {"en": "The Lord bless you.", "fr": "Que l'Éternel vous bénisse.", "it": "Il Signore ti benedica.", "ro": "Domnul să te binecuvânteze.", "sw": "Bwana akubariki.", "tl": "Pagpalain ka nawa ng Panginoon.",
+    "es": "Que el Señor te bendiga.",
+    "pt": "Que o Senhor o abençoe."
+  },
+  "greetingDaily5Subtitle": {"en": "Keep His promises close to your heart.", "fr": "Gardez ses promesses près de votre cœur.", "it": "Custodisci le sue promesse nel cuore.", "ro": "Păstrează-I promisiunile aproape de inimă.", "sw": "Shika ahadi zake karibu na moyo wako.", "tl": "Ingatan ang Kanyang mga pangako sa iyong puso.",
+    "es": "Mantén sus promesas cerca de tu corazón.",
+    "pt": "Guarde as suas promessas perto do seu coração."
+  },
+  "greetingDaily6Title": {"en": "Be still and know.", "fr": "Arrêtez, et sachez.", "it": "Fermati e riconosci.", "ro": "Oprește-te și să știi.", "sw": "Tulia ujue.", "tl": "Tumahimik ka at kilalanin.",
+    "es": "Estate quieto y sabe.",
+    "pt": "Sê quieto e sabe."
+  },
+  "greetingDaily6Subtitle": {"en": "Dwell in His quiet presence.", "fr": "Demeurez dans sa paisible présence.", "it": "Dimora nella sua quieta presenza.", "ro": "Rămâi în prezența Lui liniștită.", "sw": "Kaa katika uwepo wake wa utulivu.", "tl": "Manahan sa Kanyang tahimik na presensya.",
+    "es": "Habita en Su presencia serena",
+    "pt": "Permanece na Sua presença serena."
+  },
+  "greetingDaily7Title": {"en": "Morning mercies anew.", "fr": "Ses bontés se renouvellent chaque matin.", "it": "Misericordie nuove ogni mattina.", "ro": "Îndurări noi în fiecare dimineață.", "sw": "Rehema mpya kila asubuhi.", "tl": "Bagong kahabagan tuwing umaga.",
+    "es": "Las misericordias de la mañana, cada día.",
+    "pt": "As misericórdias da manhã, a cada dia."
+  },
+  "greetingDaily7Subtitle": {"en": "His compassions never fail.", "fr": "Ses compassions ne sont pas à leur terme.", "it": "Le sue compassioni non vengono meno.", "ro": "Îndurările Lui nu se sfârșesc.", "sw": "Rehema zake hazikomi.", "tl": "Hindi nagkukulang ang Kanyang mga habag.",
+    "es": "Sus misericordias no fallan.",
+    "pt": "As Suas misericórdias não falham."
+  },
+  "greetingDaily8Title": {"en": "Rooted in love.", "fr": "Enracinés dans l'amour.", "it": "Radicato nell'amore.", "ro": "Înrădăcinat în dragoste.", "sw": "Ukiwa na mizizi katika upendo.", "tl": "Nakaugat sa pag-ibig.",
+    "es": "Raíz en el amor.",
+    "pt": "Enraizado no amor."
+  },
+  "greetingDaily8Subtitle": {"en": "Grow in grace and truth.", "fr": "Grandissez dans la grâce et la vérité.", "it": "Cresci nella grazia e nella verità.", "ro": "Crește în har și adevăr.", "sw": "Kua katika neema na kweli.", "tl": "Lumago sa biyaya at katotohanan.",
+    "es": "Crece en gracia y verdad.",
+    "pt": "Cresça em graça e verdade."
+  },
+  "greetingDaily9Title": {"en": "Let your light shine.", "fr": "Que votre lumière brille.", "it": "Risplenda la tua luce.", "ro": "Să lumineze lumina ta.", "sw": "Nuru yako iangaze.", "tl": "Paliwanagin ang iyong ilaw.",
+    "es": "Deja que tu luz brille.",
+    "pt": "Que a sua luz brilhe."
+  },
+  "greetingDaily9Subtitle": {"en": "A city on a hill cannot be hidden.", "fr": "Une ville située sur une montagne ne peut être cachée.", "it": "Una città posta sopra un monte non può restare nascosta.", "ro": "O cetate așezată pe un munte nu poate să rămână ascunsă.", "sw": "Mji ulio juu ya mlima hauwezi kusitirika.", "tl": "Hindi maitatago ang bayang nakatayo sa ibabaw ng bundok.",
+    "es": "Una ciudad sobre un cerro no puede quedar oculta.",
+    "pt": "Uma cidade sobre um morro não pode ficar escondida."
+  },
+  "greetingDaily10Title": {"en": "Draw near to God.", "fr": "Approchez-vous de Dieu.", "it": "Avvicinati a Dio.", "ro": "Apropie-te de Dumnezeu.", "sw": "Mkaribie Mungu.", "tl": "Lumapit sa Diyos.",
+    "es": "Aproximai-vos de Deus",
+    "pt": "Aproximai-vos de Deus."
+  },
+  "greetingDaily10Subtitle": {"en": "He is already reaching for you.", "fr": "Il vous tend déjà la main.", "it": "Ti sta già tendendo la mano.", "ro": "El Își întinde deja mâna spre tine.", "sw": "Tayari anakufikia.", "tl": "Inaabot ka na Niya.",
+    "es": "Ya tiende la mano hacia ti.",
+    "pt": "Já estende a mão para ti."
+  },
+  "greetingDaily11Title": {"en": "The Word became flesh.", "fr": "La Parole a été faite chair.", "it": "La Parola si è fatta carne.", "ro": "Cuvântul S-a făcut trup.", "sw": "Neno alifanyika mwili.", "tl": "Ang Salita ay nagkatawang-tao.",
+    "es": "La Palabra se hizo carne.",
+    "pt": "O Verbo se fez carne."
+  },
+  "greetingDaily11Subtitle": {"en": "He understands your journey.", "fr": "Il comprend votre chemin.", "it": "Egli comprende il tuo cammino.", "ro": "El îți înțelege drumul.", "sw": "Anaelewa safari yako.", "tl": "Nauunawaan Niya ang iyong paglalakbay.",
+    "es": "Él comprende tu viaje.",
+    "pt": "Ele compreende a tua jornada."
+  },
+  "greetingDaily12Title": {"en": "Taste and see.", "fr": "Goûtez et voyez.", "it": "Gusta e vedi.", "ro": "Gustă și vezi.", "sw": "Onjeni mwone.", "tl": "Tikman at tingnan.",
+    "es": "Gusta y ved.",
+    "pt": "Prove e veja."
+  },
+  "greetingDaily12Subtitle": {"en": "The Lord is incredibly good.", "fr": "Combien l'Éternel est bon.", "it": "Quanto è buono il Signore.", "ro": "Cât de bun este Domnul.", "sw": "Ya kuwa Bwana yu mwema.", "tl": "Ang Panginoon ay napakabuti.",
+    "es": "El Señor es increíblemente bueno.",
+    "pt": "O Senhor é incredivelmente bom."
+  },
+  "greetingMorning1Title": {"en": "Awake, O sleeper.", "fr": "Réveille-toi, toi qui dors.", "it": "Svegliati, o tu che dormi.", "ro": "Deșteaptă-te, tu care dormi.", "sw": "Amka, wewe usinziaye.", "tl": "Gumising ka, ikaw na natutulog.",
+    "es": "Despierta, tú que duermes.",
+    "pt": "Desperta, tu que dormes."
+  },
+  "greetingMorning1Subtitle": {"en": "Christ will shine on you.", "fr": "Christ t'éclairera.", "it": "Cristo ti illuminerà.", "ro": "Hristos te va lumina.", "sw": "Kristo atakuangaza.", "tl": "Liliwanagan ka ni Cristo.",
+    "es": "Cristo brillará sobre ti.",
+    "pt": "Cristo brilhará sobre ti."
+  },
+  "greetingMorning2Title": {"en": "Joy comes in the morning.", "fr": "Le matin vient l'allégresse.", "it": "Al mattino viene la gioia.", "ro": "Dimineața vine bucuria.", "sw": "Furaha huja asubuhi.", "tl": "Darating ang kagalakan sa umaga.",
+    "es": "El gozo llega por la mañana.",
+    "pt": "A alegria vem pela manhã."
+  },
+  "greetingMorning2Subtitle": {"en": "Step into His new day.", "fr": "Entrez dans son jour nouveau.", "it": "Entra nel suo nuovo giorno.", "ro": "Pășește în ziua Lui cea nouă.", "sw": "Ingia katika siku yake mpya.", "tl": "Pumasok sa Kanyang bagong araw.",
+    "es": "Entra en Su nuevo día.",
+    "pt": "Entre no novo dia d'Ele."
+  },
+  "greetingMorning3Title": {"en": "This is the day the Lord has made.", "fr": "Voici la journée que l'Éternel a faite.", "it": "Questo è il giorno che il Signore ha fatto.", "ro": "Aceasta este ziua pe care a făcut-o Domnul.", "sw": "Siku hii ndiyo aliyoifanya Bwana.", "tl": "Ito ang araw na ginawa ng Panginoon.",
+    "es": "Este es el día que hizo el Señor.",
+    "pt": "Este é o dia que o Senhor fez."
+  },
+  "greetingMorning3Subtitle": {"en": "Let us rejoice in it.", "fr": "Qu'elle soit pour nous un sujet d'allégresse.", "it": "Rallegriamoci ed esultiamo in esso.", "ro": "Să ne bucurăm și să ne veselim în ea.", "sw": "Tushangilie na kuifurahia.", "tl": "Tayo'y magalak at magsaya rito.",
+    "es": "Regocijémonos en ello.",
+    "pt": "Regozijemo-nos nisso."
+  },
+  "greetingEvening1Title": {"en": "The day is done.", "fr": "La journée s'achève.", "it": "Il giorno è finito.", "ro": "Ziua s-a sfârșit.", "sw": "Siku imekwisha.", "tl": "Tapos na ang araw.",
+    "es": "El día ha terminado.",
+    "pt": "O dia terminou."
+  },
+  "greetingEvening1Subtitle": {"en": "He gives sleep to those He loves.", "fr": "Il donne le sommeil à ses bien-aimés.", "it": "Egli dà il sonno ai suoi amati.", "ro": "El dă somn preaiubiților Lui.", "sw": "Huwapa wapenzi wake usingizi.", "tl": "Binibigyan Niya ng tulog ang Kanyang minamahal.",
+    "es": "Da sueño a los que ama.",
+    "pt": "Dá sono aos que ama."
+  },
+  "greetingEvening2Title": {"en": "Under His wings.", "fr": "Sous ses ailes.", "it": "Sotto le sue ali.", "ro": "Sub aripile Lui.", "sw": "Chini ya mabawa yake.", "tl": "Sa ilalim ng Kanyang mga pakpak.",
+    "es": "Bajo sus alas.",
+    "pt": "Debaixo das suas asas."
+  },
+  "greetingEvening2Subtitle": {"en": "You will find refuge tonight.", "fr": "Vous trouverez refuge cette nuit.", "it": "Troverai rifugio stanotte.", "ro": "Vei găsi adăpost în noaptea aceasta.", "sw": "Utapata kimbilio usiku huu.", "tl": "Makasusumpong ka ng kanlungan ngayong gabi.",
+    "es": "Encontrarás refugio esta noche.",
+    "pt": "Vais encontrar refúgio esta noite."
+  },
+  "greetingEvening3Title": {"en": "Come to Me, you who are weary.", "fr": "Venez à moi, vous tous qui êtes fatigués.", "it": "Venite a me, voi tutti che siete affaticati.", "ro": "Veniți la Mine, toți cei trudiți.", "sw": "Njooni kwangu, ninyi nyote msumbukao.", "tl": "Lumapit kayo sa Akin, kayong nahihirapan.",
+    "es": "Venid a Mí, los que estáis cansados.",
+    "pt": "Vinde a Mim, vós que estais cansados."
+  },
+  "greetingEvening3Subtitle": {"en": "And I will give you rest.", "fr": "Et je vous donnerai du repos.", "it": "E io vi darò riposo.", "ro": "Și Eu vă voi da odihnă.", "sw": "Nami nitawapumzisha.", "tl": "At kayo'y Aking bibigyan ng kapahingahan.",
+    "es": "y os daré descanso.",
+    "pt": "e vos darei descanso."
+  },
+  "greetingGrace1Title": {"en": "Cast all your anxiety on Him.", "fr": "Déchargez-vous sur lui de tous vos soucis.", "it": "Getta su di Lui ogni tua preoccupazione.", "ro": "Aruncă asupra Lui toate îngrijorările tale.", "sw": "Mtwike yeye fadhaika zako zote.", "tl": "Ilagak mo sa Kanya ang lahat ng iyong alalahanin.",
+    "es": "Deixa toda a tua ansiedade a Ele.",
+    "pt": "Deixa toda a tua ansiedade a Ele."
+  },
+  "greetingGrace1Subtitle": {"en": "Because He cares for you.", "fr": "Car lui-même prend soin de vous.", "it": "Perché Egli ha cura di te.", "ro": "Căci El Însuși îngrijește de tine.", "sw": "Kwa maana yeye hujishughulisha sana kwa mambo yako.", "tl": "Sapagkat Siya'y nagmamalasakit sa iyo.",
+    "es": "Porque Él se preocupa por ti.",
+    "pt": "Porque Ele se importa contigo."
+  },
+  "greetingGrace2Title": {"en": "My peace I give you.", "fr": "Je vous donne ma paix.", "it": "Vi do la mia pace.", "ro": "Vă dau pacea Mea.", "sw": "Amani yangu nawapa.", "tl": "Ang Aking kapayapaan ay ibinibigay Ko sa inyo.",
+    "es": "La paz os doy.",
+    "pt": "Dou-vos a minha paz."
+  },
+  "greetingGrace2Subtitle": {"en": "Let not your heart be troubled.", "fr": "Que votre cœur ne se trouble point.", "it": "Il vostro cuore non sia turbato.", "ro": "Să nu vi se tulbure inima.", "sw": "Msifadhaike mioyoni mwenu.", "tl": "Huwag mabagabag ang inyong puso.",
+    "es": "No dejes que tu corazón se turbe.",
+    "pt": "Não deixes o teu coração perturbado."
+  },
+  "greetingGrace3Title": {"en": "He heals the brokenhearted.", "fr": "Il guérit ceux qui ont le cœur brisé.", "it": "Egli guarisce chi ha il cuore spezzato.", "ro": "El vindecă pe cei cu inima zdrobită.", "sw": "Huwaponya waliovunjika moyo.", "tl": "Pinagagaling Niya ang mga bagbag ang puso.",
+    "es": "Sana a los de corazón quebrado.",
+    "pt": "Sar coração quebrantado."
+  },
+  "greetingGrace3Subtitle": {"en": "And binds up their wounds.", "fr": "Et il panse leurs blessures.", "it": "E fascia le loro ferite.", "ro": "Și le leagă rănile.", "sw": "Na kuziganga jeraha zao.", "tl": "At tinatalian ang kanilang mga sugat.",
+    "es": "y venda sus heridas.",
+    "pt": "e liga as suas feridas."
+  },
+  "greetingGrace4Title": {"en": "Nothing can separate us.", "fr": "Rien ne pourra nous séparer.", "it": "Nulla potrà separarci.", "ro": "Nimic nu ne va putea despărți.", "sw": "Hakuna kitakachoweza kututenga.", "tl": "Walang makapaghihiwalay sa atin.",
+    "es": "Nada puede separarnos.",
+    "pt": "Nada nos pode separar."
+  },
+  "greetingGrace4Subtitle": {"en": "From the love of God.", "fr": "De l'amour de Dieu.", "it": "Dall'amore di Dio.", "ro": "De dragostea lui Dumnezeu.", "sw": "Na upendo wa Mungu.", "tl": "Sa pag-ibig ng Diyos.",
+    "es": "Del amor de Dios",
+    "pt": "Do amor de Deus."
+  },
+  "greetingCheer1Title": {"en": "Be strong and courageous.", "fr": "Fortifiez-vous et ayez du courage.", "it": "Sii forte e coraggioso.", "ro": "Întărește-te și îmbărbătează-te.", "sw": "Uwe hodari na moyo wa ushujaa.", "tl": "Magpakalakas ka at magpakatapang.",
+    "es": "Sé fuerte y valiente.",
+    "pt": "Sê forte e corajoso."
+  },
+  "greetingCheer1Subtitle": {"en": "The Lord your God goes with you.", "fr": "L'Éternel, votre Dieu, marche avec vous.", "it": "Il Signore, il tuo Dio, è con te.", "ro": "Domnul, Dumnezeul tău, merge cu tine.", "sw": "Bwana, Mungu wako, yu pamoja nawe.", "tl": "Ang Panginoon mong Diyos ay sumasaiyo.",
+    "es": "El Señor tu Dios va contigo.",
+    "pt": "O Senhor teu Deus caminha contigo."
+  },
+  "greetingCheer2Title": {"en": "Run with endurance.", "fr": "Courez avec persévérance.", "it": "Corri con perseveranza.", "ro": "Aleargă cu stăruință.", "sw": "Piga mbio kwa saburi.", "tl": "Tumakbo nang may pagtitiis.",
+    "es": "Corre con perseverancia.",
+    "pt": "Corre com perseverança."
+  },
+  "greetingCheer2Subtitle": {"en": "Keep your eyes fixed on Jesus.", "fr": "Gardez les yeux fixés sur Jésus.", "it": "Tieni lo sguardo fisso su Gesù.", "ro": "Ține-ți ochii pironiți asupra lui Isus.", "sw": "Ukimtazama Yesu.", "tl": "Ituon ang iyong paningin kay Jesus.",
+    "es": "Mantén tus ojos fijos en Jesús.",
+    "pt": "Mantenha os seus olhos fixos em Jesus."
+  },
+  "greetingCheer3Title": {"en": "Iron sharpens iron.", "fr": "Le fer aiguise le fer.", "it": "Il ferro affila il ferro.", "ro": "Fierul ascute fierul.", "sw": "Chuma hunoa chuma.", "tl": "Ang bakal ay nagpapatalas sa bakal.",
+    "es": "El hierro afila el hierro.",
+    "pt": "O ferro afia o ferro."
+  },
+  "greetingCheer3Subtitle": {"en": "Grow together in the Word.", "fr": "Grandissez ensemble dans la Parole.", "it": "Crescete insieme nella Parola.", "ro": "Creșteți împreună în Cuvânt.", "sw": "Kueni pamoja katika Neno.", "tl": "Lumago nang sama-sama sa Salita.",
+    "es": "Crescan juntos en la Palabra.",
+    "pt": "Cresçam juntos na Palavra."
+  },
+  "greetingEyebrowMorning": {"en": "{day} morning", "fr": "{day} matin", "it": "{day} mattina", "ro": "{day} dimineața", "sw": "{day} asubuhi", "tl": "{day} ng umaga", "@": {"placeholders": {"day": {"type": "String"}}},
+    "es": "{day} morning",
+    "pt": "{day} morning"
+  },
+  "greetingEyebrowAfternoon": {"en": "{day} afternoon", "fr": "{day} après-midi", "it": "{day} pomeriggio", "ro": "{day} după-amiaza", "sw": "{day} mchana", "tl": "{day} ng hapon", "@": {"placeholders": {"day": {"type": "String"}}},
+    "es": "{day} afternoon",
+    "pt": "{day} afternoon"
+  },
+  "greetingEyebrowEvening": {"en": "{day} evening", "fr": "{day} soir", "it": "{day} sera", "ro": "{day} seara", "sw": "{day} jioni", "tl": "{day} ng gabi", "@": {"placeholders": {"day": {"type": "String"}}},
+    "es": "{day} evening",
+    "pt": "{day} evening"
+  },
+  "greetingEyebrowNight": {"en": "{day} night", "fr": "{day} nuit", "it": "{day} notte", "ro": "{day} noaptea", "sw": "{day} usiku", "tl": "{day} ng madaling-araw", "@": {"placeholders": {"day": {"type": "String"}}},
+    "es": "{day} night",
+    "pt": "{day} night"
+  },
+  "creditsScripture": {"en": "Scripture", "fr": "Écritures", "it": "Scrittura", "ro": "Scriptura", "sw": "Maandiko", "tl": "Kasulatan",
+    "es": "Scripture",
+    "pt": "Scripture"
+  },
+  "creditsCommentary": {"en": "Commentary", "fr": "Commentaires", "it": "Commentario", "ro": "Comentariu", "sw": "Maelezo", "tl": "Komentaryo",
+    "es": "Comentario",
+    "pt": "Comentário"
+  },
+  "creditsStudyTools": {"en": "Study tools", "fr": "Outils d'étude", "it": "Strumenti di studio", "ro": "Instrumente de studiu", "sw": "Zana za kujifunza", "tl": "Mga kagamitan sa pag-aaral",
+    "es": "Study tools",
+    "pt": "Study tools"
+  },
+  "creditsBibleStories": {"en": "Bible stories", "fr": "Histoires bibliques", "it": "Storie bibliche", "ro": "Povestiri biblice", "sw": "Hadithi za Biblia", "tl": "Mga Kuwento sa Bibliya",
+    "es": "Bible stories",
+    "pt": "Bible stories"
+  },
+  "creditsFonts": {"en": "Fonts", "fr": "Polices", "it": "Caratteri", "ro": "Fonturi", "sw": "Fonti", "tl": "Mga font",
+    "es": "Fonts",
+    "pt": "Fonts"
+  },
+  "creditsCommentaryPerspective": {"en": "The library includes Seventh-day Adventist pioneer works and general Christian commentaries from other traditions. Interpretive perspectives vary; all are study aids alongside Scripture, not part of it.", "fr": "La bibliothèque comprend des ouvrages de pionniers adventistes du septième jour et des commentaires chrétiens d'autres traditions. Les perspectives d'interprétation varient ; tous sont des aides à l'étude, à côté des Écritures, et n'en font pas partie.", "it": "La biblioteca include opere dei pionieri avventisti del settimo giorno e commentari cristiani di altre tradizioni. Le prospettive interpretative variano; tutti sono strumenti di studio accanto alla Scrittura, non parte di essa.", "ro": "Biblioteca include lucrări ale pionierilor adventiști de ziua a șaptea și comentarii creștine din alte tradiții. Perspectivele de interpretare diferă; toate sunt ajutoare de studiu alături de Scriptură, nu parte din ea.", "sw": "Maktaba inajumuisha kazi za waanzilishi Waadventista Wasabato na fafanuzi za Kikristo kutoka mapokeo mengine. Mitazamo ya ufasiri hutofautiana; zote ni nyenzo za kujifunza pamoja na Maandiko, si sehemu yake.", "tl": "Kasama sa aklatan ang mga akda ng mga Adventistang pioneer at mga komentaryong Kristiyano mula sa ibang tradisyon. Nagkakaiba ang mga pananaw sa pagpapakahulugan; lahat ay pantulong sa pag-aaral kasama ng Kasulatan, hindi bahagi nito.",
+    "es": "The library includes Seventh-day Adventist pioneer works and general Christian commentaries from other traditions. Interpretive perspectives vary; all are study aids alongside Scripture, not part of it.",
+    "pt": "The library includes Seventh-day Adventist pioneer works and general Christian commentaries from other traditions. Interpretive perspectives vary; all are study aids alongside Scripture, not part of it."
+  },
+  "creditsPublicDomain": {"en": "Public domain.", "fr": "Domaine public.", "it": "Pubblico dominio.", "ro": "Domeniu public.", "sw": "Haki za umma (public domain).", "tl": "Pampublikong domain.",
+    "es": "Public domain.",
+    "pt": "Public domain."
+  },
+  "creditsPublicDomainUs": {"en": "Public domain in the US.", "fr": "Domaine public aux États-Unis.", "it": "Pubblico dominio negli Stati Uniti.", "ro": "Domeniu public în SUA.", "sw": "Haki za umma nchini Marekani.", "tl": "Pampublikong domain sa US.",
+    "es": "Public domain in the US.",
+    "pt": "Public domain in the US."
+  },
+  "creditsKjvDetail": {"en": "Public domain. Strong's-tagged edition also public domain.", "fr": "Domaine public. L'édition annotée avec les numéros Strong l'est aussi.", "it": "Pubblico dominio. Anche l'edizione con i numeri Strong è di pubblico dominio.", "ro": "Domeniu public. Ediția cu numerele Strong este, de asemenea, în domeniul public.", "sw": "Haki za umma. Toleo lenye namba za Strong pia ni la umma.", "tl": "Pampublikong domain. Pampublikong domain din ang edisyong may numerong Strong's.",
+    "es": "Public domain. Strong's-tagged edition also public domain.",
+    "pt": "Public domain. Strong's-tagged edition also public domain."
+  },
+  "creditsSelectedWriting": {"en": "Selected writing.", "fr": "Écrits choisis.", "it": "Scritti scelti.", "ro": "Scrieri alese.", "sw": "Maandishi teule.", "tl": "Mga piling akda.",
+    "es": "Selected writing.",
+    "pt": "Selected writing."
+  },
+  "creditsAdditionalTranslationsDetail": {"en": "Downloaded from the Free Use Bible API (bible.helloao.org) and open-bibles (github.com/seven1m/open-bibles).", "fr": "Téléchargées depuis la Free Use Bible API (bible.helloao.org) et open-bibles (github.com/seven1m/open-bibles).", "it": "Scaricate dalla Free Use Bible API (bible.helloao.org) e da open-bibles (github.com/seven1m/open-bibles).", "ro": "Descărcate din Free Use Bible API (bible.helloao.org) și open-bibles (github.com/seven1m/open-bibles).", "sw": "Zimepakuliwa kutoka Free Use Bible API (bible.helloao.org) na open-bibles (github.com/seven1m/open-bibles).", "tl": "Na-download mula sa Free Use Bible API (bible.helloao.org) at open-bibles (github.com/seven1m/open-bibles).",
+    "es": "Downloaded from the Free Use Bible API (bible.helloao.org) and open-bibles (github.com/seven1m/open-bibles).",
+    "pt": "Downloaded from the Free Use Bible API (bible.helloao.org) and open-bibles (github.com/seven1m/open-bibles)."
+  },
+  "creditsNarrativeDetail": {"en": "Adapted from The Graham Bible (grahambible.com), AI-assisted and human reviewed.", "fr": "Adaptés de The Graham Bible (grahambible.com), avec l'aide de l'IA et relus par des humains.", "it": "Adattati da The Graham Bible (grahambible.com), con l'aiuto dell'IA e revisionati da persone.", "ro": "Adaptate după The Graham Bible (grahambible.com), cu ajutorul IA și verificate de oameni.", "sw": "Zimetoholewa kutoka The Graham Bible (grahambible.com), kwa msaada wa AI na kukaguliwa na watu.", "tl": "Hinango mula sa The Graham Bible (grahambible.com), sa tulong ng AI at sinuri ng tao.",
+    "es": "Adapted from The Graham Bible (grahambible.com), AI-assisted and human reviewed.",
+    "pt": "Adapted from The Graham Bible (grahambible.com), AI-assisted and human reviewed."
+  },
+  "creditsFontsDetail": {"en": "SIL Open Font License 1.1. Full notices under {licenses}.", "fr": "SIL Open Font License 1.1. Avis complets dans {licenses}.", "it": "SIL Open Font License 1.1. Avvisi completi in {licenses}.", "ro": "SIL Open Font License 1.1. Notificările complete se află la {licenses}.", "sw": "SIL Open Font License 1.1. Taarifa kamili ziko chini ya {licenses}.", "tl": "SIL Open Font License 1.1. Kumpletong abiso sa ilalim ng {licenses}.", "@": {"placeholders": {"licenses": {"type": "String"}}},
+    "es": "SIL Open Font License 1.1. Full notices under {licenses}.",
+    "pt": "SIL Open Font License 1.1. Full notices under {licenses}."
+  },
+  "miscPlanNotFound": {"en": "Plan not found.", "fr": "Plan introuvable.", "it": "Piano non trovato.", "ro": "Planul nu a fost găsit.", "sw": "Mpango haukupatikana.", "tl": "Hindi nahanap ang plano.",
+    "es": "Plan not found.",
+    "pt": "Plan not found."
+  },
+  "miscPaceUnsupported": {"en": "This plan was created before pace adjustment was supported. Recreate it to enable this feature.", "fr": "Ce plan a été créé avant que l'ajustement du rythme soit possible. Recréez-le pour activer cette fonction.", "it": "Questo piano è stato creato prima che fosse possibile regolare il ritmo. Ricrealo per attivare questa funzione.", "ro": "Acest plan a fost creat înainte ca ajustarea ritmului să fie disponibilă. Creează-l din nou pentru a activa această funcție.", "sw": "Mpango huu uliundwa kabla ya kuwezesha kurekebisha kasi. Uunde upya ili kuwasha kipengele hiki.", "tl": "Ginawa ang planong ito bago pa suportado ang pag-aayos ng bilis. Gawin itong muli para magamit ang feature na ito.",
+    "es": "This plan was created before pace adjustment was supported. Recreate it to enable this feature.",
+    "pt": "This plan was created before pace adjustment was supported. Recreate it to enable this feature."
+  },
+  "miscPaceFailed": {"en": "Pace adjustment failed: {error}", "fr": "Échec de l'ajustement du rythme : {error}", "it": "Regolazione del ritmo non riuscita: {error}", "ro": "Ajustarea ritmului a eșuat: {error}", "sw": "Imeshindwa kurekebisha kasi: {error}", "tl": "Nabigo ang pag-aayos ng bilis: {error}", "@": {"placeholders": {"error": {"type": "String"}}},
+    "es": "Pace adjustment failed: {error}",
+    "pt": "Pace adjustment failed: {error}"
+  },
+  "miscPlanLoadFailed": {"en": "Could not load this plan ({error}).", "fr": "Impossible de charger ce plan ({error}).", "it": "Impossibile caricare questo piano ({error}).", "ro": "Planul nu a putut fi încărcat ({error}).", "sw": "Imeshindwa kupakia mpango huu ({error}).", "tl": "Hindi ma-load ang planong ito ({error}).", "@": {"placeholders": {"error": {"type": "String"}}},
+    "es": "Could not load this plan ({error}).",
+    "pt": "Could not load this plan ({error})."
+  },
+  "miscFolderSermon": {"en": "Sermon prep", "fr": "Préparation de sermon", "it": "Preparazione sermoni", "ro": "Pregătire de predici", "sw": "Maandalizi ya mahubiri", "tl": "Paghahanda ng sermon",
+    "es": "Sermon prep",
+    "pt": "Sermon prep"
+  },
+  "miscFolderMemorize": {"en": "Memorize", "fr": "À mémoriser", "it": "Da memorizzare", "ro": "De memorat", "sw": "Kukariri", "tl": "Isaulo",
+    "es": "Memorize",
+    "pt": "Memorize"
+  },
+  "miscFolderComfort": {"en": "Comfort", "fr": "Réconfort", "it": "Conforto", "ro": "Mângâiere", "sw": "Faraja", "tl": "Kaaliwan",
+    "es": "Comfort",
+    "pt": "Comfort"
+  },
+  "miscFolderStudy": {"en": "Study", "fr": "Étude", "it": "Studio", "ro": "Studiu", "sw": "Kujifunza", "tl": "Pag-aaral",
+    "es": "Estudio",
+    "pt": "Estudo"
+  },
+  "miscColorPurple": {"en": "Purple", "fr": "Violet", "it": "Viola", "ro": "Mov", "sw": "Zambarau", "tl": "Lila",
+    "es": "Purple",
+    "pt": "Purple"
+  },
+  "miscColorGreen": {"en": "Green", "fr": "Vert", "it": "Verde", "ro": "Verde", "sw": "Kijani", "tl": "Berde",
+    "es": "Green",
+    "pt": "Green"
+  },
+  "miscColorBlue": {"en": "Blue", "fr": "Bleu", "it": "Blu", "ro": "Albastru", "sw": "Bluu", "tl": "Asul",
+    "es": "Blue",
+    "pt": "Blue"
+  },
+  "miscColorPink": {"en": "Pink", "fr": "Rose", "it": "Rosa", "ro": "Roz", "sw": "Waridi", "tl": "Rosas",
+    "es": "Pink",
+    "pt": "Pink"
+  },
+  "miscColorRed": {"en": "Red", "fr": "Rouge", "it": "Rosso", "ro": "Roșu", "sw": "Nyekundu", "tl": "Pula",
+    "es": "Red",
+    "pt": "Red"
+  },
+  "miscSearchBibleVerse": {"en": "Bible verse", "fr": "Verset biblique", "it": "Versetto biblico", "ro": "Verset biblic", "sw": "Mstari wa Biblia", "tl": "Talata sa Bibliya",
+    "es": "Bible verse",
+    "pt": "Bible verse"
+  },
+  "miscSearchCommentary": {"en": "Commentary", "fr": "Commentaire", "it": "Commento", "ro": "Comentariu", "sw": "Maelezo", "tl": "Komentaryo",
+    "es": "Comentario",
+    "pt": "Comentário"
+  },
+  "miscSearchCommentaryBy": {"en": "{author} Commentary", "fr": "Commentaire de {author}", "it": "Commento di {author}", "ro": "Comentariul lui {author}", "sw": "Maelezo ya {author}", "tl": "Komentaryo ni {author}", "@": {"placeholders": {"author": {"type": "String"}}},
+    "es": "{author} Commentary",
+    "pt": "{author} Commentary"
+  },
+  "miscSearchNote": {"en": "Note • {date}", "fr": "Note • {date}", "it": "Nota • {date}", "ro": "Notiță • {date}", "sw": "Dokezo • {date}", "tl": "Tala • {date}", "@": {"placeholders": {"date": {"type": "String"}}},
+    "es": "Note • {date}",
+    "pt": "Note • {date}"
+  },
+  "miscSearchJumpTo": {"en": "Jump to", "fr": "Aller à", "it": "Vai a", "ro": "Salt la", "sw": "Nenda kwa", "tl": "Pumunta sa",
+    "es": "Jump to",
+    "pt": "Jump to"
+  },
+  "miscSearchGoToChapter": {"en": "Go to {book} chapter {chapter}", "fr": "Aller à {book}, chapitre {chapter}", "it": "Vai a {book}, capitolo {chapter}", "ro": "Mergi la {book}, capitolul {chapter}", "sw": "Nenda kwa {book} sura ya {chapter}", "tl": "Pumunta sa {book} kabanata {chapter}", "@": {"placeholders": {"book": {"type": "String"}, "chapter": {"type": "int"}}},
+    "es": "Go to {book} chapter {chapter}",
+    "pt": "Go to {book} chapter {chapter}"
+  },
+  "miscSearchGoToVerse": {"en": "Go to {book} chapter {chapter}, verse {verse}", "fr": "Aller à {book}, chapitre {chapter}, verset {verse}", "it": "Vai a {book}, capitolo {chapter}, versetto {verse}", "ro": "Mergi la {book}, capitolul {chapter}, versetul {verse}", "sw": "Nenda kwa {book} sura ya {chapter}, mstari wa {verse}", "tl": "Pumunta sa {book} kabanata {chapter}, talata {verse}", "@": {"placeholders": {"book": {"type": "String"}, "chapter": {"type": "int"}, "verse": {"type": "int"}}},
+    "es": "Go to {book} chapter {chapter}, verse {verse}",
+    "pt": "Go to {book} chapter {chapter}, verse {verse}"
+  },
+  "miscSearchDictionary": {"en": "Dictionary ({sources})", "fr": "Dictionnaire ({sources})", "it": "Dizionario ({sources})", "ro": "Dicționar ({sources})", "sw": "Kamusi ({sources})", "tl": "Diksiyonaryo ({sources})", "@": {"placeholders": {"sources": {"type": "String"}}},
+    "es": "Dictionary ({sources})",
+    "pt": "Dictionary ({sources})"
+  },
+  "miscMostReadSnippet": {"en": "{count, plural, =1{Frequently read passage (1 visit)} other{Frequently read passage ({count} visits)}}", "fr": "{count, plural, =1{Passage souvent lu (1 visite)} other{Passage souvent lu ({count} visites)}}", "it": "{count, plural, =1{Brano letto spesso (1 visita)} other{Brano letto spesso ({count} visite)}}", "ro": "{count, plural, =1{Pasaj citit des (1 vizită)} few{Pasaj citit des ({count} vizite)} other{Pasaj citit des ({count} de vizite)}}", "sw": "{count, plural, =1{Kifungu kinachosomwa mara nyingi (ziara 1)} other{Kifungu kinachosomwa mara nyingi (ziara {count})}}", "tl": "{count, plural, =1{Madalas basahing talata (1 pagbisita)} other{Madalas basahing talata ({count} pagbisita)}}", "@": {"placeholders": {"count": {"type": "int"}}},
+    "es": "{count, plural, =1{Frequently read passage (1 visit)} other{Frequently read passage ({count} visits)}}",
+    "pt": "{count, plural, =1{Frequently read passage (1 visit)} other{Frequently read passage ({count} visits)}}"
+  },
+  "miscEmotionAnxiety": {"en": "anxiety", "fr": "anxiété", "it": "ansia", "ro": "anxietate", "sw": "wasiwasi", "tl": "pagkabalisa",
+    "es": "anxiety",
+    "pt": "anxiety"
+  },
+  "miscEmotionFear": {"en": "fear", "fr": "peur", "it": "paura", "ro": "frică", "sw": "hofu", "tl": "takot",
+    "es": "fear",
+    "pt": "fear"
+  },
+  "miscEmotionSadness": {"en": "sadness", "fr": "tristesse", "it": "tristezza", "ro": "tristețe", "sw": "huzuni", "tl": "kalungkutan",
+    "es": "sadness",
+    "pt": "sadness"
+  },
+  "miscEmotionLoneliness": {"en": "loneliness", "fr": "solitude", "it": "solitudine", "ro": "singurătate", "sw": "upweke", "tl": "pag-iisa",
+    "es": "loneliness",
+    "pt": "loneliness"
+  },
+  "miscEmotionAnger": {"en": "anger", "fr": "colère", "it": "rabbia", "ro": "mânie", "sw": "hasira", "tl": "galit",
+    "es": "anger",
+    "pt": "anger"
+  },
+  "miscEmotionTemptation": {"en": "temptation", "fr": "tentation", "it": "tentazione", "ro": "ispită", "sw": "jaribu", "tl": "tukso",
+    "es": "temptation",
+    "pt": "temptation"
+  },
+  "miscEmotionGuilt": {"en": "guilt", "fr": "culpabilité", "it": "senso di colpa", "ro": "vinovăție", "sw": "hatia", "tl": "pagkakasala",
+    "es": "guilt",
+    "pt": "guilt"
+  },
+  "miscEmotionHopelessness": {"en": "hopelessness", "fr": "désespoir", "it": "sconforto", "ro": "deznădejde", "sw": "kukata tamaa", "tl": "kawalan ng pag-asa",
+    "es": "hopelessness",
+    "pt": "hopelessness"
+  },
+  "miscEmotionConfusion": {"en": "confusion", "fr": "confusion", "it": "confusione", "ro": "confuzie", "sw": "kuchanganyikiwa", "tl": "kalituhan",
+    "es": "confusion",
+    "pt": "confusion"
+  },
+  "miscEmotionDoubt": {"en": "doubt", "fr": "doute", "it": "dubbio", "ro": "îndoială", "sw": "shaka", "tl": "pag-aalinlangan",
+    "es": "doubt",
+    "pt": "doubt"
+  },
+  "miscEmotionExhaustion": {"en": "exhaustion", "fr": "épuisement", "it": "sfinimento", "ro": "epuizare", "sw": "uchovu", "tl": "pagod",
+    "es": "exhaustion",
+    "pt": "exhaustion"
+  },
+  "miscEmotionGratitude": {"en": "gratitude", "fr": "gratitude", "it": "gratitudine", "ro": "recunoștință", "sw": "shukrani", "tl": "pasasalamat",
+    "es": "gratitude",
+    "pt": "gratitude"
+  },
+  "miscEmotionJoy": {"en": "joy", "fr": "joie", "it": "gioia", "ro": "bucurie", "sw": "furaha", "tl": "kagalakan",
+    "es": "joy",
+    "pt": "joy"
+  },
+  "miscEmotionPeace": {"en": "peace", "fr": "paix", "it": "pace", "ro": "pace", "sw": "amani", "tl": "kapayapaan",
+    "es": "peace",
+    "pt": "peace"
+  },
+  "miscPrayerComfort": {"en": "Lord, bring comfort and strength as I navigate feelings of {emotion} today.", "fr": "Seigneur, apporte-moi réconfort et force face à ce sentiment de {emotion} aujourd'hui.", "it": "Signore, donami conforto e forza mentre oggi affronto sentimenti di {emotion}.", "ro": "Doamne, dă-mi mângâiere și putere în fața sentimentelor de {emotion} de astăzi.", "sw": "Bwana, nipe faraja na nguvu ninapopitia hisia za {emotion} leo.", "tl": "Panginoon, bigyan Mo ako ng aliw at lakas habang dinaranas ko ang {emotion} ngayon.", "@": {"placeholders": {"emotion": {"type": "String"}}},
+    "es": "Lord, bring comfort and strength as I navigate feelings of {emotion} today.",
+    "pt": "Lord, bring comfort and strength as I navigate feelings of {emotion} today."
+  },
+  "miscPrayerScripture": {"en": "Grant me the grace to reflect on scripture, especially {verse}.", "fr": "Accorde-moi la grâce de méditer les Écritures, en particulier {verse}.", "it": "Concedimi la grazia di meditare la Scrittura, in particolare {verse}.", "ro": "Dă-mi harul să cuget la Scriptură, mai ales la {verse}.", "sw": "Nijalie neema ya kutafakari Maandiko, hasa {verse}.", "tl": "Ipagkaloob Mo sa akin ang biyayang pagnilayan ang Kasulatan, lalo na ang {verse}.", "@": {"placeholders": {"verse": {"type": "String"}}},
+    "es": "Grant me the grace to reflect on scripture, especially {verse}.",
+    "pt": "Grant me the grace to reflect on scripture, especially {verse}."
+  },
+  "miscPrayerGuide": {"en": "Guide my steps in hope and peace, trusting in Your faithful promises.", "fr": "Guide mes pas dans l'espérance et la paix, confiant en tes promesses fidèles.", "it": "Guida i miei passi nella speranza e nella pace, confidando nelle tue promesse fedeli.", "ro": "Călăuzește-mi pașii în nădejde și pace, încrezându-mă în promisiunile Tale credincioase.", "sw": "Uongoze hatua zangu katika tumaini na amani, nikitumaini ahadi zako za uaminifu.", "tl": "Gabayan Mo ang aking mga hakbang sa pag-asa at kapayapaan, nagtitiwala sa Iyong tapat na mga pangako.",
+    "es": "Guide my steps in hope and peace, trusting in Your faithful promises.",
+    "pt": "Guide my steps in hope and peace, trusting in Your faithful promises."
+  }
 }

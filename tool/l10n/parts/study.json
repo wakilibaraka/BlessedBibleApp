@@ -6,6 +6,9 @@
   "ro": "Dimensiunea cardului",
   "sw": "Ukubwa wa kadi",
   "tl": "Laki ng card"
+ ,
+   "es": "Tamaño de la tarjeta",
+   "pt": "Tamanho do cartão"
  },
  "studyPosition": {
   "en": "Position",
@@ -14,6 +17,9 @@
   "ro": "Poziție",
   "sw": "Mahali",
   "tl": "Posisyon"
+ ,
+   "es": "Posición",
+   "pt": "Posição"
  },
  "studySizeLarge": {
   "en": "Large",
@@ -22,6 +28,9 @@
   "ro": "Mare",
   "sw": "Kubwa",
   "tl": "Malaki"
+ ,
+   "es": "Grande",
+   "pt": "Grande"
  },
  "studySizeLargeHint": {
   "en": "Full width, same size as everything",
@@ -30,6 +39,9 @@
   "ro": "Lățime completă, la fel ca restul",
   "sw": "Upana kamili, sawa na zingine",
   "tl": "Buong lapad, kapareho ng lahat"
+ ,
+   "es": "Ancho completo, mismo tamaño que todo",
+   "pt": "Largura total, mesmo tamanho que tudo"
  },
  "studySizeExtraLarge": {
   "en": "Extra large",
@@ -38,6 +50,9 @@
   "ro": "Foarte mare",
   "sw": "Kubwa zaidi",
   "tl": "Napakalaki"
+ ,
+   "es": "Extra large",
+   "pt": "Extra large"
  },
  "studySizeExtraLargeHint": {
   "en": "Full width, roomier content",
@@ -46,6 +61,9 @@
   "ro": "Lățime completă, conținut mai aerisit",
   "sw": "Upana kamili, maudhui yenye nafasi",
   "tl": "Buong lapad, mas maluwag na nilalaman"
+ ,
+   "es": "Ancho completo, contenido más espacioso",
+   "pt": "Largura total, conteúdo mais amplo"
  },
  "studySizeHalf": {
   "en": "Half",
@@ -54,6 +72,9 @@
   "ro": "Jumătate",
   "sw": "Nusu",
   "tl": "Kalahati"
+ ,
+   "es": "Mitad",
+   "pt": "Metade"
  },
  "studySizeHalfHint": {
   "en": "Compact, two per row",
@@ -62,6 +83,9 @@
   "ro": "Compact, două pe rând",
   "sw": "Ndogo, mbili kwa safu",
   "tl": "Siksik, dalawa bawat hanay"
+ ,
+   "es": "Compacto, dos por fila",
+   "pt": "Compacto, dois por linha"
  },
  "studySizeFull": {
   "en": "Full",
@@ -70,6 +94,9 @@
   "ro": "Completă",
   "sw": "Kamili",
   "tl": "Buo"
+ ,
+   "es": "Full",
+   "pt": "Full"
  },
  "studySizeFullHint": {
   "en": "Full width, one per row",
@@ -78,6 +105,9 @@
   "ro": "Lățime completă, una pe rând",
   "sw": "Upana kamili, moja kwa safu",
   "tl": "Buong lapad, isa bawat hanay"
+ ,
+   "es": "Full width, one per row",
+   "pt": "Full width, one per row"
  },
  "studyPresetLayout": {
   "en": "Layout presets",
@@ -86,6 +116,9 @@
   "ro": "Aspecte prestabilite",
   "sw": "Mipangilio iliyowekwa",
   "tl": "Mga nakatakdang layout"
+ ,
+   "es": "Layout presets",
+   "pt": "Layout presets"
  },
  "studyPresetFull": {
   "en": "All full",
@@ -94,6 +127,9 @@
   "ro": "Toate complete",
   "sw": "Zote kamili",
   "tl": "Lahat buo"
+ ,
+   "es": "All full",
+   "pt": "All full"
  },
  "studyPresetHalf": {
   "en": "All half",
@@ -102,6 +138,9 @@
   "ro": "Toate jumătăți",
   "sw": "Zote nusu",
   "tl": "Lahat kalahati"
+ ,
+   "es": "All half",
+   "pt": "All half"
  },
  "studyVerseOfTheDay": {
   "en": "Verse of the day",
@@ -110,6 +149,9 @@
   "ro": "Versetul zilei",
   "sw": "Aya ya siku",
   "tl": "Talata para sa araw na ito"
+ ,
+   "es": "Versículo del día",
+   "pt": "Versículo do dia"
  },
  "studyRecentVerses": {
   "en": "Recent verses",
@@ -118,6 +160,9 @@
   "ro": "Versete recente",
   "sw": "Aya za hivi karibuni",
   "tl": "Kamakailang mga talata"
+ ,
+   "es": "Recent verses",
+   "pt": "Recent verses"
  },
  "studyWordLookUp": {
   "en": "Look up",
@@ -126,6 +171,9 @@
   "ro": "Caută",
   "sw": "Tafuta",
   "tl": "Hanapin"
+ ,
+   "es": "Buscar",
+   "pt": "Pesquisar"
  },
  "studyConcordanceClear": {
   "en": "Clear",
@@ -134,6 +182,9 @@
   "ro": "Șterge",
   "sw": "Futa",
   "tl": "Burahin"
+ ,
+   "es": "Clear",
+   "pt": "Clear"
  },
  "studyConcordanceBrowseAll": {
   "en": "Browse all terms",
@@ -142,6 +193,9 @@
   "ro": "Răsfoiește toți termenii",
   "sw": "Vinjari maneno yote",
   "tl": "I-browse ang lahat ng termino"
+ ,
+   "es": "Browse all terms",
+   "pt": "Browse all terms"
  },
  "studyConcordanceFeatured": {
   "en": "Featured biblical terms",
@@ -150,6 +204,9 @@
   "ro": "Termeni biblici recomandați",
   "sw": "Maneno makuu ya kibiblia",
   "tl": "Mga tampok na salitang biblikal"
+ ,
+   "es": "Featured biblical terms",
+   "pt": "Featured biblical terms"
  },
  "studyConcordanceFilterAll": {
   "en": "All",
@@ -158,6 +215,9 @@
   "ro": "Toate",
   "sw": "Zote",
   "tl": "Lahat"
+ ,
+   "es": "Todos",
+   "pt": "Todos"
  },
  "studyConcordanceFilterOT": {
   "en": "Old Testament",
@@ -166,6 +226,9 @@
   "ro": "Vechiul Testament",
   "sw": "Agano la Kale",
   "tl": "Lumang Tipan"
+ ,
+   "es": "Antiguo Testamento",
+   "pt": "Antigo Testamento"
  },
  "studyConcordanceFilterNT": {
   "en": "New Testament",
@@ -174,6 +237,9 @@
   "ro": "Noul Testament",
   "sw": "Agano Jipya",
   "tl": "Bagong Tipan"
+ ,
+   "es": "Nuevo Testamento",
+   "pt": "Novo Testamento"
  },
  "studyMoveUp": {
   "en": "Move up",
@@ -182,6 +248,9 @@
   "ro": "Mută în sus",
   "sw": "Sogeza juu",
   "tl": "Iakyat"
+ ,
+   "es": "Mover arriba",
+   "pt": "Mover para cima"
  },
  "studyMoveUpHint": {
   "en": "Swap with the card above",
@@ -190,6 +259,9 @@
   "ro": "Schimbă cu cardul de deasupra",
   "sw": "Badilisha na kadi ya juu",
   "tl": "Ipagpalit sa card sa itaas"
+ ,
+   "es": "Intercambiar con la tarjeta de arriba",
+   "pt": "Trocar com o cartão acima"
  },
  "studyMoveDown": {
   "en": "Move down",
@@ -198,6 +270,9 @@
   "ro": "Mută în jos",
   "sw": "Sogeza chini",
   "tl": "Ibaba"
+ ,
+   "es": "Mover abajo",
+   "pt": "Mover para baixo"
  },
  "studyMoveDownHint": {
   "en": "Swap with the card below",
@@ -206,6 +281,9 @@
   "ro": "Schimbă cu cardul de dedesubt",
   "sw": "Badilisha na kadi ya chini",
   "tl": "Ipagpalit sa card sa ibaba"
+ ,
+   "es": "Intercambiar con la tarjeta de abajo",
+   "pt": "Trocar com o cartão abaixo"
  },
  "studyCommentaryEyebrow": {
   "en": "Commentary",
@@ -214,6 +292,9 @@
   "ro": "Comentariu",
   "sw": "Ufafanuzi",
   "tl": "Komentaryo"
+ ,
+   "es": "Comentario",
+   "pt": "Comentário"
  },
  "studyCommentaryTitle": {
   "en": "Verse-by-verse insight",
@@ -222,6 +303,9 @@
   "ro": "Explicații verset cu verset",
   "sw": "Maarifa mstari kwa mstari",
   "tl": "Pag-unawa bawat talata"
+ ,
+   "es": "Análisis versículo por versículo",
+   "pt": "Análise versículo por versículo"
  },
  "studyCommentarySnippet": {
   "en": "Historicist commentary with chapter + verse filters.",
@@ -230,6 +314,9 @@
   "ro": "Comentariu istoricist cu filtre pe capitol și verset.",
   "sw": "Ufafanuzi wa kihistoria wenye vichujio vya sura na mstari.",
   "tl": "Historisistang komentaryo na may filter sa kabanata at talata."
+ ,
+   "es": "Historicist commentary with chapter + verse filters.",
+   "pt": "Historicist commentary with chapter + verse filters."
  },
  "studyCommentaryCta": {
   "en": "Open commentary",
@@ -238,6 +325,9 @@
   "ro": "Deschide comentariul",
   "sw": "Fungua ufafanuzi",
   "tl": "Buksan ang komentaryo"
+ ,
+   "es": "Open commentary",
+   "pt": "Open commentary"
  },
  "studyDictionaryEyebrow": {
   "en": "Dictionary",
@@ -246,6 +336,9 @@
   "ro": "Dicționar",
   "sw": "Kamusi",
   "tl": "Diksiyunaryo"
+ ,
+   "es": "Diccionario",
+   "pt": "Dicionário"
  },
  "studyDictionaryTitle": {
   "en": "Words defined",
@@ -254,6 +347,9 @@
   "ro": "Cuvinte explicate",
   "sw": "Maneno yamefafanuliwa",
   "tl": "Kahulugan ng mga salita"
+ ,
+   "es": "Palabras definidas",
+   "pt": "Palavras definidas"
  },
  "studyDictionarySnippet": {
   "en": "Easton & Smith, offline, with saved words.",
@@ -262,6 +358,9 @@
   "ro": "Easton și Smith, offline, cu cuvinte salvate.",
   "sw": "Easton na Smith, nje ya mtandao, na maneno yaliyohifadhiwa.",
   "tl": "Easton at Smith, offline, may naka-save na salita."
+ ,
+   "es": "Easton & Smith, offline, with saved words.",
+   "pt": "Easton & Smith, offline, with saved words."
  },
  "studyDictionaryCta": {
   "en": "Look up",
@@ -270,6 +369,9 @@
   "ro": "Caută",
   "sw": "Tafuta",
   "tl": "Hanapin"
+ ,
+   "es": "Buscar",
+   "pt": "Pesquisar"
  },
  "studyStoriesEyebrow": {
   "en": "Bible stories",
@@ -278,6 +380,9 @@
   "ro": "Povestiri biblice",
   "sw": "Hadithi za Biblia",
   "tl": "Mga kuwento sa Bibliya"
+ ,
+   "es": "Bible stories",
+   "pt": "Bible stories"
  },
  "studyStoriesTitle": {
   "en": "Narratives retold",
@@ -286,6 +391,9 @@
   "ro": "Relatări repovestite",
   "sw": "Simulizi zilizosimuliwa upya",
   "tl": "Mga salaysay na muling isinalaysay"
+ ,
+   "es": "Relatos recreados",
+   "pt": "Narrativas recontaadas"
  },
  "studyStoriesSnippet": {
   "en": "66 stories across every book.",
@@ -294,6 +402,9 @@
   "ro": "66 de povestiri din fiecare carte.",
   "sw": "Hadithi 66 kutoka kila kitabu.",
   "tl": "66 kuwento mula sa bawat aklat."
+ ,
+   "es": "66 stories across every book.",
+   "pt": "66 stories across every book."
  },
  "studyStoriesCta": {
   "en": "Read stories",
@@ -302,6 +413,9 @@
   "ro": "Citește povestirile",
   "sw": "Soma hadithi",
   "tl": "Basahin ang mga kuwento"
+ ,
+   "es": "Leer los relatos",
+   "pt": "Ler as narrativas"
  },
  "studyConcordanceEyebrow": {
   "en": "Concordance",
@@ -310,6 +424,9 @@
   "ro": "Concordanță",
   "sw": "Konkodansi",
   "tl": "Konkordansya"
+ ,
+   "es": "Concordancia",
+   "pt": "Concordância"
  },
  "studyConcordanceTitle": {
   "en": "Every occurrence",
@@ -318,6 +435,9 @@
   "ro": "Fiecare apariție",
   "sw": "Kila mahali neno lilipo",
   "tl": "Bawat paglitaw"
+ ,
+   "es": "Cada aparición",
+   "pt": "Cada ocorrência"
  },
  "studyConcordanceSnippet": {
   "en": "Find each verse where a word appears.",
@@ -326,6 +446,9 @@
   "ro": "Găsește fiecare verset în care apare un cuvânt.",
   "sw": "Pata kila mstari ambapo neno linaonekana.",
   "tl": "Hanapin ang bawat talata kung saan lumilitaw ang salita."
+ ,
+   "es": "Find each verse where a word appears.",
+   "pt": "Find each verse where a word appears."
  },
  "studyConcordanceCta": {
   "en": "Search words",
@@ -334,6 +457,9 @@
   "ro": "Caută cuvinte",
   "sw": "Tafuta maneno",
   "tl": "Maghanap ng salita"
+ ,
+   "es": "Buscar palabras",
+   "pt": "Pesquisar palavras"
  },
  "studySpaceSaved": {
   "en": "Saved",
@@ -342,6 +468,9 @@
   "ro": "Salvate",
   "sw": "Zilizohifadhiwa",
   "tl": "Naka-save"
+ ,
+   "es": "Guardado",
+   "pt": "Guardado"
  },
  "studySpaceMarked": {
   "en": "Marked",
@@ -350,6 +479,9 @@
   "ro": "Evidențiate",
   "sw": "Zilizowekwa alama",
   "tl": "Minarkahan"
+ ,
+   "es": "Marked",
+   "pt": "Marked"
  },
  "studySpaceNotes": {
   "en": "Notes",
@@ -358,6 +490,9 @@
   "ro": "Notițe",
   "sw": "Maelezo",
   "tl": "Tala"
+ ,
+   "es": "Notas",
+   "pt": "Notas"
  },
  "studySpaceJournal": {
   "en": "Journal",
@@ -366,6 +501,9 @@
   "ro": "Jurnal",
   "sw": "Shajara",
   "tl": "Journal"
+ ,
+   "es": "Diario",
+   "pt": "Diário"
  },
  "studySpaceTitle": {
   "en": "Your Space",
@@ -374,6 +512,9 @@
   "ro": "Spațiul tău",
   "sw": "Nafasi yako",
   "tl": "Iyong Espasyo"
+ ,
+   "es": "Tu espacio",
+   "pt": "O teu espaço"
  },
  "studySpaceSubtitle": {
   "en": "Bookmarks, highlights, notes & journal",
@@ -382,6 +523,9 @@
   "ro": "Semne de carte, evidențieri, notițe și jurnal",
   "sw": "Alamisho, vivutio, maelezo na shajara",
   "tl": "Bookmark, highlight, tala at journal"
+ ,
+   "es": "Marcadores, resaltados, notas y diario",
+   "pt": "Favoritos, realces, notas e diário"
  },
  "studyReadingPlan": {
   "en": "Reading plan",
@@ -390,6 +534,9 @@
   "ro": "Plan de citire",
   "sw": "Mpango wa kusoma",
   "tl": "Plano sa pagbasa"
+ ,
+   "es": "Plan de lectura",
+   "pt": "Plano de leitura"
  },
  "studyStartReadingPlan": {
   "en": "Start a reading plan",
@@ -398,6 +545,9 @@
   "ro": "Începe un plan de citire",
   "sw": "Anza mpango wa kusoma",
   "tl": "Magsimula ng plano sa pagbasa"
+ ,
+   "es": "Empezar un plan de lectura",
+   "pt": "Começar um plano de leitura"
  },
  "studyActivePlan": {
   "en": "Active plan",
@@ -406,6 +556,9 @@
   "ro": "Plan activ",
   "sw": "Mpango unaoendelea",
   "tl": "Aktibong plano"
+ ,
+   "es": "Plan activo",
+   "pt": "Plano ativo"
  },
  "studyDayOfTotal": {
   "en": "Day {current} of {total}",
@@ -424,6 +577,9 @@
     }
    }
   }
+ ,
+   "es": "Día {current} de {total}",
+   "pt": "Dia {current} de {total}"
  },
  "studyDaysBehind": {
   "en": "{count} behind",
@@ -439,6 +595,9 @@
     }
    }
   }
+ ,
+   "es": "{count} behind",
+   "pt": "{count} behind"
  },
  "studyPlans": {
   "en": "Plans",
@@ -447,6 +606,9 @@
   "ro": "Planuri",
   "sw": "Mipango",
   "tl": "Mga plano"
+ ,
+   "es": "Planes",
+   "pt": "Planos"
  },
  "studyGuidedReading": {
   "en": "Guided reading",
@@ -455,6 +617,9 @@
   "ro": "Citire ghidată",
   "sw": "Usomaji ulioongozwa",
   "tl": "Gabay na pagbasa"
+ ,
+   "es": "Lectura guiada",
+   "pt": "Leitura guiada"
  },
  "studyGuidedReadingSubtitle": {
   "en": "Curated, paced and custom",
@@ -463,6 +628,9 @@
   "ro": "Selectate, ritmate și personalizate",
   "sw": "Teule, kwa mwendo na maalum",
   "tl": "Pinili, may takbo at pasadya"
+ ,
+   "es": "Seleccionados, a ritmo y personalizados",
+   "pt": "Selecionados, com ritmo e personalizados"
  },
  "studyReadyToBegin": {
   "en": "Ready to begin",
@@ -471,6 +639,9 @@
   "ro": "Gata de început",
   "sw": "Tayari kuanza",
   "tl": "Handa nang magsimula"
+ ,
+   "es": "Listo para empezar",
+   "pt": "Pronto para começar"
  },
  "studyTodayLabel": {
   "en": "Today: {label}",
@@ -486,6 +657,9 @@
     }
    }
   }
+ ,
+   "es": "Hoy: {label}",
+   "pt": "Hoje: {label}"
  },
  "studyReview": {
   "en": "Review",
@@ -494,6 +668,9 @@
   "ro": "Revezi",
   "sw": "Pitia",
   "tl": "Balikan"
+ ,
+   "es": "Review",
+   "pt": "Review"
  },
  "studyRead": {
   "en": "Read",
@@ -502,6 +679,9 @@
   "ro": "Citește",
   "sw": "Soma",
   "tl": "Basahin"
+ ,
+   "es": "Leer",
+   "pt": "Ler"
  },
  "studyCtaArrow": {
   "en": "{cta} →",
@@ -517,6 +697,9 @@
     }
    }
   }
+ ,
+   "es": "{cta} →",
+   "pt": "{cta} →"
  },
  "studyWordOfTheDay": {
   "en": "Word of the day",
@@ -525,6 +708,9 @@
   "ro": "Cuvântul zilei",
   "sw": "Neno la siku",
   "tl": "Salita ng araw"
+ ,
+   "es": "Palabra del día",
+   "pt": "Palavra do dia"
  },
  "studyArchiveLink": {
   "en": "Archive →",
@@ -533,6 +719,9 @@
   "ro": "Arhivă →",
   "sw": "Kumbukumbu →",
   "tl": "Archive →"
+ ,
+   "es": "Archivo →",
+   "pt": "Arquivo →"
  },
  "studyLoading": {
   "en": "Loading…",
@@ -541,6 +730,9 @@
   "ro": "Se încarcă…",
   "sw": "Inapakia…",
   "tl": "Naglo-load…"
+ ,
+   "es": "Cargando…",
+   "pt": "A carregar…"
  },
  "studyUnavailableNow": {
   "en": "Unavailable right now",
@@ -549,6 +741,9 @@
   "ro": "Indisponibil momentan",
   "sw": "Haipatikani kwa sasa",
   "tl": "Hindi available ngayon"
+ ,
+   "es": "Unavailable right now",
+   "pt": "Unavailable right now"
  },
  "studyReadingStreak": {
   "en": "Reading streak",
@@ -557,6 +752,9 @@
   "ro": "Serie de citire",
   "sw": "Mfululizo wa kusoma",
   "tl": "Sunod-sunod na pagbasa"
+ ,
+   "es": "Racha de lectura",
+   "pt": "Sequência de leitura"
  },
  "studyStartStreak": {
   "en": "Start your streak",
@@ -565,6 +763,9 @@
   "ro": "Începe-ți seria",
   "sw": "Anza mfululizo wako",
   "tl": "Simulan ang iyong streak"
+ ,
+   "es": "Start your streak",
+   "pt": "Start your streak"
  },
  "studyStreakDays": {
   "en": "{count, plural, =1{1 day} other{{count} days}}",
@@ -580,6 +781,9 @@
     }
    }
   }
+ ,
+   "es": "{count, plural, =1{1 day} other{{count} days}}",
+   "pt": "{count, plural, =1{1 day} other{{count} days}}"
  },
  "studyStreakGrow": {
   "en": "Open daily to grow it.",
@@ -588,6 +792,9 @@
   "ro": "Deschide zilnic ca s-o crești.",
   "sw": "Fungua kila siku ili uikuze.",
   "tl": "Buksan araw-araw para lumago ito."
+ ,
+   "es": "Open daily to grow it.",
+   "pt": "Open daily to grow it."
  },
  "studyStreakStart": {
   "en": "Complete a reading each day.",
@@ -596,6 +803,9 @@
   "ro": "Finalizează o citire în fiecare zi.",
   "sw": "Kamilisha usomaji kila siku.",
   "tl": "Tapusin ang isang pagbasa araw-araw."
+ ,
+   "es": "Complete a reading each day.",
+   "pt": "Complete a reading each day."
  },
  "studyViewProgress": {
   "en": "View progress →",
@@ -604,6 +814,9 @@
   "ro": "Vezi progresul →",
   "sw": "Tazama maendeleo →",
   "tl": "Tingnan ang progreso →"
+ ,
+   "es": "Ver el progreso →",
+   "pt": "Ver o progresso →"
  },
  "studyPassageNotFound": {
   "en": "Passage not found",
@@ -612,6 +825,9 @@
   "ro": "Pasaj negăsit",
   "sw": "Kifungu hakijapatikana",
   "tl": "Hindi nakita ang talata"
+ ,
+   "es": "Pasaje no encontrado",
+   "pt": "Passagem não encontrada"
  },
  "studyPassageLoadError": {
   "en": "Could not load passage data.",
@@ -620,6 +836,9 @@
   "ro": "Pasajul nu a putut fi încărcat.",
   "sw": "Imeshindwa kupakia kifungu.",
   "tl": "Hindi ma-load ang talata."
+ ,
+   "es": "No se pudieron cargar los datos del pasaje.",
+   "pt": "Não foi possível carregar os dados da passagem."
  },
  "studyCompletedCheck": {
   "en": "✓ Completed",
@@ -628,6 +847,9 @@
   "ro": "✓ Finalizat",
   "sw": "✓ Imekamilika",
   "tl": "✓ Natapos"
+ ,
+   "es": "✓ Completed",
+   "pt": "✓ Completed"
  },
  "studyMarkAsRead": {
   "en": "Mark as Read",
@@ -636,6 +858,9 @@
   "ro": "Marchează ca citit",
   "sw": "Weka kuwa imesomwa",
   "tl": "Markahang nabasa"
+ ,
+   "es": "Mark as Read",
+   "pt": "Mark as Read"
  },
  "studyNextPassage": {
   "en": "Next passage",
@@ -644,6 +869,9 @@
   "ro": "Pasajul următor",
   "sw": "Kifungu kijacho",
   "tl": "Susunod na talata"
+ ,
+   "es": "Next passage",
+   "pt": "Next passage"
  },
  "studyFullChapter": {
   "en": "Full chapter",
@@ -652,6 +880,9 @@
   "ro": "Tot capitolul",
   "sw": "Sura nzima",
   "tl": "Buong kabanata"
+ ,
+   "es": "Capítulo completo",
+   "pt": "Capítulo completo"
  },
  "studyPassageOfTotal": {
   "en": "Passage {current} of {total}",
@@ -670,6 +901,9 @@
     }
    }
   }
+ ,
+   "es": "Pasaje {current} de {total}",
+   "pt": "Passagem {current} de {total}"
  },
  "studySelectedCount": {
   "en": "{count} selected",
@@ -685,6 +919,9 @@
     }
    }
   }
+ ,
+   "es": "{count} selected",
+   "pt": "{count} selected"
  },
  "studyHighlight": {
   "en": "Highlight",
@@ -693,6 +930,9 @@
   "ro": "Evidențiază",
   "sw": "Angazia",
   "tl": "I-highlight"
+ ,
+   "es": "Resaltar",
+   "pt": "Realçar"
  },
  "studyBookmark": {
   "en": "Bookmark",
@@ -701,6 +941,9 @@
   "ro": "Semn de carte",
   "sw": "Alamisho",
   "tl": "Bookmark"
+ ,
+   "es": "Marcador",
+   "pt": "Favorito"
  },
  "studyAddNote": {
   "en": "Add note",
@@ -709,6 +952,9 @@
   "ro": "Adaugă notiță",
   "sw": "Ongeza maelezo",
   "tl": "Magdagdag ng tala"
+ ,
+   "es": "Añadir nota",
+   "pt": "Adicionar nota"
  },
  "studyChaptersWithContent": {
   "en": "{count, plural, =1{1 chapter with content} other{{count} chapters with content}}",
@@ -724,6 +970,9 @@
     }
    }
   }
+ ,
+   "es": "{count, plural, =1{1 chapter with content} other{{count} chapters with content}}",
+   "pt": "{count, plural, =1{1 chapter with content} other{{count} chapters with content}}"
  },
  "studyCommentaryLibrary": {
   "en": "Commentary library",
@@ -732,6 +981,9 @@
   "ro": "Biblioteca de comentarii",
   "sw": "Maktaba ya ufafanuzi",
   "tl": "Aklatan ng komentaryo"
+ ,
+   "es": "Commentary library",
+   "pt": "Commentary library"
  },
  "studyCommentaryLoadError": {
   "en": "Could not load commentary.",
@@ -740,6 +992,9 @@
   "ro": "Comentariul nu a putut fi încărcat.",
   "sw": "Imeshindwa kupakia ufafanuzi.",
   "tl": "Hindi ma-load ang komentaryo."
+ ,
+   "es": "No se pudo cargar el comentario.",
+   "pt": "Não foi possível carregar o comentário."
  },
  "studyNoCommentaryYet": {
   "en": "No commentary available yet.",
@@ -748,6 +1003,9 @@
   "ro": "Niciun comentariu disponibil încă.",
   "sw": "Bado hakuna ufafanuzi.",
   "tl": "Wala pang komentaryo."
+ ,
+   "es": "Todavía no hay comentario disponible.",
+   "pt": "Ainda não há comentário disponível."
  },
  "studyCommentaryShelf": {
   "en": "The shelf",
@@ -756,6 +1014,9 @@
   "ro": "Raftul",
   "sw": "Rafu",
   "tl": "Ang istante"
+ ,
+   "es": "The shelf",
+   "pt": "The shelf"
  },
  "studyCommentaryByBook": {
   "en": "By book",
@@ -764,6 +1025,9 @@
   "ro": "După carte",
   "sw": "Kwa kitabu",
   "tl": "Ayon sa aklat"
+ ,
+   "es": "By book",
+   "pt": "By book"
  },
  "studyCommentaryVolumes": {
   "en": "{count, plural, =1{1 volume} other{{count} volumes}}",
@@ -779,6 +1043,9 @@
     }
    }
   }
+ ,
+   "es": "{count, plural, =1{1 volume} other{{count} volumes}}",
+   "pt": "{count, plural, =1{1 volume} other{{count} volumes}}"
  },
  "studyCommentaryEntries": {
   "en": "{count, plural, =1{1 entry} other{{count} entries}}",
@@ -794,6 +1061,9 @@
     }
    }
   }
+ ,
+   "es": "{count, plural, =1{1 entry} other{{count} entries}}",
+   "pt": "{count, plural, =1{1 entry} other{{count} entries}}"
  },
  "studyCommentaryChapters": {
   "en": "{count, plural, =1{1 chapter} other{{count} chapters}}",
@@ -809,6 +1079,9 @@
     }
    }
   }
+ ,
+   "es": "{count, plural, =1{1 chapter} other{{count} chapters}}",
+   "pt": "{count, plural, =1{1 chapter} other{{count} chapters}}"
  },
  "studyCommentarySearchHint": {
   "en": "Search volumes and books",
@@ -817,6 +1090,9 @@
   "ro": "Caută volume și cărți",
   "sw": "Tafuta juzuu na vitabu",
   "tl": "Maghanap ng tomo at aklat"
+ ,
+   "es": "Search volumes and books",
+   "pt": "Search volumes and books"
  },
  "studyCommentaryNoMatch": {
   "en": "Nothing matches \"{query}\".",
@@ -832,6 +1108,9 @@
     }
    }
   }
+ ,
+   "es": "Nothing matches \"{query}\".",
+   "pt": "Nothing matches \"{query}\"."
  },
  "studyReadingRef": {
   "en": "Reading · {reference}",
@@ -847,6 +1126,9 @@
     }
    }
   }
+ ,
+   "es": "Reading · {reference}",
+   "pt": "Reading · {reference}"
  },
  "studyAllSources": {
   "en": "All sources",
@@ -855,6 +1137,9 @@
   "ro": "Toate sursele",
   "sw": "Vyanzo vyote",
   "tl": "Lahat ng sanggunian"
+ ,
+   "es": "Todas las fuentes",
+   "pt": "Todas as fontes"
  },
  "studyVerseLevel": {
   "en": "Verse-level",
@@ -863,6 +1148,9 @@
   "ro": "La nivel de verset",
   "sw": "Kwa mstari",
   "tl": "Bawat talata"
+ ,
+   "es": "A nivel de versículo",
+   "pt": "Ao nível do versículo"
  },
  "studySearchWithin": {
   "en": "Search within {reference}…",
@@ -878,6 +1166,9 @@
     }
    }
   }
+ ,
+   "es": "Search within {reference}…",
+   "pt": "Search within {reference}…"
  },
  "studyNoEntriesMatch": {
   "en": "No entries match these filters.\nTry All sources, or browse the library.",
@@ -886,6 +1177,9 @@
   "ro": "Nicio intrare nu corespunde filtrelor.\nÎncearcă Toate sursele sau răsfoiește biblioteca.",
   "sw": "Hakuna maingizo yanayolingana na vichujio hivi.\nJaribu Vyanzo vyote, au vinjari maktaba.",
   "tl": "Walang entry na tugma sa mga filter.\nSubukan ang Lahat ng sanggunian, o tingnan ang aklatan."
+ ,
+   "es": "No entries match these filters.\nTry All sources, or browse the library.",
+   "pt": "No entries match these filters.\nTry All sources, or browse the library."
  },
  "studyVerseN": {
   "en": "Verse {verse}",
@@ -901,6 +1195,9 @@
     }
    }
   }
+ ,
+   "es": "Verse {verse}",
+   "pt": "Verse {verse}"
  },
  "studyChapter": {
   "en": "Chapter",
@@ -909,6 +1206,9 @@
   "ro": "Capitol",
   "sw": "Sura",
   "tl": "Kabanata"
+ ,
+   "es": "Chapter",
+   "pt": "Chapter"
  },
  "studyCategoryCommentary": {
   "en": "Commentary",
@@ -917,6 +1217,9 @@
   "ro": "Comentariu",
   "sw": "Ufafanuzi",
   "tl": "Komentaryo"
+ ,
+   "es": "Comentario",
+   "pt": "Comentário"
  },
  "studyCategoryDevotional": {
   "en": "Devotional",
@@ -925,6 +1228,9 @@
   "ro": "Devoțional",
   "sw": "Ibada",
   "tl": "Debosyonal"
+ ,
+   "es": "Devotional",
+   "pt": "Devotional"
  },
  "studyCategoryStudyNote": {
   "en": "Study note",
@@ -933,6 +1239,9 @@
   "ro": "Notă de studiu",
   "sw": "Dokezo la funzo",
   "tl": "Tala sa pag-aaral"
+ ,
+   "es": "Study note",
+   "pt": "Study note"
  },
  "studyNoContentForFilters": {
   "en": "No content found for these filters.",
@@ -941,6 +1250,9 @@
   "ro": "Niciun conținut pentru aceste filtre.",
   "sw": "Hakuna maudhui kwa vichujio hivi.",
   "tl": "Walang nilalaman para sa mga filter na ito."
+ ,
+   "es": "No se encontró contenido para estos filtros.",
+   "pt": "Não foi encontrado conteúdo para estes filtros."
  },
  "studyVerseLabel": {
   "en": "Verse {verse}",
@@ -956,6 +1268,9 @@
     }
    }
   }
+ ,
+   "es": "Verse {verse}",
+   "pt": "Verse {verse}"
  },
  "studyChapterView": {
   "en": "Chapter view",
@@ -964,6 +1279,9 @@
   "ro": "Tot capitolul",
   "sw": "Mwonekano wa sura",
   "tl": "Buong kabanata"
+ ,
+   "es": "Chapter view",
+   "pt": "Chapter view"
  },
  "studyFilterAll": {
   "en": "All",
@@ -972,6 +1290,9 @@
   "ro": "Toate",
   "sw": "Zote",
   "tl": "Lahat"
+ ,
+   "es": "Todos",
+   "pt": "Todos"
  },
  "studyFilterDevotionals": {
   "en": "Devotionals",
@@ -980,6 +1301,9 @@
   "ro": "Devoționale",
   "sw": "Ibada",
   "tl": "Mga debosyonal"
+ ,
+   "es": "Devotionals",
+   "pt": "Devotionals"
  },
  "studyFilterAllContexts": {
   "en": "All contexts",
@@ -988,6 +1312,9 @@
   "ro": "Toate contextele",
   "sw": "Miktadha yote",
   "tl": "Lahat ng konteksto"
+ ,
+   "es": "All contexts",
+   "pt": "All contexts"
  },
  "studyFilterChapterLevel": {
   "en": "Chapter level",
@@ -996,6 +1323,9 @@
   "ro": "La nivel de capitol",
   "sw": "Kwa sura",
   "tl": "Bawat kabanata"
+ ,
+   "es": "Chapter level",
+   "pt": "Chapter level"
  },
  "studyFilterVerseLevel": {
   "en": "Verse level",
@@ -1004,6 +1334,9 @@
   "ro": "La nivel de verset",
   "sw": "Kwa mstari",
   "tl": "Bawat talata"
+ ,
+   "es": "Verse level",
+   "pt": "Verse level"
  },
  "studyRemoveBookmark": {
   "en": "Remove bookmark",
@@ -1012,6 +1345,9 @@
   "ro": "Elimină semnul de carte",
   "sw": "Ondoa alamisho",
   "tl": "Alisin ang bookmark"
+ ,
+   "es": "Quitar marcador",
+   "pt": "Remover marcador"
  },
  "studyBookmarkCommentary": {
   "en": "Bookmark commentary",
@@ -1020,6 +1356,9 @@
   "ro": "Adaugă semn de carte",
   "sw": "Weka alamisho",
   "tl": "I-bookmark ang komentaryo"
+ ,
+   "es": "Bookmark commentary",
+   "pt": "Bookmark commentary"
  },
  "studyExpandFullScreen": {
   "en": "Expand to full screen",
@@ -1028,6 +1367,9 @@
   "ro": "Ecran complet",
   "sw": "Panua skrini nzima",
   "tl": "I-full screen"
+ ,
+   "es": "Ampliar a pantalla completa",
+   "pt": "Expandir para tela cheia"
  },
  "studyTapToReadInContext": {
   "en": "Tap to read in context",
@@ -1036,6 +1378,9 @@
   "ro": "Atinge pentru a citi în context",
   "sw": "Gusa kusoma katika muktadha",
   "tl": "I-tap para basahin sa konteksto"
+ ,
+   "es": "Toca para leer en contexto",
+   "pt": "Toque para ler em contexto"
  },
  "studyOnThisChapter": {
   "en": "On this chapter",
@@ -1044,6 +1389,9 @@
   "ro": "Despre acest capitol",
   "sw": "Kuhusu sura hii",
   "tl": "Tungkol sa kabanatang ito"
+ ,
+   "es": "En este capítulo",
+   "pt": "Neste capítulo"
  },
  "studyOnThisBook": {
   "en": "On this book",
@@ -1052,6 +1400,9 @@
   "ro": "Despre această carte",
   "sw": "Kuhusu kitabu hiki",
   "tl": "Tungkol sa aklat na ito"
+ ,
+   "es": "En este libro",
+   "pt": "Neste livro"
  },
  "studyNoCommentaryTitle": {
   "en": "No commentary yet",
@@ -1060,6 +1411,9 @@
   "ro": "Încă niciun comentariu",
   "sw": "Bado hakuna ufafanuzi",
   "tl": "Wala pang komentaryo"
+ ,
+   "es": "Todavía no hay comentario",
+   "pt": "Ainda não há comentário"
  },
  "studyNoCommentaryBody": {
   "en": "We couldn't find specific commentary for this passage. Try exploring the chapter or book-level commentary below.",
@@ -1068,6 +1422,9 @@
   "ro": "Nu am găsit un comentariu specific pentru acest pasaj. Explorează comentariile capitolului sau ale cărții de mai jos.",
   "sw": "Hatukupata ufafanuzi maalum wa kifungu hiki. Jaribu ufafanuzi wa sura au kitabu hapa chini.",
   "tl": "Walang tiyak na komentaryo para sa talatang ito. Subukan ang komentaryo sa kabanata o aklat sa ibaba."
+ ,
+   "es": "We couldn't find specific commentary for this passage. Try exploring the chapter or book-level commentary below.",
+   "pt": "We couldn't find specific commentary for this passage. Try exploring the chapter or book-level commentary below."
  },
  "storiesTitle": {
   "en": "Bible stories",
@@ -1076,6 +1433,9 @@
   "ro": "Povestiri biblice",
   "sw": "Hadithi za Biblia",
   "tl": "Mga Kuwento sa Bibliya"
+ ,
+   "es": "Bible stories",
+   "pt": "Bible stories"
  },
  "storiesFilters": {
   "en": "Filters",
@@ -1084,6 +1444,9 @@
   "ro": "Filtre",
   "sw": "Vichujio",
   "tl": "Mga filter"
+ ,
+   "es": "Filtros",
+   "pt": "Filtros"
  },
  "storiesSubtitle": {
   "en": "500 illustrated moments from Genesis to Revelation",
@@ -1092,6 +1455,9 @@
   "ro": "500 de momente ilustrate de la Geneza la Apocalipsa",
   "sw": "Matukio 500 yenye picha kutoka Mwanzo hadi Ufunuo",
   "tl": "500 larawang sandali mula Genesis hanggang Pahayag"
+ ,
+   "es": "500 momentos ilustrados del Génesis al Apocalipsis",
+   "pt": "500 momentos ilustrados de Gênesis ao Apocalipse"
  },
  "storiesSearchHint": {
   "en": "Search title, book, or reference…",
@@ -1100,6 +1466,9 @@
   "ro": "Titlu, carte sau referință…",
   "sw": "Tafuta kichwa, kitabu au rejea…",
   "tl": "Pamagat, aklat, o sanggunian…"
+ ,
+   "es": "Busca por título, libro o referencia…",
+   "pt": "Pesquisar por título, livro ou referência…"
  },
  "storiesClearSearch": {
   "en": "Clear search",
@@ -1108,6 +1477,9 @@
   "ro": "Șterge căutarea",
   "sw": "Futa utafutaji",
   "tl": "I-clear ang paghahanap"
+ ,
+   "es": "Clear search",
+   "pt": "Clear search"
  },
  "storiesFilterAll": {
   "en": "All",
@@ -1116,6 +1488,9 @@
   "ro": "Toate",
   "sw": "Zote",
   "tl": "Lahat"
+ ,
+   "es": "Todos",
+   "pt": "Todos"
  },
  "storiesFilterOt": {
   "en": "OT",
@@ -1124,6 +1499,9 @@
   "ro": "VT",
   "sw": "AK",
   "tl": "LT"
+ ,
+   "es": "OT",
+   "pt": "OT"
  },
  "storiesFilterNt": {
   "en": "NT",
@@ -1132,6 +1510,9 @@
   "ro": "NT",
   "sw": "AJ",
   "tl": "BT"
+ ,
+   "es": "NT",
+   "pt": "NT"
  },
  "storiesCountOfTotal": {
   "en": "{count} of {total} stories",
@@ -1150,6 +1531,9 @@
     }
    }
   }
+ ,
+   "es": "{count} de {total} relatos",
+   "pt": "{count} de {total} narrativas"
  },
  "storiesFavorites": {
   "en": "Saved",
@@ -1158,6 +1542,9 @@
   "ro": "Salvate",
   "sw": "Zilizohifadhiwa",
   "tl": "Naka-save"
+ ,
+   "es": "Guardado",
+   "pt": "Guardado"
  },
  "storiesUnread": {
   "en": "Unread",
@@ -1166,6 +1553,9 @@
   "ro": "Necitite",
   "sw": "Hazijasomwa",
   "tl": "Hindi pa nabasa"
+ ,
+   "es": "No leído",
+   "pt": "Por ler"
  },
  "storiesBooks": {
   "en": "Books",
@@ -1174,6 +1564,9 @@
   "ro": "Cărți",
   "sw": "Vitabu",
   "tl": "Mga aklat"
+ ,
+   "es": "Books",
+   "pt": "Books"
  },
  "storiesSearchBooks": {
   "en": "Search books…",
@@ -1182,6 +1575,9 @@
   "ro": "Caută o carte…",
   "sw": "Tafuta vitabu…",
   "tl": "Maghanap ng aklat…"
+ ,
+   "es": "Buscar libros…",
+   "pt": "Pesquisar livros…"
  },
  "storiesAllBooks": {
   "en": "All books",
@@ -1190,6 +1586,9 @@
   "ro": "Toate cărțile",
   "sw": "Vitabu vyote",
   "tl": "Lahat ng aklat"
+ ,
+   "es": "Todos los libros",
+   "pt": "Todos os livros"
  },
  "storiesNoMatch": {
   "en": "No stories match these filters.",
@@ -1198,6 +1597,9 @@
   "ro": "Nicio povestire nu corespunde filtrelor.",
   "sw": "Hakuna hadithi inayolingana na vichujio hivi.",
   "tl": "Walang kuwentong tugma sa mga filter."
+ ,
+   "es": "No stories match these filters.",
+   "pt": "No stories match these filters."
  },
  "storiesNoFavorites": {
   "en": "No saved stories yet.",
@@ -1206,6 +1608,9 @@
   "ro": "Încă nicio povestire salvată.",
   "sw": "Bado hakuna hadithi zilizohifadhiwa.",
   "tl": "Wala pang naka-save na kuwento."
+ ,
+   "es": "No saved stories yet.",
+   "pt": "No saved stories yet."
  },
  "storiesBrowseAll": {
   "en": "Browse all stories",
@@ -1214,6 +1619,9 @@
   "ro": "Răsfoiește toate povestirile",
   "sw": "Vinjari hadithi zote",
   "tl": "Tingnan ang lahat ng kuwento"
+ ,
+   "es": "Browse all stories",
+   "pt": "Browse all stories"
  },
  "storiesAllCaughtUp": {
   "en": "You're all caught up.",
@@ -1222,6 +1630,9 @@
   "ro": "Ești la zi.",
   "sw": "Umesoma zote.",
   "tl": "Nabasa mo na lahat."
+ ,
+   "es": "You're all caught up.",
+   "pt": "You're all caught up."
  },
  "storiesShowRead": {
   "en": "Show read stories",
@@ -1230,6 +1641,9 @@
   "ro": "Arată povestirile citite",
   "sw": "Onyesha hadithi zilizosomwa",
   "tl": "Ipakita ang mga nabasa na"
+ ,
+   "es": "Show read stories",
+   "pt": "Show read stories"
  },
  "storiesClearFilters": {
   "en": "Clear filters",
@@ -1238,6 +1652,9 @@
   "ro": "Șterge filtrele",
   "sw": "Futa vichujio",
   "tl": "I-clear ang mga filter"
+ ,
+   "es": "Clear filters",
+   "pt": "Clear filters"
  },
  "storiesFavoritesHint": {
   "en": "Tap the bookmark on any story to save it here and in Your Space.",
@@ -1246,6 +1663,9 @@
   "ro": "Atinge semnul de carte al unei povestiri ca s-o salvezi aici și în Spațiul tău.",
   "sw": "Gusa alama ya kitabu kwenye hadithi kuihifadhi hapa na katika Nafasi Yako.",
   "tl": "I-tap ang bookmark sa kuwento para i-save ito rito at sa Iyong Espasyo."
+ ,
+   "es": "Tap the bookmark on any story to save it here and in Your Space.",
+   "pt": "Tap the bookmark on any story to save it here and in Your Space."
  },
  "storiesAttribution": {
   "en": "Scripture from the King James Version (public domain). Narrative summaries adapted from The Graham Bible (grahambible.com), AI-assisted and human reviewed. Artwork: Gustave Doré (1832–1883), public domain, via Wikimedia Commons.",
@@ -1254,6 +1674,9 @@
   "ro": "Scriptura din King James Version (domeniu public). Rezumate adaptate după The Graham Bible (grahambible.com), asistate de IA și revizuite de oameni. Ilustrații: Gustave Doré (1832–1883), domeniu public, prin Wikimedia Commons.",
   "sw": "Maandiko kutoka King James Version (kikoa cha umma). Muhtasari umetoholewa kutoka The Graham Bible (grahambible.com), kwa msaada wa AI na kukaguliwa na binadamu. Picha: Gustave Doré (1832–1883), kikoa cha umma, kupitia Wikimedia Commons.",
   "tl": "Kasulatan mula sa King James Version (pampublikong domain). Mga buod na hinango mula sa The Graham Bible (grahambible.com), tinulungan ng AI at sinuri ng tao. Likhang-sining: Gustave Doré (1832–1883), pampublikong domain, sa pamamagitan ng Wikimedia Commons."
+ ,
+   "es": "Scripture from the King James Version (public domain). Narrative summaries adapted from The Graham Bible (grahambible.com), AI-assisted and human reviewed. Artwork: Gustave Doré (1832–1883), public domain, via Wikimedia Commons.",
+   "pt": "Scripture from the King James Version (public domain). Narrative summaries adapted from The Graham Bible (grahambible.com), AI-assisted and human reviewed. Artwork: Gustave Doré (1832–1883), public domain, via Wikimedia Commons."
  },
  "storiesReachedEnd": {
   "en": "You have reached the end.",
@@ -1262,6 +1685,9 @@
   "ro": "Ai ajuns la final.",
   "sw": "Umefika mwisho.",
   "tl": "Narating mo na ang dulo."
+ ,
+   "es": "You have reached the end.",
+   "pt": "You have reached the end."
  },
  "storiesFirstStory": {
   "en": "This is the first story.",
@@ -1270,6 +1696,9 @@
   "ro": "Aceasta este prima povestire.",
   "sw": "Hii ni hadithi ya kwanza.",
   "tl": "Ito ang unang kuwento."
+ ,
+   "es": "This is the first story.",
+   "pt": "This is the first story."
  },
  "storiesFavorite": {
   "en": "Save story",
@@ -1278,6 +1707,9 @@
   "ro": "Salvează povestirea",
   "sw": "Hifadhi hadithi",
   "tl": "I-save ang kuwento"
+ ,
+   "es": "Save story",
+   "pt": "Save story"
  },
  "storiesMarkAsRead": {
   "en": "Mark as read",
@@ -1286,6 +1718,9 @@
   "ro": "Marchează ca citită",
   "sw": "Weka kuwa imesomwa",
   "tl": "Markahang nabasa"
+ ,
+   "es": "Marcar como leído",
+   "pt": "Marcar como lido"
  },
  "storiesKeyVerse": {
   "en": "KEY VERSE · {reference}",
@@ -1301,6 +1736,9 @@
     }
    }
   }
+ ,
+   "es": "VERSÍCULO CLAVE · {reference}",
+   "pt": "VERSÍCULO-CHAVE · {reference}"
  },
  "storiesTheStory": {
   "en": "THE STORY",
@@ -1309,6 +1747,9 @@
   "ro": "POVESTIREA",
   "sw": "HADITHI",
   "tl": "ANG KUWENTO"
+ ,
+   "es": "EL RELATO",
+   "pt": "A HISTÓRIA"
  },
  "storiesArtworkCaption": {
   "en": "Artwork: {caption} — Gustave Doré, public domain",
@@ -1324,6 +1765,9 @@
     }
    }
   }
+ ,
+   "es": "Ilustración: {caption} — Gustave Doré, dominio público",
+   "pt": "Ilustração: {caption} — Gustave Doré, domínio público"
  },
  "storiesPrevious": {
   "en": "Previous story",
@@ -1332,6 +1776,9 @@
   "ro": "Povestirea anterioară",
   "sw": "Hadithi iliyotangulia",
   "tl": "Nakaraang kuwento"
+ ,
+   "es": "Relato anterior",
+   "pt": "Narrativa anterior"
  },
  "storiesNext": {
   "en": "Next story",
@@ -1340,6 +1787,9 @@
   "ro": "Povestirea următoare",
   "sw": "Hadithi inayofuata",
   "tl": "Susunod na kuwento"
+ ,
+   "es": "Relato siguiente",
+   "pt": "Narrativa seguinte"
  },
  "storiesPosition": {
   "en": "{index} of {total} in {book}",
@@ -1362,6 +1812,9 @@
     }
    }
   }
+ ,
+   "es": "{index} de {total} en {book}",
+   "pt": "{index} de {total} em {book}"
  },
  "studyDictionarySearchHint": {
   "en": "Search 3,400+ words…",
@@ -1370,6 +1823,9 @@
   "ro": "Caută în peste 3.400 de cuvinte…",
   "sw": "Tafuta maneno 3,400+…",
   "tl": "Maghanap sa 3,400+ salita…"
+ ,
+   "es": "Busca entre más de 3400 palabras…",
+   "pt": "Pesquisar em mais de 3400 palavras…"
  },
  "studyDictionarySavedFilter": {
   "en": "★ Saved",
@@ -1378,6 +1834,9 @@
   "ro": "★ Salvate",
   "sw": "★ Zilizohifadhiwa",
   "tl": "★ Naka-save"
+ ,
+   "es": "★ Guardado",
+   "pt": "★ Guardado"
  },
  "studyNoHeadwords": {
   "en": "No headwords found.",
@@ -1386,6 +1845,9 @@
   "ro": "Niciun cuvânt-titlu găsit.",
   "sw": "Hakuna vichwa vya maneno vilivyopatikana.",
   "tl": "Walang nahanap na salita."
+ ,
+   "es": "No headwords found.",
+   "pt": "No headwords found."
  },
  "studyDictionaryNoMatches": {
   "en": "No matches. Try “grace”, “atonement” or “wilderness”.",
@@ -1394,6 +1856,9 @@
   "ro": "Niciun rezultat. Încearcă „grace”, „atonement” sau „wilderness” (dicționar în engleză).",
   "sw": "Hakuna matokeo. Jaribu “grace”, “atonement” au “wilderness” (kamusi ya Kiingereza).",
   "tl": "Walang tugma. Subukan ang “grace”, “atonement” o “wilderness” (diksiyunaryong Ingles)."
+ ,
+   "es": "No matches. Try “grace”, “atonement” or “wilderness”.",
+   "pt": "No matches. Try “grace”, “atonement” or “wilderness”."
  },
  "studyResultCount": {
   "en": "{count, plural, =1{1 result} other{{count} results}}",
@@ -1409,6 +1874,9 @@
     }
    }
   }
+ ,
+   "es": "{count, plural, =1{1 result} other{{count} results}}",
+   "pt": "{count, plural, =1{1 result} other{{count} results}}"
  },
  "studyUntitledEntry": {
   "en": "(untitled entry)",
@@ -1417,6 +1885,9 @@
   "ro": "(intrare fără titlu)",
   "sw": "(ingizo bila kichwa)",
   "tl": "(entry na walang pamagat)"
+ ,
+   "es": "(untitled entry)",
+   "pt": "(untitled entry)"
  },
  "studyRemoveSavedWord": {
   "en": "Remove saved word",
@@ -1425,6 +1896,9 @@
   "ro": "Elimină cuvântul salvat",
   "sw": "Ondoa neno lililohifadhiwa",
   "tl": "Alisin ang naka-save na salita"
+ ,
+   "es": "Remove saved word",
+   "pt": "Remove saved word"
  },
  "studySaveWord": {
   "en": "Save word",
@@ -1433,6 +1907,9 @@
   "ro": "Salvează cuvântul",
   "sw": "Hifadhi neno",
   "tl": "I-save ang salita"
+ ,
+   "es": "Save word",
+   "pt": "Save word"
  },
  "studyNoDefinition": {
   "en": "No definition found.",
@@ -1441,6 +1918,9 @@
   "ro": "Nicio definiție găsită.",
   "sw": "Hakuna maana iliyopatikana.",
   "tl": "Walang nahanap na kahulugan."
+ ,
+   "es": "No se encontró ninguna definición.",
+   "pt": "Não foi encontrada nenhuma definição."
  },
  "studyStrongsShareText": {
   "en": "{id} - {lemma}\n\nTransliteration: {transliteration}\nPronunciation: {pronunciation}\n\nDefinition:\n{definition}",
@@ -1468,6 +1948,9 @@
     }
    }
   }
+ ,
+   "es": "{id} - {lemma}\n\nTransliteration: {transliteration}\nPronunciation: {pronunciation}\n\nDefinition:\n{definition}",
+   "pt": "{id} - {lemma}\n\nTransliteration: {transliteration}\nPronunciation: {pronunciation}\n\nDefinition:\n{definition}"
  },
  "studyNoStrongsEntry": {
   "en": "No entry found for {id}.",
@@ -1483,6 +1966,9 @@
     }
    }
   }
+ ,
+   "es": "No se encontró ninguna entrada para {id}.",
+   "pt": "Não foi encontrada nenhuma entrada para {id}."
  },
  "studyStrongsLexicon": {
   "en": "STRONG'S LEXICON",
@@ -1491,6 +1977,9 @@
   "ro": "LEXICONUL STRONG",
   "sw": "KAMUSI YA STRONG",
   "tl": "LEKSIKON NI STRONG"
+ ,
+   "es": "STRONG'S LEXICON",
+   "pt": "STRONG'S LEXICON"
  },
  "studyConcordanceHint": {
   "en": "Type a word (e.g., grace, covenant)…",
@@ -1499,14 +1988,26 @@
   "ro": "Cuvânt în engleză (ex. grace, covenant)…",
   "sw": "Neno la Kiingereza (k.m. grace, covenant)…",
   "tl": "Salitang Ingles (hal. grace, covenant)…"
+ ,
+   "es": "Escribe una palabra (p. ej. gracia, pacto)…",
+   "pt": "Escreva uma palavra (ex.: graça, aliança)…"
  },
  "studyConcordanceIntro": {
-  "en": "KJV occurrences — tap a verse to read it in context.",
-  "fr": "Occurrences dans la KJV — touchez un verset pour le lire dans son contexte.",
-  "it": "Occorrenze nella KJV — tocca un versetto per leggerlo nel contesto.",
-  "ro": "Apariții în KJV — atinge un verset pentru a-l citi în context.",
-  "sw": "Matukio katika KJV — gusa mstari kuusoma katika muktadha.",
-  "tl": "Mga paglitaw sa KJV — i-tap ang talata para basahin sa konteksto."
+  "en": "Occurrences in {translation} — tap a verse to read it in context.",
+  "fr": "Occurrences dans {translation} — touchez un verset pour le lire dans son contexte.",
+  "it": "Occorrenze in {translation} — tocca un versetto per leggerlo nel contesto.",
+  "ro": "Apariții în {translation} — atinge un verset pentru a-l citi în context.",
+  "sw": "Matukio katika {translation} — gusa mstari kuusoma katika muktadha.",
+  "tl": "Mga paglitaw sa {translation} — i-tap ang talata para basahin sa konteksto.",
+  "es": "Apariciones en {translation} — toca un versículo para leerlo en contexto.",
+  "pt": "Ocorrências em {translation} — toque num versículo para o ler em contexto.",
+  "@": {
+   "placeholders": {
+    "translation": {
+     "type": "String"
+    }
+   }
+  }
  },
  "studyConcordanceEmpty": {
   "en": "Every verse containing your word, in canonical order.",
@@ -1515,14 +2016,19 @@
   "ro": "Fiecare verset care conține cuvântul, în ordine canonică.",
   "sw": "Kila mstari wenye neno lako, kwa mpangilio wa vitabu.",
   "tl": "Bawat talatang may iyong salita, ayon sa kanonikong ayos."
+ ,
+   "es": "Every verse containing your word, in canonical order.",
+   "pt": "Every verse containing your word, in canonical order."
  },
  "studyConcordanceSingleWord": {
-  "en": "Enter a single English word to search.",
-  "fr": "Saisissez un seul mot anglais.",
-  "it": "Inserisci una sola parola inglese.",
-  "ro": "Introdu un singur cuvânt în engleză.",
-  "sw": "Andika neno moja la Kiingereza.",
-  "tl": "Maglagay ng isang salitang Ingles."
+  "en": "Enter a word or phrase to search.",
+  "fr": "Saisissez un mot ou une expression.",
+  "it": "Inserisci una parola o una frase.",
+  "ro": "Introdu un cuvânt sau o expresie.",
+  "sw": "Andika neno au sentensi ya kutafuta.",
+  "tl": "Maglagay ng salita o parasaan para hanapin.",
+  "es": "Escribe una palabra o una frase para buscar.",
+  "pt": "Escreva uma palavra ou uma frase para pesquisar."
  },
  "studyConcordanceNoVerses": {
   "en": "No verses contain \"{word}\".",
@@ -1538,6 +2044,9 @@
     }
    }
   }
+ ,
+   "es": "Ningún versículo contiene «{word}».",
+   "pt": "Nenhum versículo contém «{word}»."
  },
  "studyConcordanceCount": {
   "en": "{count, plural, =1{1 verse} other{{count} verses}}",
@@ -1553,6 +2062,9 @@
     }
    }
   }
+ ,
+   "es": "{count, plural, =1{1 verse} other{{count} verses}}",
+   "pt": "{count, plural, =1{1 verse} other{{count} verses}}"
  },
  "studyConcordanceCountTruncated": {
   "en": "{count, plural, =1{1 verse} other{{count} verses}} (first {limit} shown)",
@@ -1571,6 +2083,9 @@
     }
    }
   }
+ ,
+   "es": "{count, plural, =1{1 verse} other{{count} verses}} (first {limit} shown)",
+   "pt": "{count, plural, =1{1 verse} other{{count} verses}} (first {limit} shown)"
  },
  "creditsTitle": {
   "en": "Credits & sources",
@@ -1579,6 +2094,9 @@
   "ro": "Mulțumiri și surse",
   "sw": "Shukrani na vyanzo",
   "tl": "Mga kredito at sanggunian"
+ ,
+   "es": "Credits & sources",
+   "pt": "Credits & sources"
  },
  "creditsLicenses": {
   "en": "Open-source licenses",
@@ -1587,6 +2105,9 @@
   "ro": "Licențe open source",
   "sw": "Leseni za chanzo huria",
   "tl": "Mga open-source na lisensya"
+ ,
+   "es": "Open-source licenses",
+   "pt": "Open-source licenses"
  },
  "creditsLicensesSubtitle": {
   "en": "Fonts and software packages",
@@ -1595,6 +2116,9 @@
   "ro": "Fonturi și pachete software",
   "sw": "Fonti na vifurushi vya programu",
   "tl": "Mga font at software package"
+ ,
+   "es": "Fonts and software packages",
+   "pt": "Fonts and software packages"
  },
  "studyPreparingOfflineBible": {
   "en": "Preparing offline Bible… {percent}%",
@@ -1610,6 +2134,9 @@
     }
    }
   }
+ ,
+   "es": "Preparando la Biblia sin conexión… {percent} %",
+   "pt": "A preparar a Bíblia offline… {percent}%"
  },
  "errorTitle": {
   "en": "Something went wrong",
@@ -1618,6 +2145,9 @@
   "ro": "A apărut o problemă",
   "sw": "Hitilafu imetokea",
   "tl": "May nangyaring mali"
+ ,
+   "es": "Something went wrong",
+   "pt": "Something went wrong"
  },
  "errorBody": {
   "en": "An unexpected issue occurred. Tap below to return to the home screen.",
@@ -1626,6 +2156,9 @@
   "ro": "A apărut o problemă neașteptată. Atinge mai jos pentru a reveni la ecranul principal.",
   "sw": "Tatizo lisilotarajiwa limetokea. Gusa hapa chini kurudi mwanzo.",
   "tl": "May hindi inaasahang problema. I-tap sa ibaba para bumalik sa home screen."
+ ,
+   "es": "Ocurrió un problema inesperado. Toca abajo para volver a la pantalla de inicio.",
+   "pt": "Ocorreu um problema inesperado. Toque abaixo para voltar à tela inicial."
  },
  "errorBackHome": {
   "en": "Back to Home",
@@ -1634,6 +2167,9 @@
   "ro": "Înapoi la început",
   "sw": "Rudi mwanzo",
   "tl": "Bumalik sa Home"
+ ,
+   "es": "Volver al inicio",
+   "pt": "Voltar ao início"
  },
  "studyWeekN": {
   "en": "Week {week}",
@@ -1649,6 +2185,9 @@
     }
    }
   }
+ ,
+   "es": "Semana {week}",
+   "pt": "Semana {week}"
  },
  "privacyTitle": {
   "en": "Privacy policy",
@@ -1657,6 +2196,9 @@
   "ro": "Politica de confidențialitate",
   "sw": "Sera ya faragha",
   "tl": "Patakaran sa Privacy"
+ ,
+   "es": "Privacy policy",
+   "pt": "Privacy policy"
  },
  "privacyLoadError": {
   "en": "Could not load the privacy policy.",
@@ -1665,6 +2207,9 @@
   "ro": "Politica de confidențialitate nu a putut fi încărcată.",
   "sw": "Imeshindwa kupakia sera ya faragha.",
   "tl": "Hindi ma-load ang patakaran sa privacy."
+ ,
+   "es": "Could not load the privacy policy.",
+   "pt": "Could not load the privacy policy."
  },
  "privacyEffectiveDate": {
   "en": "Effective Date: {date}",
@@ -1680,6 +2225,9 @@
     }
    }
   }
+ ,
+   "es": "Effective Date: {date}",
+   "pt": "Effective Date: {date}"
  },
  "privacyEnglishOnly": {
   "en": "This policy is provided in English.",
@@ -1688,6 +2236,9 @@
   "ro": "Această politică este disponibilă în limba engleză.",
   "sw": "Sera hii inapatikana kwa Kiingereza.",
   "tl": "Ang patakarang ito ay nasa Ingles."
+ ,
+   "es": "This policy is provided in English.",
+   "pt": "This policy is provided in English."
  },
  "privacyViewOnline": {
   "en": "View online",
@@ -1696,5 +2247,8 @@
   "ro": "Vezi online",
   "sw": "Tazama mtandaoni",
   "tl": "Tingnan online"
+ ,
+   "es": "View online",
+   "pt": "View online"
  }
 }

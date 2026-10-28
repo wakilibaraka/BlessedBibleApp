@@ -1955,9 +1955,16 @@
   },
   "studyStrongsLexicon": "STRONG'S LEXICON",
   "studyConcordanceHint": "Type a word (e.g., grace, covenant)…",
-  "studyConcordanceIntro": "KJV occurrences — tap a verse to read it in context.",
+  "studyConcordanceIntro": "Occurrences in {translation} — tap a verse to read it in context.",
+  "@studyConcordanceIntro": {
+    "placeholders": {
+      "translation": {
+        "type": "String"
+      }
+    }
+  },
   "studyConcordanceEmpty": "Every verse containing your word, in canonical order.",
-  "studyConcordanceSingleWord": "Enter a single English word to search.",
+  "studyConcordanceSingleWord": "Enter a word or phrase to search.",
   "studyConcordanceNoVerses": "No verses contain \"{word}\".",
   "@studyConcordanceNoVerses": {
     "placeholders": {

@@ -11,7 +11,7 @@ import json
 import os
 import sys
 
-LANGS = ["en", "fr", "it", "ro", "sw", "tl"]
+LANGS = ["en", "fr", "it", "ro", "sw", "tl", "es", "pt"]
 root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 out = {l: {"@@locale": l} for l in LANGS}
 seen = {}

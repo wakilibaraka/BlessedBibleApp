@@ -6,6 +6,9 @@
     "ro": "Text mai mic",
     "sw": "Maandishi madogo zaidi",
     "tl": "Mas maliit na teksto"
+  ,
+    "es": "Smaller text",
+    "pt": "Smaller text"
   },
   "a11yTextLarger": {
     "en": "Larger text",
@@ -14,6 +17,9 @@
     "ro": "Text mai mare",
     "sw": "Maandishi makubwa zaidi",
     "tl": "Mas malaking teksto"
+  ,
+    "es": "Larger text",
+    "pt": "Larger text"
   },
   "a11yNotifications": {
     "en": "Notifications",
@@ -22,6 +28,9 @@
     "ro": "Notificări",
     "sw": "Arifa",
     "tl": "Mga abiso"
+  ,
+    "es": "Notifications",
+    "pt": "Notifications"
   },
   "a11yShowNav": {
     "en": "Show navigation",
@@ -30,6 +39,9 @@
     "ro": "Afișează navigarea",
     "sw": "Onyesha urambazaji",
     "tl": "Ipakita ang nabigasyon"
+  ,
+    "es": "Show navigation",
+    "pt": "Show navigation"
   },
   "a11yHideNav": {
     "en": "Hide navigation",
@@ -38,6 +50,9 @@
     "ro": "Ascunde navigarea",
     "sw": "Ficha urambazaji",
     "tl": "Itago ang nabigasyon"
+  ,
+    "es": "Hide navigation",
+    "pt": "Hide navigation"
   },
   "a11yVersesSelected": {
     "en": "{count, plural, =1{1 verse selected} other{{count} verses selected}}",
@@ -53,6 +68,9 @@
         }
       }
     }
+  ,
+    "es": "{count, plural, =1{1 verse selected} other{{count} verses selected}}",
+    "pt": "{count, plural, =1{1 verse selected} other{{count} verses selected}}"
   },
   "a11yMakePrimary": {
     "en": "Make main translation",
@@ -61,5 +79,8 @@
     "ro": "Setează ca traducere principală",
     "sw": "Fanya iwe tafsiri kuu",
     "tl": "Gawing pangunahing salin"
+  ,
+    "es": "Make main translation",
+    "pt": "Make main translation"
   }
 }

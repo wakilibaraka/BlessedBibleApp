@@ -3631,16 +3631,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyConcordanceHint => 'Type a word (e.g., grace, covenant)…';
 
   @override
-  String get studyConcordanceIntro =>
-      'KJV occurrences — tap a verse to read it in context.';
+  String studyConcordanceIntro(String translation) {
+    return 'Occurrences in $translation — tap a verse to read it in context.';
+  }
 
   @override
   String get studyConcordanceEmpty =>
       'Every verse containing your word, in canonical order.';
 
   @override
-  String get studyConcordanceSingleWord =>
-      'Enter a single English word to search.';
+  String get studyConcordanceSingleWord => 'Enter a word or phrase to search.';
 
   @override
   String studyConcordanceNoVerses(String word) {

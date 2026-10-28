@@ -3678,16 +3678,16 @@ class AppLocalizationsRo extends AppLocalizations {
   String get studyConcordanceHint => 'Cuvânt în engleză (ex. grace, covenant)…';
 
   @override
-  String get studyConcordanceIntro =>
-      'Apariții în KJV — atinge un verset pentru a-l citi în context.';
+  String studyConcordanceIntro(String translation) {
+    return 'Apariții în $translation — atinge un verset pentru a-l citi în context.';
+  }
 
   @override
   String get studyConcordanceEmpty =>
       'Fiecare verset care conține cuvântul, în ordine canonică.';
 
   @override
-  String get studyConcordanceSingleWord =>
-      'Introdu un singur cuvânt în engleză.';
+  String get studyConcordanceSingleWord => 'Introdu un cuvânt sau o expresie.';
 
   @override
   String studyConcordanceNoVerses(String word) {

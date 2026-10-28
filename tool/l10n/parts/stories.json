@@ -6,6 +6,9 @@
   "ro": "Afișează textul biblic în povestiri",
   "sw": "Onyesha maandiko katika hadithi",
   "tl": "Ipakita ang kasulatan sa mga kuwento"
+ ,
+   "es": "Show scripture in stories",
+   "pt": "Show scripture in stories"
  },
  "storiesShowPassageSubtitle": {
   "en": "Print the full passage above each story. When off, tap the reference to read it.",
@@ -14,6 +17,9 @@
   "ro": "Afișează pasajul complet deasupra fiecărei povestiri. Când e oprit, atinge referința pentru a-l citi.",
   "sw": "Onyesha kifungu kizima juu ya kila hadithi. Kikizimwa, gusa rejea ili kukisoma.",
   "tl": "Ipakita ang buong talata sa itaas ng bawat kuwento. Kapag naka-off, i-tap ang reperensya para basahin ito."
+ ,
+   "es": "Print the full passage above each story. When off, tap the reference to read it.",
+   "pt": "Print the full passage above each story. When off, tap the reference to read it."
  },
  "storiesOpenPassage": {
   "en": "Read {reference}",
@@ -29,6 +35,9 @@
     }
    }
   }
+ ,
+   "es": "Read {reference}",
+   "pt": "Read {reference}"
  },
  "storiesHighlight": {
   "en": "Highlight",
@@ -37,6 +46,9 @@
   "ro": "Evidențiază",
   "sw": "Angazia",
   "tl": "I-highlight"
+ ,
+   "es": "Resaltar",
+   "pt": "Realçar"
  },
  "storiesUnderline": {
   "en": "Underline",
@@ -45,6 +57,9 @@
   "ro": "Subliniază",
   "sw": "Pigia mstari",
   "tl": "Salungguhitan"
+ ,
+   "es": "Underline",
+   "pt": "Underline"
  },
  "storiesRemoveMark": {
   "en": "Remove mark",
@@ -53,6 +68,9 @@
   "ro": "Elimină marcajul",
   "sw": "Ondoa alama",
   "tl": "Alisin ang marka"
+ ,
+   "es": "Remove mark",
+   "pt": "Remove mark"
  },
  "storiesNextUp": {
   "en": "Next: {title}",
@@ -68,6 +86,9 @@
     }
    }
   }
+ ,
+   "es": "Next: {title}",
+   "pt": "Next: {title}"
  },
  "storiesInBook": {
   "en": "Stories in {book}",
@@ -83,6 +104,9 @@
     }
    }
   }
+ ,
+   "es": "Stories in {book}",
+   "pt": "Stories in {book}"
  },
  "storiesMarkAsUnread": {
   "en": "Mark as unread",
@@ -91,6 +115,9 @@
   "ro": "Marchează ca necitit",
   "sw": "Weka kama haijasomwa",
   "tl": "Markahan bilang hindi pa nababasa"
+ ,
+   "es": "Mark as unread",
+   "pt": "Mark as unread"
  },
  "storiesMarkedRead": {
   "en": "Marked as read",
@@ -99,6 +126,9 @@
   "ro": "Marcat ca citit",
   "sw": "Imewekwa kama imesomwa",
   "tl": "Namarkahang nabasa na"
+ ,
+   "es": "Marked as read",
+   "pt": "Marked as read"
  },
  "storiesMarkedUnread": {
   "en": "Marked as unread",
@@ -107,6 +137,9 @@
   "ro": "Marcat ca necitit",
   "sw": "Imewekwa kama haijasomwa",
   "tl": "Namarkahang hindi pa nababasa"
+ ,
+   "es": "Marked as unread",
+   "pt": "Marked as unread"
  },
  "storiesSavedToSpace": {
   "en": "Saved to Your Space",
@@ -115,6 +148,9 @@
   "ro": "Salvat în Spațiul tău",
   "sw": "Imehifadhiwa katika Nafasi Yako",
   "tl": "Na-save sa Iyong Espasyo"
+ ,
+   "es": "Saved to Your Space",
+   "pt": "Saved to Your Space"
  },
  "storiesRemovedFromSaved": {
   "en": "Removed from saved stories",
@@ -123,6 +159,9 @@
   "ro": "Eliminat din povestirile salvate",
   "sw": "Imeondolewa kwenye hadithi zilizohifadhiwa",
   "tl": "Inalis sa mga naka-save na kuwento"
+ ,
+   "es": "Removed from saved stories",
+   "pt": "Removed from saved stories"
  },
  "storiesRemoveFromSaved": {
   "en": "Remove from saved",
@@ -131,6 +170,9 @@
   "ro": "Elimină din salvate",
   "sw": "Ondoa kwenye zilizohifadhiwa",
   "tl": "Alisin sa naka-save"
+ ,
+   "es": "Remove from saved",
+   "pt": "Remove from saved"
  },
  "spaceTabStories": {
   "en": "Stories",
@@ -139,6 +181,9 @@
   "ro": "Povestiri",
   "sw": "Hadithi",
   "tl": "Kuwento"
+ ,
+   "es": "Stories",
+   "pt": "Stories"
  },
  "spaceSavedStories": {
   "en": "Saved stories",
@@ -147,6 +192,9 @@
   "ro": "Povestiri salvate",
   "sw": "Hadithi zilizohifadhiwa",
   "tl": "Mga naka-save na kuwento"
+ ,
+   "es": "Saved stories",
+   "pt": "Saved stories"
  },
  "spaceStoryMarks": {
   "en": "Highlights and underlines",
@@ -155,6 +203,9 @@
   "ro": "Evidențieri și sublinieri",
   "sw": "Vionyesho na mistari",
   "tl": "Mga highlight at salungguhit"
+ ,
+   "es": "Highlights and underlines",
+   "pt": "Highlights and underlines"
  },
  "spaceNoStories": {
   "en": "No saved stories yet. Tap the bookmark on a story, or select its text to highlight it, and it will show up here.",
@@ -163,6 +214,9 @@
   "ro": "Încă nicio povestire salvată. Atinge semnul de carte al unei povestiri sau selectează textul ca să-l evidențiezi și va apărea aici.",
   "sw": "Bado hakuna hadithi zilizohifadhiwa. Gusa alama ya kitabu kwenye hadithi, au chagua maandishi yake kuyaangazia, nayo itaonekana hapa.",
   "tl": "Wala pang naka-save na kuwento. I-tap ang bookmark sa kuwento, o piliin ang teksto nito para i-highlight, at lalabas ito rito."
+ ,
+   "es": "No saved stories yet. Tap the bookmark on a story, or select its text to highlight it, and it will show up here.",
+   "pt": "No saved stories yet. Tap the bookmark on a story, or select its text to highlight it, and it will show up here."
  },
  "storyOfTheDayOrderTitle": {
   "en": "Story of the Day order",
@@ -171,6 +225,9 @@
   "ro": "Ordinea povestirii zilei",
   "sw": "Mpangilio wa Hadithi ya Siku",
   "tl": "Ayos ng Kuwento ng Araw"
+ ,
+   "es": "Story of the Day order",
+   "pt": "Story of the Day order"
  },
  "storyOfTheDayOrderSubtitle": {
   "en": "Shuffled goes through all 500 stories without repeats. In order follows the Bible. Stories you have read are skipped.",
@@ -179,6 +236,9 @@
   "ro": "Amestecat parcurge toate cele 500 de povestiri fără repetări. În ordine urmează Biblia. Povestirile citite sunt sărite.",
   "sw": "Mchanganyiko hupitia hadithi zote 500 bila kurudia. Kwa mpangilio hufuata Biblia. Hadithi ulizosoma zinarukwa.",
   "tl": "Halo-halo: dadaan sa lahat ng 500 kuwento nang walang ulit. Sunod-sunod: ayon sa Bibliya. Nilalaktawan ang mga nabasa na."
+ ,
+   "es": "Shuffled goes through all 500 stories without repeats. In order follows the Bible. Stories you have read are skipped.",
+   "pt": "Shuffled goes through all 500 stories without repeats. In order follows the Bible. Stories you have read are skipped."
  },
  "storyOfTheDayOrderShuffled": {
   "en": "Shuffled",
@@ -187,6 +247,9 @@
   "ro": "Amestecat",
   "sw": "Mchanganyiko",
   "tl": "Halo-halo"
+ ,
+   "es": "Shuffled",
+   "pt": "Shuffled"
  },
  "storyOfTheDayOrderInOrder": {
   "en": "In order",
@@ -195,5 +258,8 @@
   "ro": "În ordine",
   "sw": "Kwa mpangilio",
   "tl": "Sunod-sunod"
+ ,
+   "es": "In order",
+   "pt": "In order"
  }
 }

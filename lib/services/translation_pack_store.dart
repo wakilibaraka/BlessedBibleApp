@@ -90,6 +90,8 @@ class TranslationPackStore {
     'fra_lsg',
     'ron_btf',
     'tgl_ulb',
+    'por_blj',
+    'spa_r09',
   ];
 
   /// Packs withdrawn from the app (e.g. found to be under copyright).

@@ -1,29 +1,110 @@
 {
-  "planFlowEmptyTitle": {"en": "Read the Bible with a plan", "fr": "Lisez la Bible avec un plan", "it": "Leggi la Bibbia con un piano", "ro": "Citește Biblia după un plan", "sw": "Soma Biblia kwa mpango", "tl": "Basahin ang Biblia nang may plano"},
-  "planFlowEmptyBody": {"en": "A few chapters a day, at your own pace.", "fr": "Quelques chapitres par jour, à votre rythme.", "it": "Pochi capitoli al giorno, al tuo ritmo.", "ro": "Câteva capitole pe zi, în ritmul tău.", "sw": "Sura chache kwa siku, kwa mwendo wako.", "tl": "Ilang kabanata bawat araw, sa sarili mong bilis."},
-  "planFlowPickPlan": {"en": "Pick a plan", "fr": "Choisir un plan", "it": "Scegli un piano", "ro": "Alege un plan", "sw": "Chagua mpango", "tl": "Pumili ng plano"},
-  "planFlowAllPlans": {"en": "All plans", "fr": "Tous les plans", "it": "Tutti i piani", "ro": "Toate planurile", "sw": "Mipango yote", "tl": "Lahat ng plano"},
-  "planFlowYourPlans": {"en": "Your plans · {count} active", "fr": "Vos plans · {count} actifs", "it": "I tuoi piani · {count} attivi", "ro": "Planurile tale · {count} active", "sw": "Mipango yako · {count} hai", "tl": "Iyong mga plano · {count} aktibo", "@": {"placeholders": {"count": {"type": "int"}}}},
-  "planFlowTodayDay": {"en": "Today · Day {day}", "fr": "Aujourd'hui · Jour {day}", "it": "Oggi · Giorno {day}", "ro": "Azi · Ziua {day}", "sw": "Leo · Siku {day}", "tl": "Ngayon · Araw {day}", "@": {"placeholders": {"day": {"type": "int"}}}},
-  "planFlowCatchUpDay": {"en": "Catch up · Day {day}", "fr": "Rattrapage · Jour {day}", "it": "Recupero · Giorno {day}", "ro": "Recuperare · Ziua {day}", "sw": "Fidia · Siku {day}", "tl": "Habulin · Araw {day}", "@": {"placeholders": {"day": {"type": "int"}}}},
-  "planFlowDoneToday": {"en": "Done for today ✓", "fr": "Terminé pour aujourd'hui ✓", "it": "Fatto per oggi ✓", "ro": "Gata pentru azi ✓", "sw": "Umemaliza leo ✓", "tl": "Tapos na ngayong araw ✓"},
-  "planFlowNextDay": {"en": "Next · Day {day}", "fr": "Suivant · Jour {day}", "it": "Prossimo · Giorno {day}", "ro": "Următoarea · Ziua {day}", "sw": "Inayofuata · Siku {day}", "tl": "Susunod · Araw {day}", "@": {"placeholders": {"day": {"type": "int"}}}},
-  "planFlowReadToday": {"en": "Read today", "fr": "Lire aujourd'hui", "it": "Leggi oggi", "ro": "Citește azi", "sw": "Soma leo", "tl": "Basahin ngayon"},
-  "planFlowReadDay": {"en": "Read day {day}", "fr": "Lire le jour {day}", "it": "Leggi il giorno {day}", "ro": "Citește ziua {day}", "sw": "Soma siku {day}", "tl": "Basahin ang araw {day}", "@": {"placeholders": {"day": {"type": "int"}}}},
-  "planFlowReadAhead": {"en": "Read ahead", "fr": "Lire en avance", "it": "Leggi in anticipo", "ro": "Citește înainte", "sw": "Soma mbele", "tl": "Magbasa nang maaga"},
-  "planFlowPlanComplete": {"en": "Plan complete", "fr": "Plan terminé", "it": "Piano completato", "ro": "Plan încheiat", "sw": "Mpango umekamilika", "tl": "Tapos na ang plano"},
-  "planFlowPlanCompleteBody": {"en": "You've read every day of this plan.", "fr": "Vous avez lu chaque jour de ce plan.", "it": "Hai letto ogni giorno di questo piano.", "ro": "Ai citit fiecare zi a acestui plan.", "sw": "Umesoma kila siku ya mpango huu.", "tl": "Nabasa mo ang bawat araw ng planong ito."},
-  "planFlowStartAndRead": {"en": "Start & read day 1", "fr": "Commencer et lire le jour 1", "it": "Inizia e leggi il giorno 1", "ro": "Începe și citește ziua 1", "sw": "Anza na usome siku 1", "tl": "Simulan at basahin ang araw 1"},
-  "planFlowStartOn": {"en": "Start on {date}", "fr": "Commencer le {date}", "it": "Inizia il {date}", "ro": "Începe pe {date}", "sw": "Anza tarehe {date}", "tl": "Simulan sa {date}", "@": {"placeholders": {"date": {"type": "String"}}}},
-  "planFlowStartsToday": {"en": "Starts today", "fr": "Commence aujourd'hui", "it": "Inizia oggi", "ro": "Începe azi", "sw": "Inaanza leo", "tl": "Magsisimula ngayon"},
-  "planFlowStartsOn": {"en": "Starts {date}", "fr": "Commence le {date}", "it": "Inizia il {date}", "ro": "Începe pe {date}", "sw": "Inaanza {date}", "tl": "Magsisimula sa {date}", "@": {"placeholders": {"date": {"type": "String"}}}},
-  "planFlowChangeDate": {"en": "Change date", "fr": "Changer la date", "it": "Cambia data", "ro": "Schimbă data", "sw": "Badilisha tarehe", "tl": "Palitan ang petsa"},
-  "planFlowShowEarlier": {"en": "{count, plural, =1{Show 1 earlier day} other{Show {count} earlier days}}", "fr": "{count, plural, =1{Afficher 1 jour précédent} other{Afficher {count} jours précédents}}", "it": "{count, plural, =1{Mostra 1 giorno precedente} other{Mostra {count} giorni precedenti}}", "ro": "{count, plural, =1{Arată 1 zi anterioară} other{Arată {count} zile anterioare}}", "sw": "{count, plural, =1{Onyesha siku 1 iliyopita} other{Onyesha siku {count} zilizopita}}", "tl": "{count, plural, =1{Ipakita ang 1 naunang araw} other{Ipakita ang {count} naunang araw}}", "@": {"placeholders": {"count": {"type": "int"}}}},
-  "planFlowPace": {"en": "Pace", "fr": "Rythme", "it": "Ritmo", "ro": "Ritm", "sw": "Mwendo", "tl": "Bilis"},
-  "planFlowFinishDay": {"en": "Finish day {day}", "fr": "Terminer le jour {day}", "it": "Completa il giorno {day}", "ro": "Încheie ziua {day}", "sw": "Maliza siku {day}", "tl": "Tapusin ang araw {day}", "@": {"placeholders": {"day": {"type": "int"}}}},
-  "planFlowMarkDayComplete": {"en": "Mark day complete", "fr": "Marquer le jour comme terminé", "it": "Segna il giorno come completato", "ro": "Marchează ziua ca încheiată", "sw": "Weka alama siku imekamilika", "tl": "Markahang tapos ang araw"},
-  "planFlowUpNext": {"en": "Up next: {label}", "fr": "Ensuite : {label}", "it": "Prossimo: {label}", "ro": "Urmează: {label}", "sw": "Inayofuata: {label}", "tl": "Susunod: {label}", "@": {"placeholders": {"label": {"type": "String"}}}},
-  "planFlowReaderSubtitle": {"en": "Day {day} · {plan}", "fr": "Jour {day} · {plan}", "it": "Giorno {day} · {plan}", "ro": "Ziua {day} · {plan}", "sw": "Siku {day} · {plan}", "tl": "Araw {day} · {plan}", "@": {"placeholders": {"day": {"type": "int"}, "plan": {"type": "String"}}}},
-  "planFlowPassages": {"en": "{count, plural, =1{1 passage} other{{count} passages}}", "fr": "{count, plural, =1{1 passage} other{{count} passages}}", "it": "{count, plural, =1{1 brano} other{{count} brani}}", "ro": "{count, plural, =1{1 pasaj} other{{count} pasaje}}", "sw": "{count, plural, =1{kifungu 1} other{vifungu {count}}}", "tl": "{count, plural, =1{1 talata} other{{count} talata}}", "@": {"placeholders": {"count": {"type": "int"}}}},
-  "planFlowMyPlans": {"en": "My Plans", "fr": "Mes plans", "it": "I miei piani", "ro": "Planurile mele", "sw": "Mipango Yangu", "tl": "Aking mga Plano"}
+  "planFlowEmptyTitle": {"en": "Read the Bible with a plan", "fr": "Lisez la Bible avec un plan", "it": "Leggi la Bibbia con un piano", "ro": "Citește Biblia după un plan", "sw": "Soma Biblia kwa mpango", "tl": "Basahin ang Biblia nang may plano",
+    "es": "Read the Bible with a plan",
+    "pt": "Read the Bible with a plan"
+  },
+  "planFlowEmptyBody": {"en": "A few chapters a day, at your own pace.", "fr": "Quelques chapitres par jour, à votre rythme.", "it": "Pochi capitoli al giorno, al tuo ritmo.", "ro": "Câteva capitole pe zi, în ritmul tău.", "sw": "Sura chache kwa siku, kwa mwendo wako.", "tl": "Ilang kabanata bawat araw, sa sarili mong bilis.",
+    "es": "A few chapters a day, at your own pace.",
+    "pt": "A few chapters a day, at your own pace."
+  },
+  "planFlowPickPlan": {"en": "Pick a plan", "fr": "Choisir un plan", "it": "Scegli un piano", "ro": "Alege un plan", "sw": "Chagua mpango", "tl": "Pumili ng plano",
+    "es": "Pick a plan",
+    "pt": "Pick a plan"
+  },
+  "planFlowAllPlans": {"en": "All plans", "fr": "Tous les plans", "it": "Tutti i piani", "ro": "Toate planurile", "sw": "Mipango yote", "tl": "Lahat ng plano",
+    "es": "All plans",
+    "pt": "All plans"
+  },
+  "planFlowYourPlans": {"en": "Your plans · {count} active", "fr": "Vos plans · {count} actifs", "it": "I tuoi piani · {count} attivi", "ro": "Planurile tale · {count} active", "sw": "Mipango yako · {count} hai", "tl": "Iyong mga plano · {count} aktibo", "@": {"placeholders": {"count": {"type": "int"}}},
+    "es": "Your plans · {count} active",
+    "pt": "Your plans · {count} active"
+  },
+  "planFlowTodayDay": {"en": "Today · Day {day}", "fr": "Aujourd'hui · Jour {day}", "it": "Oggi · Giorno {day}", "ro": "Azi · Ziua {day}", "sw": "Leo · Siku {day}", "tl": "Ngayon · Araw {day}", "@": {"placeholders": {"day": {"type": "int"}}},
+    "es": "Today · Day {day}",
+    "pt": "Today · Day {day}"
+  },
+  "planFlowCatchUpDay": {"en": "Catch up · Day {day}", "fr": "Rattrapage · Jour {day}", "it": "Recupero · Giorno {day}", "ro": "Recuperare · Ziua {day}", "sw": "Fidia · Siku {day}", "tl": "Habulin · Araw {day}", "@": {"placeholders": {"day": {"type": "int"}}},
+    "es": "Catch up · Day {day}",
+    "pt": "Catch up · Day {day}"
+  },
+  "planFlowDoneToday": {"en": "Done for today ✓", "fr": "Terminé pour aujourd'hui ✓", "it": "Fatto per oggi ✓", "ro": "Gata pentru azi ✓", "sw": "Umemaliza leo ✓", "tl": "Tapos na ngayong araw ✓",
+    "es": "Done for today ✓",
+    "pt": "Done for today ✓"
+  },
+  "planFlowNextDay": {"en": "Next · Day {day}", "fr": "Suivant · Jour {day}", "it": "Prossimo · Giorno {day}", "ro": "Următoarea · Ziua {day}", "sw": "Inayofuata · Siku {day}", "tl": "Susunod · Araw {day}", "@": {"placeholders": {"day": {"type": "int"}}},
+    "es": "Next · Day {day}",
+    "pt": "Next · Day {day}"
+  },
+  "planFlowReadToday": {"en": "Read today", "fr": "Lire aujourd'hui", "it": "Leggi oggi", "ro": "Citește azi", "sw": "Soma leo", "tl": "Basahin ngayon",
+    "es": "Read today",
+    "pt": "Read today"
+  },
+  "planFlowReadDay": {"en": "Read day {day}", "fr": "Lire le jour {day}", "it": "Leggi il giorno {day}", "ro": "Citește ziua {day}", "sw": "Soma siku {day}", "tl": "Basahin ang araw {day}", "@": {"placeholders": {"day": {"type": "int"}}},
+    "es": "Read day {day}",
+    "pt": "Read day {day}"
+  },
+  "planFlowReadAhead": {"en": "Read ahead", "fr": "Lire en avance", "it": "Leggi in anticipo", "ro": "Citește înainte", "sw": "Soma mbele", "tl": "Magbasa nang maaga",
+    "es": "Read ahead",
+    "pt": "Read ahead"
+  },
+  "planFlowPlanComplete": {"en": "Plan complete", "fr": "Plan terminé", "it": "Piano completato", "ro": "Plan încheiat", "sw": "Mpango umekamilika", "tl": "Tapos na ang plano",
+    "es": "Plan complete",
+    "pt": "Plan complete"
+  },
+  "planFlowPlanCompleteBody": {"en": "You've read every day of this plan.", "fr": "Vous avez lu chaque jour de ce plan.", "it": "Hai letto ogni giorno di questo piano.", "ro": "Ai citit fiecare zi a acestui plan.", "sw": "Umesoma kila siku ya mpango huu.", "tl": "Nabasa mo ang bawat araw ng planong ito.",
+    "es": "You've read every day of this plan.",
+    "pt": "You've read every day of this plan."
+  },
+  "planFlowStartAndRead": {"en": "Start & read day 1", "fr": "Commencer et lire le jour 1", "it": "Inizia e leggi il giorno 1", "ro": "Începe și citește ziua 1", "sw": "Anza na usome siku 1", "tl": "Simulan at basahin ang araw 1",
+    "es": "Start & read day 1",
+    "pt": "Start & read day 1"
+  },
+  "planFlowStartOn": {"en": "Start on {date}", "fr": "Commencer le {date}", "it": "Inizia il {date}", "ro": "Începe pe {date}", "sw": "Anza tarehe {date}", "tl": "Simulan sa {date}", "@": {"placeholders": {"date": {"type": "String"}}},
+    "es": "Start on {date}",
+    "pt": "Start on {date}"
+  },
+  "planFlowStartsToday": {"en": "Starts today", "fr": "Commence aujourd'hui", "it": "Inizia oggi", "ro": "Începe azi", "sw": "Inaanza leo", "tl": "Magsisimula ngayon",
+    "es": "Starts today",
+    "pt": "Starts today"
+  },
+  "planFlowStartsOn": {"en": "Starts {date}", "fr": "Commence le {date}", "it": "Inizia il {date}", "ro": "Începe pe {date}", "sw": "Inaanza {date}", "tl": "Magsisimula sa {date}", "@": {"placeholders": {"date": {"type": "String"}}},
+    "es": "Starts {date}",
+    "pt": "Starts {date}"
+  },
+  "planFlowChangeDate": {"en": "Change date", "fr": "Changer la date", "it": "Cambia data", "ro": "Schimbă data", "sw": "Badilisha tarehe", "tl": "Palitan ang petsa",
+    "es": "Change date",
+    "pt": "Change date"
+  },
+  "planFlowShowEarlier": {"en": "{count, plural, =1{Show 1 earlier day} other{Show {count} earlier days}}", "fr": "{count, plural, =1{Afficher 1 jour précédent} other{Afficher {count} jours précédents}}", "it": "{count, plural, =1{Mostra 1 giorno precedente} other{Mostra {count} giorni precedenti}}", "ro": "{count, plural, =1{Arată 1 zi anterioară} other{Arată {count} zile anterioare}}", "sw": "{count, plural, =1{Onyesha siku 1 iliyopita} other{Onyesha siku {count} zilizopita}}", "tl": "{count, plural, =1{Ipakita ang 1 naunang araw} other{Ipakita ang {count} naunang araw}}", "@": {"placeholders": {"count": {"type": "int"}}},
+    "es": "{count, plural, =1{Show 1 earlier day} other{Show {count} earlier days}}",
+    "pt": "{count, plural, =1{Show 1 earlier day} other{Show {count} earlier days}}"
+  },
+  "planFlowPace": {"en": "Pace", "fr": "Rythme", "it": "Ritmo", "ro": "Ritm", "sw": "Mwendo", "tl": "Bilis",
+    "es": "Pace",
+    "pt": "Pace"
+  },
+  "planFlowFinishDay": {"en": "Finish day {day}", "fr": "Terminer le jour {day}", "it": "Completa il giorno {day}", "ro": "Încheie ziua {day}", "sw": "Maliza siku {day}", "tl": "Tapusin ang araw {day}", "@": {"placeholders": {"day": {"type": "int"}}},
+    "es": "Finish day {day}",
+    "pt": "Finish day {day}"
+  },
+  "planFlowMarkDayComplete": {"en": "Mark day complete", "fr": "Marquer le jour comme terminé", "it": "Segna il giorno come completato", "ro": "Marchează ziua ca încheiată", "sw": "Weka alama siku imekamilika", "tl": "Markahang tapos ang araw",
+    "es": "Mark day complete",
+    "pt": "Mark day complete"
+  },
+  "planFlowUpNext": {"en": "Up next: {label}", "fr": "Ensuite : {label}", "it": "Prossimo: {label}", "ro": "Urmează: {label}", "sw": "Inayofuata: {label}", "tl": "Susunod: {label}", "@": {"placeholders": {"label": {"type": "String"}}},
+    "es": "Up next: {label}",
+    "pt": "Up next: {label}"
+  },
+  "planFlowReaderSubtitle": {"en": "Day {day} · {plan}", "fr": "Jour {day} · {plan}", "it": "Giorno {day} · {plan}", "ro": "Ziua {day} · {plan}", "sw": "Siku {day} · {plan}", "tl": "Araw {day} · {plan}", "@": {"placeholders": {"day": {"type": "int"}, "plan": {"type": "String"}}},
+    "es": "Day {day} · {plan}",
+    "pt": "Day {day} · {plan}"
+  },
+  "planFlowPassages": {"en": "{count, plural, =1{1 passage} other{{count} passages}}", "fr": "{count, plural, =1{1 passage} other{{count} passages}}", "it": "{count, plural, =1{1 brano} other{{count} brani}}", "ro": "{count, plural, =1{1 pasaj} other{{count} pasaje}}", "sw": "{count, plural, =1{kifungu 1} other{vifungu {count}}}", "tl": "{count, plural, =1{1 talata} other{{count} talata}}", "@": {"placeholders": {"count": {"type": "int"}}},
+    "es": "{count, plural, =1{1 passage} other{{count} passages}}",
+    "pt": "{count, plural, =1{1 passage} other{{count} passages}}"
+  },
+  "planFlowMyPlans": {"en": "My Plans", "fr": "Mes plans", "it": "I miei piani", "ro": "Planurile mele", "sw": "Mipango Yangu", "tl": "Aking mga Plano",
+    "es": "My Plans",
+    "pt": "My Plans"
+  }
 }

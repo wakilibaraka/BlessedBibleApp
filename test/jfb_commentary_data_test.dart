@@ -21,7 +21,8 @@ void main() {
     expect(entries, hasLength(19015));
     expect(entries.every((entry) => entry.text.trim().isNotEmpty), isTrue);
     expect(
-      entries.every((entry) => entry.source ==
+      entries.every((entry) =>
+          entry.source ==
           'Commentary Critical and Explanatory on the Whole Bible (1871)'),
       isTrue,
     );

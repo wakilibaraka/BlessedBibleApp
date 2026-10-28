@@ -3675,15 +3675,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get studyConcordanceHint => 'Mot anglais (ex. grace, covenant)…';
 
   @override
-  String get studyConcordanceIntro =>
-      'Occurrences dans la KJV — touchez un verset pour le lire dans son contexte.';
+  String studyConcordanceIntro(String translation) {
+    return 'Occurrences dans $translation — touchez un verset pour le lire dans son contexte.';
+  }
 
   @override
   String get studyConcordanceEmpty =>
       'Chaque verset contenant votre mot, dans l\'ordre canonique.';
 
   @override
-  String get studyConcordanceSingleWord => 'Saisissez un seul mot anglais.';
+  String get studyConcordanceSingleWord =>
+      'Saisissez un mot ou une expression.';
 
   @override
   String studyConcordanceNoVerses(String word) {

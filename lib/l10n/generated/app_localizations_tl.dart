@@ -3654,15 +3654,17 @@ class AppLocalizationsTl extends AppLocalizations {
   String get studyConcordanceHint => 'Salitang Ingles (hal. grace, covenant)…';
 
   @override
-  String get studyConcordanceIntro =>
-      'Mga paglitaw sa KJV — i-tap ang talata para basahin sa konteksto.';
+  String studyConcordanceIntro(String translation) {
+    return 'Mga paglitaw sa $translation — i-tap ang talata para basahin sa konteksto.';
+  }
 
   @override
   String get studyConcordanceEmpty =>
       'Bawat talatang may iyong salita, ayon sa kanonikong ayos.';
 
   @override
-  String get studyConcordanceSingleWord => 'Maglagay ng isang salitang Ingles.';
+  String get studyConcordanceSingleWord =>
+      'Maglagay ng salita o parasaan para hanapin.';
 
   @override
   String studyConcordanceNoVerses(String word) {

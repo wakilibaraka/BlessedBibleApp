@@ -3644,15 +3644,17 @@ class AppLocalizationsSw extends AppLocalizations {
       'Neno la Kiingereza (k.m. grace, covenant)…';
 
   @override
-  String get studyConcordanceIntro =>
-      'Matukio katika KJV — gusa mstari kuusoma katika muktadha.';
+  String studyConcordanceIntro(String translation) {
+    return 'Matukio katika $translation — gusa mstari kuusoma katika muktadha.';
+  }
 
   @override
   String get studyConcordanceEmpty =>
       'Kila mstari wenye neno lako, kwa mpangilio wa vitabu.';
 
   @override
-  String get studyConcordanceSingleWord => 'Andika neno moja la Kiingereza.';
+  String get studyConcordanceSingleWord =>
+      'Andika neno au sentensi ya kutafuta.';
 
   @override
   String studyConcordanceNoVerses(String word) {

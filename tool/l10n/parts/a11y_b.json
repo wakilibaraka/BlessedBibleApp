@@ -6,6 +6,9 @@
     "ro": "Săptămâna anterioară",
     "sw": "Wiki iliyopita",
     "tl": "Nakaraang linggo"
+  ,
+    "es": "Previous week",
+    "pt": "Previous week"
   },
   "a11yNextWeek": {
     "en": "Next week",
@@ -14,6 +17,9 @@
     "ro": "Săptămâna următoare",
     "sw": "Wiki ijayo",
     "tl": "Susunod na linggo"
+  ,
+    "es": "Next week",
+    "pt": "Next week"
   },
   "a11yRead": {
     "en": "Read",
@@ -22,5 +28,8 @@
     "ro": "Citit",
     "sw": "Imesomwa",
     "tl": "Nabasa na"
+  ,
+    "es": "Leer",
+    "pt": "Ler"
   }
 }
