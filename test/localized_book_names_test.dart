@@ -6,7 +6,7 @@ import 'package:the_blessed_bible/data/localized_book_names.dart';
 import 'package:the_blessed_bible/l10n/l10n.dart';
 
 void main() {
-  final languages = ['fr', 'it', 'ro', 'sw', 'tl'];
+  final languages = ['es', 'fr', 'it', 'pt', 'ro', 'sw', 'tl'];
 
   test('every shipped language has all 66 book names', () {
     for (final language in languages) {
@@ -35,6 +35,9 @@ void main() {
     expect(localizedBookName('Genesis', 'sw'), 'Mwanzo');
     expect(localizedBookName('Matthew', 'sw'), 'Mathayo');
     expect(localizedBookName('Psalms', 'tl'), 'Mga Awit');
+    expect(localizedBookName('Genesis', 'es'), 'Génesis');
+    expect(localizedBookName('Revelation', 'pt'), 'Apocalipse');
+    expect(localizedReference('1 John 3:16', 'pt'), '1 João 3:16');
   });
 
   test('unknown languages and non-book names fall back to the input', () {
