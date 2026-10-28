@@ -31,6 +31,7 @@ class CommentaryLibraryV2Screen extends ConsumerStatefulWidget {
 class _CommentaryLibraryV2ScreenState
     extends ConsumerState<CommentaryLibraryV2Screen> {
   String _query = '';
+  String _selectedSource = '';
 
   void _openBook(String book, Map<int, int> chapterCounts) {
     final chapters = chapterCounts.keys.toList()..sort();
@@ -77,8 +78,13 @@ class _CommentaryLibraryV2ScreenState
                       onTap: () {
                         Navigator.of(ctx).pop();
                         Navigator.of(context).push(CupertinoPageRoute<void>(
-                          builder: (_) =>
-                              CommentaryHubV2Screen(book: book, chapter: ch),
+                          builder: (_) => CommentaryHubV2Screen(
+                            book: book,
+                            chapter: ch,
+                            source: _selectedSource.isEmpty
+                                ? null
+                                : _selectedSource,
+                          ),
                         ));
                       },
                       child: Container(
@@ -133,10 +139,15 @@ class _CommentaryLibraryV2ScreenState
                   onRetry: () => ref.invalidate(commentaryProvider),
                 ),
                 data: (entries) {
+                  final sources = entries.map((e) => e.source).toSet().toList()
+                    ..sort();
+                  final visibleEntries = _selectedSource.isEmpty
+                      ? entries
+                      : entries.where((e) => e.source == _selectedSource).toList();
                   // book -> chapter -> entry count
                   final Map<String, Map<int, int>> books = {};
                   final Map<String, String> authors = {};
-                  for (final e in entries) {
+                  for (final e in visibleEntries) {
                     final b = e.scope.book;
                     final c = e.scope.chapter;
                     if (b == null || c == null) continue;
@@ -151,7 +162,7 @@ class _CommentaryLibraryV2ScreenState
                         .where((b) => b.toLowerCase().contains(q))
                         .toList();
                   }
-                  if (names.isEmpty) {
+                  if (names.isEmpty && _query.isNotEmpty) {
                     return EmptyState(
                       icon: Icons.search_off_rounded,
                       title: entries.isEmpty
@@ -161,9 +172,40 @@ class _CommentaryLibraryV2ScreenState
                   }
                   return ListView.builder(
                     padding: const EdgeInsets.fromLTRB(20, 12, 20, 140),
-                    itemCount: names.length + 1,
+                    itemCount: names.length + 2,
                     itemBuilder: (context, i) {
                       if (i == 0) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: DropdownButtonFormField<String>(
+                            initialValue: _selectedSource,
+                            decoration: InputDecoration(
+                              labelText: context.l10n.creditsCommentary,
+                              filled: true,
+                              fillColor: theme.colorScheme.surface,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(Radii.lg),
+                                borderSide: BorderSide(color: theme.dividerColor),
+                              ),
+                            ),
+                            items: [
+                              DropdownMenuItem<String>(
+                                value: '',
+                                child: Text(context.l10n.studyAllSources),
+                              ),
+                              for (final source in sources)
+                                DropdownMenuItem<String>(
+                                  value: source,
+                                  child: Text(source),
+                                ),
+                            ],
+                            onChanged: (value) => setState(
+                              () => _selectedSource = value ?? '',
+                            ),
+                          ),
+                        );
+                      }
+                      if (i == 1) {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10),
                           child: TextField(
@@ -188,7 +230,7 @@ class _CommentaryLibraryV2ScreenState
                           ),
                         );
                       }
-                      final book = names[i - 1];
+                      final book = names[i - 2];
                       final chapters = books[book]!;
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 10),
@@ -266,11 +308,13 @@ class CommentaryHubV2Screen extends ConsumerStatefulWidget {
   final String book;
   final int chapter;
   final int? verse;
+  final String? source;
   const CommentaryHubV2Screen({
     super.key,
     required this.book,
     required this.chapter,
     this.verse,
+    this.source,
   });
 
   @override
@@ -399,7 +443,9 @@ class _CommentaryHubV2ScreenState extends ConsumerState<CommentaryHubV2Screen> {
                         var list = entries
                             .where((e) =>
                                 e.scope.book == widget.book &&
-                                e.scope.chapter == widget.chapter)
+                                e.scope.chapter == widget.chapter &&
+                                (widget.source == null ||
+                                    e.source == widget.source))
                             .toList();
                         if (_filter != null) {
                           list =

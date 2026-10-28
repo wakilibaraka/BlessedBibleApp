@@ -58,6 +58,13 @@ List<CreditSection> creditSections(AppLocalizations l10n) => [
           CreditItem('E. J. Waggoner', 'Waggoner on Romans; The Glad Tidings.'),
           CreditItem('M. L. Andreasen', 'The Book of Hebrews (1948).'),
           CreditItem('Samuel T. Spear', l10n.creditsSelectedWriting),
+          CreditItem(
+            'Matthew Henry',
+            'Matthew Henry\'s Concise Commentary on the Bible. Public domain; '
+                'electronic text from CCEL, distributed by CrossWire as SWORD '
+                'module MHCC. The module identifies the text as matching the '
+                'Moody Press 28th printing (ISBN 0-8024-5190-X).',
+          ),
         ],
         note: l10n.creditsCommentaryPerspective,
       ),

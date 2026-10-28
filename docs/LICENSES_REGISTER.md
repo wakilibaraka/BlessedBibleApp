@@ -45,7 +45,7 @@ Status: ✅ OK to ship · ⚠️ verify before release · ⛔ do not ship as-is
 | Bíblia Livre | `content_packs/por_blj.db` | CC BY (version: item 5) | ⚠️ |
 | Romanian BTF 2015 | `assets/packs/ron_btf.db` | © 2015 Dr. Brian J. Nibbe, Sr., all rights reserved; permission needed (item 1) | ⛔ |
 
-## Commentary (`assets/commentary/commentary.json`, 4,724 entries)
+## Commentary (`assets/commentary/commentary.json`, 5,913 entries)
 
 | Work | Author | Entries | License | Status |
 | --- | --- | --- | --- | --- |
@@ -54,6 +54,7 @@ Status: ✅ OK to ship · ⚠️ verify before release · ⛔ do not ship as-is
 | Daniel and the Revelation | Uriah Smith | 403 | Public domain (edition: item 7) | ⚠️ |
 | The Book of Hebrews (1948) | M. L. Andreasen | 319 | Unconfirmed (item 2) | ⚠️ |
 | (single entry) | Samuel T. Spear | 1 | Public domain (19th c.) | ✅ |
+| *Matthew Henry's Concise Commentary on the Bible* | Matthew Henry | 1,189 chapter entries | Public Domain—Copy Freely; CrossWire SWORD module MHCC identifies the text as matching the Moody Press 28th printing (ISBN 0-8024-5190-X) and cites the CCEL plaintext source | ✅ |
 
 ## Study data (`assets/bible/bible.db`, `assets/data/`)
 

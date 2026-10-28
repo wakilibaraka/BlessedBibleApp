@@ -3554,7 +3554,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get creditsCommentaryPerspective =>
-      'Maelezo yanatoka kwa waandishi wa karne ya 19 na 20 wa mapokeo ya Waadventista Wasabato, na yanasoma unabii wa Biblia kwa mtazamo wa kihistoria (historicist). Yanatolewa kama msaada wa kujifunza pamoja na Maandiko, si sehemu yake.';
+      'Maelezo yanaakisi mapokeo tofauti ya Kikristo na mitazamo ya kihistoria. Ni msaada wa kujifunza pamoja na Maandiko, si sehemu yake.';
 
   @override
   String get creditsPublicDomain => 'Haki za umma (public domain).';

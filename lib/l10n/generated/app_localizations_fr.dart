@@ -3594,7 +3594,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get creditsCommentaryPerspective =>
-      'Les commentaires proviennent d\'auteurs des XIXe et XXe siècles de la tradition adventiste du septième jour et lisent la prophétie biblique selon la perspective historiciste. Ils sont proposés comme aide à l\'étude, à côté des Écritures, et n\'en font pas partie.';
+      'Les commentaires reflètent diverses traditions chrétiennes et perspectives historiques. Ils sont des outils d\'étude à côté des Écritures, et n\'en font pas partie.';
 
   @override
   String get creditsPublicDomain => 'Domaine public.';

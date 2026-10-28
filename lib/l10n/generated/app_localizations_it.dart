@@ -3574,7 +3574,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get creditsCommentaryPerspective =>
-      'I commenti provengono da autori del XIX e XX secolo della tradizione avventista del settimo giorno e leggono la profezia biblica secondo la prospettiva storicista. Sono offerti come aiuto allo studio accanto alla Scrittura, non come parte di essa.';
+      'I commentari riflettono diverse tradizioni cristiane e prospettive storiche. Sono strumenti di studio accanto alla Scrittura, non ne fanno parte.';
 
   @override
   String get creditsPublicDomain => 'Pubblico dominio.';

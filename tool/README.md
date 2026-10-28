@@ -27,6 +27,7 @@ everything from the repo root.
 | File | Purpose |
 | --- | --- |
 | `commentary-studio.html` | Local browser tool for authoring commentary JSON. |
+| `import_mhcc.py` | Imports/checks Matthew Henry's Concise Commentary from the pinned public-domain CCEL text. |
 | `hebrews_*.json` | Hebrews commentary source drafts. |
 
 ## Devotional (Bible Stories)

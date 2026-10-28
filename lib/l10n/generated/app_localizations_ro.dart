@@ -3597,7 +3597,7 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get creditsCommentaryPerspective =>
-      'Comentariile provin de la autori din secolele al XIX-lea și al XX-lea din tradiția adventistă de ziua a șaptea și interpretează profeția biblică din perspectivă istoricistă. Sunt oferite ca ajutor de studiu alături de Scriptură, nu ca parte a ei.';
+      'Comentariile reflectă diferite tradiții creștine și perspective istorice. Sunt ajutoare pentru studiu alături de Scriptură, nu fac parte din ea.';
 
   @override
   String get creditsPublicDomain => 'Domeniu public.';
