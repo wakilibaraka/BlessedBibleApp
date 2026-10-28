@@ -62,6 +62,13 @@ List<CreditSection> creditSections(AppLocalizations l10n) => [
               'Robert Jamieson, A. R. Fausset and David Brown',
               'Commentary Critical and Explanatory on the Whole Bible (1871). '
                   'Public domain. Source: CCEL (ccel.org/j/jamieson/jfb/cache/jfb.txt).'),
+          CreditItem(
+            'Matthew Henry',
+            'Matthew Henry\'s Concise Commentary on the Bible. Public domain; '
+                'electronic text from CCEL, distributed by CrossWire as SWORD '
+                'module MHCC. The module identifies the text as matching the '
+                'Moody Press 28th printing (ISBN 0-8024-5190-X).',
+          ),
         ],
         note: l10n.creditsCommentaryPerspective,
       ),

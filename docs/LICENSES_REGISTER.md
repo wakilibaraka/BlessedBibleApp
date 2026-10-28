@@ -50,11 +50,12 @@ Status: ✅ OK to ship · ⚠️ verify before release · ⛔ do not ship as-is
 | Work | Author | Entries | License | Status |
 | --- | --- | ---: | --- | --- |
 | JFB, *Commentary Critical and Explanatory on the Whole Bible* (1871), `jfb.json.gz` | Robert Jamieson, A. R. Fausset and David Brown | 19,015 | Public domain; CCEL source explicitly identifies the 1871 print basis and public-domain rights. | ✅ |
-| The Desire of Ages (1898), Patriarchs and Prophets (1890), The Acts of the Apostles (1911), Prophets and Kings (1917) | Ellen G. White | 3,103 | Public domain (original editions; no modern compilations used) | ✅ |
+| The Desire of Ages (1898), Patriarchs and Prophets (1890), The Acts of the Apostles (1911), Prophets and Kings (1917) | Ellen G. White | 3,007 | Public domain (original editions; no modern compilations used) | ✅ |
 | Waggoner on Romans; The Glad Tidings (1900) | E. J. Waggoner | 898 | Public domain (edition: item 8) | ✅/⚠️ |
 | Daniel and the Revelation | Uriah Smith | 403 | Public domain (edition: item 7) | ⚠️ |
 | The Book of Hebrews (1948) | M. L. Andreasen | 319 | Unconfirmed (item 2) | ⚠️ |
 | (single entry) | Samuel T. Spear | 1 | Public domain (19th c.) | ✅ |
+| *Matthew Henry's Concise Commentary on the Bible* | Matthew Henry | 1,189 chapter entries | Public Domain—Copy Freely; CrossWire SWORD module MHCC identifies the text as matching the Moody Press 28th printing (ISBN 0-8024-5190-X) and cites the CCEL plaintext source | ✅ |
 
 ## Study data (`assets/bible/bible.db`, `assets/data/`)
 
