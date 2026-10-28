@@ -4,6 +4,10 @@ All notable changes to The Blessed Bible. Newest first.
 
 ## [Unreleased]
 
+### Study
+- **Full card text:** Study cards no longer cut off with "...". Verse of the Day shows the whole verse, and plan titles, readings and snippets show in full.
+- **Word of the Day card removed:** It no longer appears on Study. The Dictionary and its Word of the Day history are unchanged.
+
 ### Account
 - **Sign out to a guest:** One sheet asks whether to keep your study data and your name on this device (both ticked). You always land as a guest, under your name or "Guest".
 - **Reset this device:** Erases study data on this device only. Signed in, choose to sign out or stay signed in and re-download. Deleting this app's cloud data is a separate switch, off by default, confirmed by typing DELETE.

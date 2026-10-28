@@ -110,8 +110,8 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
             .map((e) => StudyCardConfig.fromJson(e as Map<String, dynamic>))
             .toList();
 
-        // Version 6: reset to the default view once (all cards Full by default
-        // except wotd + votd_archive pair at the bottom).
+        // Version 6: reset to the default view once (all cards Full by
+        // default, votd_archive at the bottom).
         // Recomputed idempotently on every launch until a v6 save lands,
         // so no write is needed here. Unknown future ids are preserved.
         final needsReset = decoded.any(
@@ -209,8 +209,9 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
   }
 
   /// Layout-v2 default order and sizes: all cards Full by default,
-  /// with Word of the Day History and Verse of the Day History
-  /// side by side as Halves at the bottom.
+  /// with Verse of the Day History at the bottom. Word of the Day is no
+  /// longer a Study card (the dictionary keeps it); stored 'wotd'
+  /// entries are kept here but skipped by the Study screen.
   static List<StudyCardConfig> defaultLayoutV2() => [
         StudyCardConfig(
             id: 'your_space', size: CardSize.large, span: CardSpan.full),
@@ -226,9 +227,8 @@ class StudyLayoutNotifier extends Notifier<List<StudyCardConfig>> {
             id: 'commentary', size: CardSize.large, span: CardSpan.full),
         StudyCardConfig(
             id: 'streak', size: CardSize.large, span: CardSpan.full),
-        StudyCardConfig(id: 'wotd', size: CardSize.medium, span: CardSpan.half),
         StudyCardConfig(
-            id: 'votd_archive', size: CardSize.medium, span: CardSpan.half),
+            id: 'votd_archive', size: CardSize.large, span: CardSpan.full),
       ];
 }
 

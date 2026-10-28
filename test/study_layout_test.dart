@@ -1,5 +1,5 @@
-// Hub card sizes: v6 default view (all cards Full except wotd + votd_archive
-// which are Halves side-by-side at the bottom; streak is Full before them).
+// Hub card sizes: v6 default view (all cards Full, streak then
+// votd_archive at the bottom; Word of the Day is no longer a Study card).
 // Tests cover default order, migration, custom preservation, version
 // persistence, and Move up/down reorder.
 
@@ -36,25 +36,11 @@ void main() {
       'concordance',
       'commentary',
       'streak',
-      'wotd',
       'votd_archive',
     ]);
-    final byId = {for (final c in layout) c.id: c};
-    // All non-history cards are full width.
-    for (final id in [
-      'your_space',
-      'plans_live',
-      'bible_stories',
-      'dictionary',
-      'concordance',
-      'commentary',
-      'streak',
-    ]) {
-      expect(byId[id]!.span, CardSpan.full, reason: id);
-    }
-    // wotd and votd_archive are halves side by side at the bottom.
-    for (final id in ['wotd', 'votd_archive']) {
-      expect(byId[id]!.span, CardSpan.half, reason: id);
+    // Every default card is full width.
+    for (final c in layout) {
+      expect(c.span, CardSpan.full, reason: c.id);
     }
   });
 
@@ -94,12 +80,13 @@ void main() {
       'concordance',
       'commentary',
       'streak',
-      'wotd',
       'votd_archive',
+      // The retired wotd card is kept as an unknown id at the end; the
+      // Study screen skips it.
+      'wotd',
     ]);
     final byId = {for (final c in layout) c.id: c};
-    expect(byId['wotd']!.span, CardSpan.half);
-    expect(byId['votd_archive']!.span, CardSpan.half);
+    expect(byId['votd_archive']!.span, CardSpan.full);
     expect(byId['streak']!.span, CardSpan.full);
     expect(byId['commentary']!.span, CardSpan.full);
     expect(byId['concordance']!.span, CardSpan.full);
@@ -124,9 +111,9 @@ void main() {
     final byId = {for (final c in layout) c.id: c};
     // User had commentary as half — preserved through migration.
     expect(byId['commentary']!.span, CardSpan.half);
-    // wotd and votd_archive default to half.
-    expect(byId['wotd']!.span, CardSpan.half);
-    expect(byId['votd_archive']!.span, CardSpan.half);
+    // The retired wotd card is not added back.
+    expect(byId.containsKey('wotd'), isFalse);
+    expect(byId['votd_archive']!.span, CardSpan.full);
   });
 
   test('v6 stored layout gains concordance at the end, customs kept', () async {
@@ -202,12 +189,12 @@ void main() {
     addTearDown(container.dispose);
 
     container.read(studyLayoutProvider);
-    // In the new layout wotd and votd_archive are adjacent (both halves at end).
-    container.read(studyLayoutProvider.notifier).move('votd_archive', 'wotd');
+    // streak and votd_archive are adjacent at the end.
+    container.read(studyLayoutProvider.notifier).move('votd_archive', 'streak');
 
     var layout = container.read(studyLayoutProvider);
     var ids = [for (final c in layout) c.id];
-    expect(ids.indexOf('votd_archive'), ids.indexOf('wotd') - 1);
+    expect(ids.indexOf('votd_archive'), ids.indexOf('streak') - 1);
 
     // Unknown ids are no-ops.
     container.read(studyLayoutProvider.notifier).move('your_space', 'nope');
