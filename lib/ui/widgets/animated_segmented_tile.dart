@@ -9,6 +9,10 @@ class AnimatedSegmentedTile<T> extends StatelessWidget {
   final List<MapEntry<T, String>> options;
   final ValueChanged<T> onChanged;
 
+  /// Space around the tile. Sheets that already pad their content pass
+  /// [EdgeInsets.zero] so the selector lines up with the sheet's edges.
+  final EdgeInsetsGeometry padding;
+
   const AnimatedSegmentedTile({
     super.key,
     this.title,
@@ -16,13 +20,14 @@ class AnimatedSegmentedTile<T> extends StatelessWidget {
     required this.selectedValue,
     required this.options,
     required this.onChanged,
+    this.padding = const EdgeInsets.all(Space.lg),
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
