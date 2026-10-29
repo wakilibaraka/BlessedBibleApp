@@ -69,15 +69,26 @@ class TheBlessedBibleApp extends ConsumerStatefulWidget {
 class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
   @override
   Widget build(BuildContext context) {
-    ref.watch(widgetUpdateServiceProvider); // Initialize widget background sync
-    // Account sync (bookmarks, highlights, notes): kept alive for the app's
-    // lifetime without rebuilding it on every status change.
-    ref.listen(syncControllerProvider, (_, __) {});
+    final hasCompletedOnboarding = ref.watch(onboardingCompleteProvider);
+
+    // Onboarding needs none of this: the whole-KJV load, the home-screen
+    // widget syncs and the account listeners are pure background cost, and
+    // starting them at launch makes the first taps stutter on a cold device.
+    // They start together with the splash that waits for the Bible instead.
+    final bool isBibleLoading;
+    if (hasCompletedOnboarding) {
+      ref.watch(widgetUpdateServiceProvider);
+      // Account sync (bookmarks, highlights, notes): kept alive for the app's
+      // lifetime without rebuilding it on every status change.
+      ref.listen(syncControllerProvider, (_, __) {});
+      isBibleLoading = ref.watch(bibleProvider.select((s) => s.isLoading));
+    } else {
+      isBibleLoading = false;
+    }
 
     final themeMode = ref.watch(themeProvider);
     final resolvedTheme = themeMode.resolve(context);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
-    final isBibleLoading = ref.watch(bibleProvider.select((s) => s.isLoading));
 
     ThemeData lightBase = resolvedTheme == AppThemeMode.lilies
         ? AppTheme.liliesTheme(14.0)
@@ -125,8 +136,6 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
           ? darkBase.applyFreshPaperlike()
           : darkBase.applyPaperlike();
     }
-
-    final hasCompletedOnboarding = ref.watch(onboardingCompleteProvider);
 
     final locale = ref.watch(appLocaleProvider);
 
