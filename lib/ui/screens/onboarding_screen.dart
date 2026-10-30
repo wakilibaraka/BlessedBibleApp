@@ -18,6 +18,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/account_menu.dart';
 import '../../theme/design_tokens.dart';
+import '../../utils/log.dart';
 
 // Onboarding keeps its own warm sepia look whatever theme is picked, so the
 // first impression is the same for everyone.
@@ -59,6 +60,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   late String _primaryTranslation;
   late ReadingLayout _readingLayout;
   late String _secondaryTranslation;
+  bool _finishing = false;
 
   @override
   void initState() {
@@ -119,7 +121,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   void _next() {
     HapticFeedback.lightImpact();
-    if (_page == 1) unawaited(_applyBible());
+    // Leaving the Bible page applies the choice in onPageChanged; doing it
+    // here as well ran two overlapping translation switches.
     if (_page < _pageCount - 1) {
       _goToPage(_page + 1, const Duration(milliseconds: 380));
     } else {
@@ -128,13 +131,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   Future<void> _finish() async {
+    // A double tap (or Skip then Begin) must not apply and finish twice.
+    if (_finishing) return;
+    _finishing = true;
     unawaited(HapticFeedback.mediumImpact());
     // Skipping early still sets up the Bible that matches the language,
     // so the app opens the way the flow suggested. The interface language
     // keeps following the device unless one was tapped.
-    if (_page < 2) await _applyBible();
-    final prefs = ref.read(preferencesProvider);
-    await prefs.prefs.remove(OnboardingScreen.pageKey);
+    // A failed save must not trap anyone here: the app's defaults still
+    // work, so finish anyway.
+    try {
+      if (_page < 2) await _applyBible();
+      await ref
+          .read(preferencesProvider)
+          .prefs
+          .remove(OnboardingScreen.pageKey);
+    } catch (e) {
+      logDebug('Onboarding finish: $e');
+    }
     if (!mounted) return;
     // The app's home switches to the splash (until the offline Bible is
     // ready) and then Home; replacing the root route here skipped both.
@@ -1069,8 +1083,13 @@ class _ComfortPage extends ConsumerWidget {
                   activeColor: _terracotta,
                   label: size.round().toString(),
                   semanticFormatterCallback: (v) => '${v.round()}',
-                  onChanged: (v) =>
-                      ref.read(typographyProvider.notifier).setFontSize(v),
+                  // Drag events repeat the same snapped value; only a real
+                  // change needs a rebuild and a preferences write.
+                  onChanged: (v) {
+                    if (v != size) {
+                      ref.read(typographyProvider.notifier).setFontSize(v);
+                    }
+                  },
                 ),
               ),
               const ExcludeSemantics(
