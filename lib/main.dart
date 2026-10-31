@@ -25,6 +25,7 @@ import 'data/credits.dart';
 import 'services/firebase_setup.dart';
 import 'services/widget_update_service.dart';
 import 'sync/bible_sync.dart';
+import 'utils/log.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/l10n.dart';
 import 'state/locale_provider.dart';
@@ -33,8 +34,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   final prefs = PreferencesService(await SharedPreferences.getInstance());
-  await initCrashReporting(enabled: prefs.crashReportsEnabled);
-  await activateAppCheck();
   registerFontLicenses();
 
   // Branded fallback instead of the red error screen in release builds.
@@ -46,7 +45,15 @@ void main() async {
   };
 
   final authGateway = FirebaseAuthGateway();
-  await authGateway.initialize();
+  // Independent of each other, so they run side by side. None of them may
+  // stop the app from starting: a throw here (e.g. Google Play services
+  // missing or out of date) used to leave the native splash up forever.
+  await Future.wait([
+    _guardStartup('Crash reporting setup',
+        () => initCrashReporting(enabled: prefs.crashReportsEnabled)),
+    activateAppCheck(),
+    _guardStartup('Google sign-in setup', authGateway.initialize),
+  ]);
 
   runApp(
     ProviderScope(
@@ -57,6 +64,14 @@ void main() async {
       child: const TheBlessedBibleApp(),
     ),
   );
+}
+
+Future<void> _guardStartup(String what, Future<void> Function() step) async {
+  try {
+    await step();
+  } catch (e) {
+    logDebug('$what failed: $e');
+  }
 }
 
 class TheBlessedBibleApp extends ConsumerStatefulWidget {
@@ -151,7 +166,12 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
       ],
       localeListResolutionCallback: resolveAppLocale,
       debugShowCheckedModeBanner: false,
-      themeAnimationDuration: const Duration(milliseconds: 600),
+      // Onboarding keeps its own fixed colours, so a theme picked there
+      // only needs to switch, not lerp: animating it rebuilt the whole
+      // onboarding tree every frame for 600 ms and made the taps stutter.
+      themeAnimationDuration: hasCompletedOnboarding
+          ? const Duration(milliseconds: 600)
+          : Duration.zero,
       themeAnimationCurve: Curves.easeInOut,
       themeMode: switch (themeMode) {
         AppThemeMode.automatic => ThemeMode.system,
