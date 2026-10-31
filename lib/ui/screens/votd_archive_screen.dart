@@ -32,7 +32,7 @@ class VotdArchiveScreen extends ConsumerWidget {
     // Epoch used for VotD calculation
     final epoch = DateTime(2026, 1, 1);
 
-    final appThemeMode = ref.watch(themeProvider);
+    final appThemeMode = ref.watch(resolvedThemeProvider);
     final is3DTheme = appThemeMode.is3DTheme;
 
     Color getThemeBackgroundColor() {

@@ -229,7 +229,7 @@ class _ConcordanceScreenState extends ConsumerState<ConcordanceScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final appThemeMode = ref.watch(themeProvider);
+    final appThemeMode = ref.watch(resolvedThemeProvider);
     final l10n = context.l10n;
 
     final categories = const [

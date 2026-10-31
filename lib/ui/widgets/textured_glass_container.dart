@@ -51,7 +51,7 @@ class TexturedGlassContainer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final appTheme = ref.watch(themeProvider);
+    final appTheme = ref.watch(resolvedThemeProvider);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
 
     final is3D = surfaceStyle == SurfaceStyle.threeDimensional;

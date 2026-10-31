@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../data/local_storage/preferences_service.dart';
 import 'theme_provider.dart';
 
 enum EarthHeavenStyle {
@@ -31,47 +32,47 @@ class EarthHeavenStyleNotifier extends Notifier<EarthHeavenStyle> {
 
   @override
   EarthHeavenStyle build() {
-    _loadState();
-    return EarthHeavenStyle.earth;
+    // Read synchronously when preferences are already loaded (they are
+    // before runApp), so the first frame already has the saved surface
+    // instead of flashing Earth and then switching.
+    final SharedPreferences prefs;
+    try {
+      prefs = ref.read(preferencesProvider).prefs;
+    } catch (_) {
+      _loadAsync();
+      return EarthHeavenStyle.earth;
+    }
+    return _readSaved(prefs);
   }
 
-  Future<void> _loadState() async {
+  Future<void> _loadAsync() async {
     final prefs = await SharedPreferences.getInstance();
+    state = _readSaved(prefs);
+  }
 
+  static EarthHeavenStyle _readSaved(SharedPreferences prefs) {
     // Fresh install: deal a random surface so day one feels personal.
     // Runs once — the pick is persisted like any manual choice.
     if (prefs.getInt(_surfaceStyleKey) == null &&
         !(prefs.getBool(_migrationKey) ?? false)) {
       final pick = EarthHeavenStyle
           .values[Random().nextInt(EarthHeavenStyle.values.length)];
-      state = pick;
-      await prefs.setInt(_surfaceStyleKey, pick.index);
-      await prefs.setBool(_migrationKey, true);
-      return;
+      prefs.setInt(_surfaceStyleKey, pick.index);
+      prefs.setBool(_migrationKey, true);
+      return pick;
     }
 
-    final migrated = prefs.getBool(_migrationKey) ?? false;
-    if (!migrated) {
-      final savedIndex = prefs.getInt(_surfaceStyleKey);
-      if (savedIndex != null &&
-          savedIndex >= 0 &&
-          savedIndex < EarthHeavenStyle.values.length) {
-        state = EarthHeavenStyle.values[savedIndex];
-      } else {
-        // Fallback for previous Aero (4) or Physical (5) to Earth
-        state = EarthHeavenStyle.earth;
-      }
-      await prefs.setBool(_migrationKey, true);
-    } else {
-      final savedIndex = prefs.getInt(_surfaceStyleKey);
-      if (savedIndex != null &&
-          savedIndex >= 0 &&
-          savedIndex < EarthHeavenStyle.values.length) {
-        state = EarthHeavenStyle.values[savedIndex];
-      } else {
-        state = EarthHeavenStyle.earth;
-      }
+    if (!(prefs.getBool(_migrationKey) ?? false)) {
+      prefs.setBool(_migrationKey, true);
     }
+    final savedIndex = prefs.getInt(_surfaceStyleKey);
+    if (savedIndex != null &&
+        savedIndex >= 0 &&
+        savedIndex < EarthHeavenStyle.values.length) {
+      return EarthHeavenStyle.values[savedIndex];
+    }
+    // Fallback for previous Aero (4) or Physical (5) to Earth
+    return EarthHeavenStyle.earth;
   }
 
   Future<void> setStyle(EarthHeavenStyle style) async {
@@ -99,8 +100,7 @@ final surfaceStyleProvider = Provider<SurfaceStyle>((ref) {
     return SurfaceStyle.threeDimensional;
   }
   if (eh == EarthHeavenStyle.paperlike) {
-    final theme = ref.watch(themeProvider);
-    final resolved = theme.resolve();
+    final resolved = ref.watch(resolvedThemeProvider);
     if (resolved.isFirmamentTheme) {
       return SurfaceStyle.skeuomorphic;
     }
@@ -112,6 +112,5 @@ final surfaceStyleProvider = Provider<SurfaceStyle>((ref) {
   if (eh == EarthHeavenStyle.claymorphic) {
     return SurfaceStyle.claymorphic;
   }
-  final theme = ref.watch(themeProvider);
-  return resolveEarthSurface(theme);
+  return resolveEarthSurface(ref.watch(resolvedThemeProvider));
 });

@@ -169,7 +169,7 @@ class _ReadingPlanDetailV2ScreenState
   @override
   Widget build(BuildContext context) {
     final plan = ref.watch(readingPlanProvider(widget.planId));
-    final appThemeMode = ref.watch(themeProvider);
+    final appThemeMode = ref.watch(resolvedThemeProvider);
 
     Widget shell(Widget body, {List<Widget>? actions}) => V2PageShell(
           appThemeMode: appThemeMode,

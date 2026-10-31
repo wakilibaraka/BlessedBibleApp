@@ -19,7 +19,7 @@ class WotdArchiveScreen extends ConsumerWidget {
     final tokens = theme.extension<ReadingTokens>()!;
     final pastWordsAsync = ref.watch(pastWordsOfTheDayProvider);
 
-    final appThemeMode = ref.watch(themeProvider);
+    final appThemeMode = ref.watch(resolvedThemeProvider);
     final is3DTheme = appThemeMode.is3DTheme;
 
     Color getThemeBackgroundColor() {

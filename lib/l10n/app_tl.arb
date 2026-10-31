@@ -589,6 +589,7 @@
   "settingsAutoOpenSingleShortSubtitle": "Direktang pumunta kung iisa ang resulta",
   "settingsBackgroundGlow": "I-on ang Liwanag sa Background",
   "settingsBackgroundGlowSubtitle": "Banayad na gumagalaw na liwanag sa likod ng teksto",
+  "settingsThemeDailyToday": "Ngayon: {theme}",
   "settingsThemeGroupFoundations": "MGA SALIGAN",
   "settingsThemeDawn": "Bukang-liwayway",
   "settingsThemeFresh": "Sariwa",

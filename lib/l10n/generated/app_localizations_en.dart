@@ -393,7 +393,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingThemeDailyDesc =>
-      'Changes daily to reflect the rich themes of Scripture';
+      'A new theme each day, light or dark to match your phone';
 
   @override
   String get onboardingFontFamily => 'Font style';
@@ -2155,6 +2155,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsBackgroundGlowSubtitle =>
       'Renders a subtle animated light behind the reader';
+
+  @override
+  String settingsThemeDailyToday(String theme) {
+    return 'Today: $theme';
+  }
 
   @override
   String get settingsThemeGroupFoundations => 'FOUNDATIONS';

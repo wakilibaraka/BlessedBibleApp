@@ -384,7 +384,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
     // screens in every theme.
     final accent = theme.primaryColor;
     final typography = ref.watch(typographyProvider);
-    final appThemeMode = ref.watch(themeProvider);
+    final appThemeMode = ref.watch(resolvedThemeProvider);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
     ref.watch(pericopesProvider);
     final pericopesNotifier = ref.read(pericopesProvider.notifier);

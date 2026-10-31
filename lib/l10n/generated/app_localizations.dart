@@ -743,7 +743,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingThemeDailyDesc.
   ///
   /// In en, this message translates to:
-  /// **'Changes daily to reflect the rich themes of Scripture'**
+  /// **'A new theme each day, light or dark to match your phone'**
   String get onboardingThemeDailyDesc;
 
   /// No description provided for @onboardingFontFamily.
@@ -3643,6 +3643,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Renders a subtle animated light behind the reader'**
   String get settingsBackgroundGlowSubtitle;
+
+  /// Chip on the Daily rotation option naming the theme shown today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today: {theme}'**
+  String settingsThemeDailyToday(String theme);
 
   /// No description provided for @settingsThemeGroupFoundations.
   ///

@@ -463,7 +463,7 @@ class _CustomPlanBuilderV2ScreenState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final appThemeMode = ref.watch(themeProvider);
+    final appThemeMode = ref.watch(resolvedThemeProvider);
     return V2PageShell(
       appThemeMode: appThemeMode,
       page: Scaffold(

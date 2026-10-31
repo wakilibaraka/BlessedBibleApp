@@ -2179,6 +2179,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Une douce lumière animée derrière le texte';
 
   @override
+  String settingsThemeDailyToday(String theme) {
+    return 'Aujourd’hui : $theme';
+  }
+
+  @override
   String get settingsThemeGroupFoundations => 'FONDEMENTS';
 
   @override

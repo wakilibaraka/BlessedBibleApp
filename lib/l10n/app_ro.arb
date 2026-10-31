@@ -589,6 +589,7 @@
   "settingsAutoOpenSingleShortSubtitle": "Mergi direct dacă există un singur rezultat",
   "settingsBackgroundGlow": "Activează strălucirea de fundal",
   "settingsBackgroundGlowSubtitle": "O lumină animată discretă în spatele textului",
+  "settingsThemeDailyToday": "Astăzi: {theme}",
   "settingsThemeGroupFoundations": "TEMELII",
   "settingsThemeDawn": "Zori",
   "settingsThemeFresh": "Proaspăt",

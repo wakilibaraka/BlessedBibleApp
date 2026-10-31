@@ -148,7 +148,7 @@ class _CommentaryLibraryV2ScreenState
 
   @override
   Widget build(BuildContext context) {
-    final appThemeMode = ref.watch(themeProvider);
+    final appThemeMode = ref.watch(resolvedThemeProvider);
     final asyncEntries = ref.watch(commentaryProvider);
 
     return V2PageShell(
@@ -649,7 +649,7 @@ class CommentaryVolumeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final appThemeMode = ref.watch(themeProvider);
+    final appThemeMode = ref.watch(resolvedThemeProvider);
 
     return V2PageShell(
       appThemeMode: appThemeMode,
@@ -846,7 +846,7 @@ class _CommentaryHubV2ScreenState extends ConsumerState<CommentaryHubV2Screen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final asyncEntries = ref.watch(commentaryProvider);
-    final appThemeMode = ref.watch(themeProvider);
+    final appThemeMode = ref.watch(resolvedThemeProvider);
 
     return V2PageShell(
       appThemeMode: appThemeMode,

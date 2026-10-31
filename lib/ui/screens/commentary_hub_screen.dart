@@ -81,7 +81,7 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appThemeMode = ref.watch(themeProvider);
+    final appThemeMode = ref.watch(resolvedThemeProvider);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
     final theme = Theme.of(context);
     final tokens = Theme.of(context).extension<ReadingTokens>()!;

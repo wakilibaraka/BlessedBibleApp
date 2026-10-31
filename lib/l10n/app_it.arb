@@ -589,6 +589,7 @@
   "settingsAutoOpenSingleShortSubtitle": "Vai direttamente se c'è un solo risultato",
   "settingsBackgroundGlow": "Attiva bagliore di sfondo",
   "settingsBackgroundGlowSubtitle": "Una luce animata discreta dietro al testo",
+  "settingsThemeDailyToday": "Oggi: {theme}",
   "settingsThemeGroupFoundations": "FONDAMENTA",
   "settingsThemeDawn": "Alba",
   "settingsThemeFresh": "Fresco",

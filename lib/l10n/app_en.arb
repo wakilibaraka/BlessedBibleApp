@@ -168,7 +168,7 @@
   "onboardingLookTitle": "Make it comfortable",
   "onboardingLookBody": "Choose a page color, font and text size. Everything can be fine-tuned later.",
   "onboardingThemeDaily": "Daily rotation",
-  "onboardingThemeDailyDesc": "Changes daily to reflect the rich themes of Scripture",
+  "onboardingThemeDailyDesc": "A new theme each day, light or dark to match your phone",
   "onboardingFontFamily": "Font style",
   "onboardingShuffleHint": "Tap to shuffle",
   "onboardingThemeLight": "Light",
@@ -1153,6 +1153,15 @@
   "settingsAutoOpenSingleShortSubtitle": "Jump directly if only one result is found",
   "settingsBackgroundGlow": "Enable background glow",
   "settingsBackgroundGlowSubtitle": "Renders a subtle animated light behind the reader",
+  "settingsThemeDailyToday": "Today: {theme}",
+  "@settingsThemeDailyToday": {
+    "description": "Chip on the Daily rotation option naming the theme shown today.",
+    "placeholders": {
+      "theme": {
+        "type": "String"
+      }
+    }
+  },
   "settingsThemeGroupFoundations": "FOUNDATIONS",
   "settingsThemeDawn": "Dawn",
   "settingsThemeFresh": "Fresh",
