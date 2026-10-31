@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import '../data/bible_books.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/bible_model.dart';
 import '../utils/isolate_parsers.dart';
@@ -40,9 +40,17 @@ class BibleNotifier extends Notifier<BibleState> {
       // KJV backbone loads from the offline database (never JSON, never
       // network). The query below also drives DB install/verify/repair, so
       // the splash screen stays active until content is fully ready.
-      final rows = await bibleDbService.getAllVerses('kjv');
-
-      final booksList = await compute(parseBibleRows, rows);
+      //
+      // Read one book at a time. A single 31k-row query was decoded from
+      // the platform channel on the UI isolate and then copied again into
+      // a parsing isolate, which froze the splash for a few seconds. Each
+      // book is a small reply that parses within a frame, and awaiting
+      // between books lets the spinner keep turning.
+      final booksList = <BibleBook>[];
+      for (var book = 1; book <= kBibleBookNames.length; book++) {
+        final rows = await bibleDbService.getBookVerses('kjv', book);
+        booksList.addAll(parseBibleRows(rows));
+      }
 
       state = state.copyWith(isLoading: false, books: booksList);
     } catch (e) {

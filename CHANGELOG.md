@@ -4,6 +4,9 @@ All notable changes to The Blessed Bible. Newest first.
 
 ## [Unreleased]
 
+### Performance
+- **Home opens without freezing:** Verse of the Day is picked without reworking every commentary entry, the other tabs build just after Home instead of with it, and the offline Bible loads book by book so the splash keeps moving.
+
 ### Study
 - **Full card text:** Study cards no longer cut off with "...". Verse of the Day shows the whole verse, and plan titles, readings and snippets show in full.
 - **Word of the Day card removed:** It no longer appears on Study. The Dictionary and its Word of the Day history are unchanged.

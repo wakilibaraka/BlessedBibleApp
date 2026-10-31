@@ -36,6 +36,76 @@ import '../widgets/commentary_view.dart';
 import '../../services/firebase_setup.dart';
 import '../../utils/log.dart';
 
+/// An [IndexedStack] that builds the open tab first and the others one per
+/// frame after that, instead of all five in the first frame.
+///
+/// Every tab used to build the moment Home appeared: the reader, search,
+/// study and settings screens (and the providers they start) all landed in
+/// one frame, which is part of why Home froze on launch. Tabs still stay
+/// alive once built, and a tab that is opened before its turn is built
+/// right away.
+class _StaggeredTabStack extends StatefulWidget {
+  final int index;
+  final List<Widget> children;
+
+  const _StaggeredTabStack({required this.index, required this.children});
+
+  @override
+  State<_StaggeredTabStack> createState() => _StaggeredTabStackState();
+}
+
+class _StaggeredTabStackState extends State<_StaggeredTabStack> {
+  // Lets Home's own first frames (and its data) settle before the hidden
+  // tabs start building.
+  static const _firstDelay = Duration(milliseconds: 600);
+  static const _gap = Duration(milliseconds: 120);
+
+  late final Set<int> _built = {widget.index};
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer(_firstDelay, _buildNext);
+  }
+
+  void _buildNext() {
+    if (!mounted) return;
+    final next = Iterable<int>.generate(widget.children.length)
+        .where((i) => !_built.contains(i))
+        .firstOrNull;
+    if (next == null) return;
+    setState(() => _built.add(next));
+    // Wait for that tab's frame before starting the next one.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _timer = Timer(_gap, _buildNext);
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant _StaggeredTabStack oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _built.add(widget.index);
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IndexedStack(
+      index: widget.index,
+      children: [
+        for (var i = 0; i < widget.children.length; i++)
+          _built.contains(i) ? widget.children[i] : const SizedBox.shrink(),
+      ],
+    );
+  }
+}
+
 const double kBottomDockHeight = 64.0;
 const double kBottomDockInset = 16.0;
 const double kBottomDockGap = 12.0;
@@ -136,7 +206,7 @@ class MainNavScreen extends ConsumerWidget {
           extendBody: true,
           body: Stack(
             children: [
-              IndexedStack(
+              _StaggeredTabStack(
                 index: currentIndex,
                 children: screens.asMap().entries.map((entry) {
                   return Stack(

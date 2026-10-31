@@ -33,6 +33,12 @@ String normalizeProse(String text) {
   return out.trim();
 }
 
+/// Whether [text] still has something to show once whitespace and invisible
+/// characters are dropped; the same as `normalizeProse(text).isNotEmpty`
+/// without running the normalising passes.
+bool hasVisibleProse(String text) =>
+    text.replaceAll(_invisible, '').trim().isNotEmpty;
+
 /// Splits [text] into paragraphs at blank lines and normalizes each one.
 ///
 /// Single line breaks are treated as wrap artefacts (they are joined), blank
