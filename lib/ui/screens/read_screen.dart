@@ -420,6 +420,11 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
       if (mounted) {
         ref.read(streakProvider.notifier).markReadToday();
 
+        // The reader is built after Home, so a verse opened from Home in
+        // the meantime is already waiting for it.
+        final pending = ref.read(readLocationProvider);
+        if (pending.requestedVerse != null) _applyLocationRequest(pending);
+
         // Cancellable (not Future.delayed) so tests disposing the tree
         // don't trip on a pending timer — and so it never fires post-dispose.
         _hintTimer = Timer(const Duration(seconds: 2), () {
@@ -435,6 +440,61 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         });
       }
     });
+  }
+
+  /// Applies a location request (page jump, verse scroll, commentary) made
+  /// from elsewhere in the app. Runs for every change to the location, and
+  /// once when the reader is first built in case the request came first.
+  void _applyLocationRequest(ReadLocationState next) {
+    if (!mounted) return;
+    final flatChapters = ref.read(flatChaptersProvider);
+    final bibleState = ref.read(bibleProvider);
+    final isLoading = bibleState.isLoading;
+    final allBooks = bibleState.books;
+    if (flatChapters.isNotEmpty && _hasInitialJumped) {
+      final targetIndex = _pageIndexFor(next, flatChapters);
+      if (targetIndex != -1 && _pageController.hasClients) {
+        final currentPage = _pageController.page?.round() ?? 0;
+        if (currentPage != targetIndex) {
+          if ((currentPage - targetIndex).abs() == 1) {
+            _animateToPage(targetIndex);
+          } else {
+            _pageController.jumpToPage(targetIndex);
+          }
+        }
+      }
+    }
+
+    final reqVerse = next.requestedVerse;
+    if (reqVerse != null) {
+      _scrollToVerse(reqVerse, next);
+      ref.read(readLocationProvider.notifier).clearRequestedVerse();
+    }
+    if (next.openCommentary && reqVerse != null) {
+      if (!isLoading && allBooks.isNotEmpty) {
+        try {
+          int bookIdx =
+              allBooks.indexWhere((b) => b.abbreviation == next.bookAbbrev);
+          if (bookIdx == -1) bookIdx = 0;
+          final book = allBooks[bookIdx];
+
+          if (book.chapters.isEmpty) return;
+          int chapIdx =
+              book.chapters.indexWhere((c) => c.number == next.chapter);
+          if (chapIdx == -1) chapIdx = 0;
+          final chapter = book.chapters[chapIdx];
+          if (reqVerse <= chapter.verses.length) {
+            final verseText = chapter.verses[reqVerse - 1].text;
+            Future.delayed(const Duration(milliseconds: 500), () {
+              if (mounted) {
+                _showCommentaryBottomSheet(reqVerse, verseText);
+              }
+            });
+          }
+        } catch (_) {}
+      }
+      ref.read(readLocationProvider.notifier).clearCommentary();
+    }
   }
 
   @override
@@ -904,53 +964,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     }
 
     ref.listen<ReadLocationState>(readLocationProvider, (previous, next) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        if (flatChapters.isNotEmpty && _hasInitialJumped) {
-          final targetIndex = _pageIndexFor(next, flatChapters);
-          if (targetIndex != -1 && _pageController.hasClients) {
-            final currentPage = _pageController.page?.round() ?? 0;
-            if (currentPage != targetIndex) {
-              if ((currentPage - targetIndex).abs() == 1) {
-                _animateToPage(targetIndex);
-              } else {
-                _pageController.jumpToPage(targetIndex);
-              }
-            }
-          }
-        }
-
-        final reqVerse = next.requestedVerse;
-        if (reqVerse != null) {
-          _scrollToVerse(reqVerse, next);
-          ref.read(readLocationProvider.notifier).clearRequestedVerse();
-        }
-        if (next.openCommentary && reqVerse != null) {
-          if (!isLoading && allBooks.isNotEmpty) {
-            try {
-              int bookIdx =
-                  allBooks.indexWhere((b) => b.abbreviation == next.bookAbbrev);
-              if (bookIdx == -1) bookIdx = 0;
-              final book = allBooks[bookIdx];
-
-              if (book.chapters.isEmpty) return;
-              int chapIdx =
-                  book.chapters.indexWhere((c) => c.number == next.chapter);
-              if (chapIdx == -1) chapIdx = 0;
-              final chapter = book.chapters[chapIdx];
-              if (reqVerse <= chapter.verses.length) {
-                final verseText = chapter.verses[reqVerse - 1].text;
-                Future.delayed(const Duration(milliseconds: 500), () {
-                  if (mounted) {
-                    _showCommentaryBottomSheet(reqVerse, verseText);
-                  }
-                });
-              }
-            } catch (_) {}
-          }
-          ref.read(readLocationProvider.notifier).clearCommentary();
-        }
-      });
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _applyLocationRequest(next));
     });
 
     String currentBookName = loc.bookName;

@@ -734,6 +734,21 @@ class BibleDatabaseService {
     );
   }
 
+  /// One book's verses in canonical order, as rows shaped like
+  /// [getAllVerses]. Loading the backbone book by book keeps each platform
+  /// channel reply small, so decoding it never stalls a frame.
+  Future<List<Map<String, dynamic>>> getBookVerses(
+      String translationId, int bookNumber) async {
+    final db = await _dbForTranslation(translationId);
+    return db.query(
+      'verses',
+      columns: ['book_number', 'chapter', 'verse', 'text'],
+      where: 'translation_id = ? AND book_number = ?',
+      whereArgs: [translationId, bookNumber],
+      orderBy: 'chapter ASC, verse ASC',
+    );
+  }
+
   /// Installs a downloaded translation as a standalone pack file
   /// (verified before publishing). Backbone ids are rejected.
   Future<void> insertTranslationPack(

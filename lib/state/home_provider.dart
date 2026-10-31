@@ -6,6 +6,7 @@ import '../data/models/home_data.dart';
 import 'notes_provider.dart';
 import '../state/commentary_provider.dart';
 import '../state/bible_provider.dart';
+import '../data/models/bible_model.dart';
 import '../models/study_content_category.dart';
 import 'package:collection/collection.dart'; // for firstOrNull
 
@@ -76,9 +77,28 @@ final votdPoolProvider = Provider<List<VerseOfTheDay>>((ref) {
   }
 
   final commentaries = commentaryState.value ?? [];
-  final books = bibleState.books;
 
-  final List<VerseOfTheDay> pool = [];
+  // Lookups by name and number instead of scanning the whole Bible for every
+  // entry. With ~22k verse entries the old scans (plus a duplicate check
+  // over the growing pool and an excerpt per entry) took seconds on the UI
+  // isolate, which is the freeze people saw right as Home appeared.
+  final booksByName = <String, BibleBook>{
+    for (final b in bibleState.books) b.name.toLowerCase(): b,
+  };
+  final versesByChapter = <BibleChapter, Map<int, BibleVerse>>{};
+  BibleVerse? findVerse(String bookName, int chapterNum, int verseNum) {
+    final book = booksByName[bookName.toLowerCase()];
+    if (book == null) return null;
+    final chapter =
+        book.chapters.firstWhereOrNull((c) => c.number == chapterNum);
+    if (chapter == null) return null;
+    final verses = versesByChapter.putIfAbsent(
+        chapter, () => {for (final v in chapter.verses) v.number: v});
+    return verses[verseNum];
+  }
+
+  // First usable entry per reference wins, as before.
+  final byReference = <String, VerseOfTheDay>{};
 
   for (final entry in commentaries) {
     final isDevotional = entry.category == StudyContentCategory.devotional;
@@ -94,33 +114,28 @@ final votdPoolProvider = Provider<List<VerseOfTheDay>>((ref) {
       final verseNum = entry.scope.verse!;
 
       final refStr = '$bookName $chapterNum:$verseNum';
-      if (pool.any((v) => v.reference == refStr)) continue;
+      if (byReference.containsKey(refStr)) continue;
 
-      final book = books.firstWhereOrNull(
-          (b) => b.name.toLowerCase() == bookName.toLowerCase());
-      if (book != null) {
-        final chapter =
-            book.chapters.firstWhereOrNull((c) => c.number == chapterNum);
-        if (chapter != null) {
-          final verse =
-              chapter.verses.firstWhereOrNull((v) => v.number == verseNum);
-          if (verse != null && verse.text.isNotEmpty) {
-            final snippet = extractVotdSnippet(entry.text);
-            if (snippet.trim().isNotEmpty) {
-              pool.add(VerseOfTheDay(
-                refStr,
-                verse.text,
-                commentarySnippet: snippet,
-                author: entry.author,
-                sourceTitle: entry.source,
-                isDevotional: isDevotional,
-              ));
-            }
-          }
-        }
+      final verse = findVerse(bookName, chapterNum, verseNum);
+      if (verse == null || verse.text.isEmpty) continue;
+      // Same test as a non-blank excerpt, without building the excerpt.
+      if (!hasVisibleProse(
+          entry.text.replaceAll('**', '').replaceAll('__', ''))) {
+        continue;
       }
+      final source = entry.text;
+      byReference[refStr] = VerseOfTheDay.lazy(
+        refStr,
+        verse.text,
+        commentarySnippet: () => extractVotdSnippet(source),
+        author: entry.author,
+        sourceTitle: entry.source,
+        isDevotional: isDevotional,
+      );
     }
   }
+
+  final pool = byReference.values.toList();
 
   if (pool.isEmpty) return defaultFallback;
 

@@ -22,19 +22,37 @@ class HomeData {
 class VerseOfTheDay {
   final String reference;
   final String text;
-  final String? commentarySnippet;
   final String? author;
   final String? sourceTitle;
   final bool isDevotional;
 
+  final String? _snippet;
+  final String Function()? _buildSnippet;
+
   VerseOfTheDay(
     this.reference,
     this.text, {
-    this.commentarySnippet,
+    String? commentarySnippet,
     this.author,
     this.sourceTitle,
     this.isDevotional = false,
-  });
+  })  : _snippet = commentarySnippet,
+        _buildSnippet = null;
+
+  /// A verse whose commentary excerpt is only worked out when something
+  /// reads it. The pool holds thousands of verses but a screen shows one or
+  /// a few, so building every excerpt up front was wasted work on launch.
+  VerseOfTheDay.lazy(
+    this.reference,
+    this.text, {
+    required String Function() commentarySnippet,
+    this.author,
+    this.sourceTitle,
+    this.isDevotional = false,
+  })  : _snippet = null,
+        _buildSnippet = commentarySnippet;
+
+  late final String? commentarySnippet = _snippet ?? _buildSnippet?.call();
 }
 
 class StudyProgress {
