@@ -84,7 +84,7 @@ void main() {
 
   // Onboarding steps (they draw their own fixed palette, so one theme).
   // Step 3 is left out: its live theme preview restores asynchronously.
-  for (final page in [0, 1, 3, 4]) {
+  for (final page in [0, 1, 3]) {
     testWidgets('onboarding step ${page + 1}', (tester) async {
       await _pump(tester, const OnboardingScreen(), AppTheme.lightTheme(1.0),
           prefsValues: {OnboardingScreen.pageKey: page});

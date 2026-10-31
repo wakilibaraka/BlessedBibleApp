@@ -60,15 +60,31 @@ void main() {
   });
 
   testWidgets('resumes on the step it was closed on', (tester) async {
-    await _pump(tester, {OnboardingScreen.pageKey: 3});
-    expect(find.text('A gentle daily reminder'), findsOneWidget);
+    await _pump(tester, {OnboardingScreen.pageKey: 2});
+    expect(find.byTooltip('Back'), findsOneWidget);
+    expect(find.bySemanticsLabel('Step 3 of 4'), findsOneWidget);
   });
 
-  testWidgets('the last step offers optional sign-in', (tester) async {
-    await _pump(tester, {OnboardingScreen.pageKey: 4});
+  testWidgets('the last step has the tour, reminder and optional sign-in',
+      (tester) async {
+    await _pump(tester, {OnboardingScreen.pageKey: 3});
+    expect(find.bySemanticsLabel('Step 4 of 4'), findsOneWidget);
+    expect(find.text('Everything for your daily walk'), findsOneWidget);
+    expect(find.text('A gentle daily reminder'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Sign in with Google'), 200,
+        scrollable: find
+            .descendant(
+                of: find.byType(ListView), matching: find.byType(Scrollable))
+            .first);
     expect(find.text('Keep your notes safe'), findsOneWidget);
-    expect(find.text('Sign in with Google'), findsOneWidget);
     expect(find.text('Skip'), findsNothing);
+    expect(find.text('Begin reading'), findsOneWidget);
+  });
+
+  testWidgets('an old saved step past the end resumes on the last page',
+      (tester) async {
+    // Onboarding used to have five steps.
+    await _pump(tester, {OnboardingScreen.pageKey: 4});
     expect(find.text('Begin reading'), findsOneWidget);
   });
 }

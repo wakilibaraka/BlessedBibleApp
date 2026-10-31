@@ -33,11 +33,10 @@ const double _kWelcomeTitleSize = 36;
 const Color _amber = Color(0xFFD49A36);
 const Color _terracotta = Color(0xFFB56553);
 const Color _olive = Color(0xFF7D8C61);
-const Color _slate = Color(0xFF5E7A8C);
 const Color _cream = Color(0xFFF9F4E8);
 
-/// First-run flow: language, Bible, reading comfort, a daily reminder, a
-/// short tour, then optional sign-in.
+/// First-run flow: language, Bible, reading comfort, then one closing page
+/// with a short tour, a daily reminder and optional sign-in.
 ///
 /// Every step is optional — "Skip" keeps sensible defaults (the device
 /// language and its matching Bible) so nobody is forced through setup.
@@ -52,7 +51,7 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 }
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
-  static const int _pageCount = 5;
+  static const int _pageCount = 4;
 
   late final PageController _pages;
   late int _page;
@@ -230,8 +229,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         }),
                       ),
                       const _ComfortPage(),
-                      const _ReminderPage(),
-                      const _FeaturesAndAccountPage(),
+                      const _FinalPage(),
                     ],
                   ),
                 ),
@@ -1321,97 +1319,16 @@ String _themeDisplayName(AppThemeMode mode, AppLocalizations l10n) {
   }
 }
 
-class _ReminderPage extends ConsumerWidget {
-  const _ReminderPage();
+/// The closing step: what the app offers, a daily reminder and optional
+/// sign-in, so the flow ends on one page instead of two.
+class _FinalPage extends ConsumerWidget {
+  const _FinalPage();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final reminders = ref.watch(remindersProvider);
-    final notifier = ref.read(remindersProvider.notifier);
-    final time =
-        TimeOfDay(hour: reminders.dailyHour, minute: reminders.dailyMinute);
-    return _PageFrame(
-      title: l10n.onboardingReminderTitle,
-      body: l10n.onboardingReminderBody,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Material(
-            color: _cream.withValues(alpha: 0.6),
-            borderRadius: BorderRadius.circular(Radii.lg),
-            clipBehavior: Clip.antiAlias,
-            child: Column(
-              children: [
-                SwitchListTile.adaptive(
-                  activeTrackColor: _terracotta,
-                  value: reminders.dailyEnabled,
-                  // Turning it on is what asks for notification permission,
-                  // so the request comes right after this explanation.
-                  onChanged: notifier.toggleDaily,
-                  secondary: const Icon(Icons.notifications_active_outlined,
-                      color: _terracotta),
-                  title: Text(l10n.onboardingReminderToggle,
-                      style: const TextStyle(
-                          fontSize: TypeScale.bodyLarge, color: _ink)),
-                ),
-                AnimatedSize(
-                  duration:
-                      Motion.of(context, const Duration(milliseconds: 200)),
-                  child: reminders.dailyEnabled
-                      ? ListTile(
-                          leading:
-                              const Icon(Icons.schedule_rounded, color: _muted),
-                          title: Text(l10n.onboardingReminderTime,
-                              style: const TextStyle(color: _ink)),
-                          trailing: Text(time.format(context),
-                              style: const TextStyle(
-                                  fontSize: TypeScale.bodyLarge,
-                                  fontWeight: FontWeight.w600,
-                                  color: _terracotta)),
-                          onTap: () async {
-                            final picked = await showTimePicker(
-                                context: context, initialTime: time);
-                            if (picked != null) {
-                              notifier.setDailyTime(picked.hour, picked.minute);
-                            }
-                          },
-                        )
-                      : const SizedBox(width: double.infinity),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(l10n.onboardingReminderPermission,
-              style: TextStyle(
-                  fontSize: TypeScale.body,
-                  color: _muted.withValues(alpha: 0.65))),
-        ],
-      ),
-    );
-  }
-}
-
-class _FeaturesAndAccountPage extends ConsumerWidget {
-  const _FeaturesAndAccountPage();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = context.l10n;
-    final user = ref.watch(accountUserProvider).value;
-    final apple = ref.watch(appleSignInAvailableProvider);
-    final buttonStyle = OutlinedButton.styleFrom(
-      foregroundColor: _ink,
-      backgroundColor: _cream,
-      minimumSize: const Size.fromHeight(52),
-      side: BorderSide(color: _muted.withValues(alpha: 0.25)),
-      shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(Radii.lg)),
-    );
     return _PageFrame(
       title: l10n.onboardingFeaturesTitle,
-      body: l10n.onboardingAccountBody,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -1433,53 +1350,172 @@ class _FeaturesAndAccountPage extends ConsumerWidget {
             title: l10n.onboardingFeatureStudyTitle,
             body: l10n.onboardingFeatureStudyBody,
           ),
-          _FeatureRow(
-            icon: Icons.cloud_done_rounded,
-            color: _slate,
-            title: l10n.onboardingFeatureSyncTitle,
-            body: l10n.onboardingFeatureSyncBody,
-          ),
+          // Syncing is covered by the sign-in section below.
           const SizedBox(height: 6),
-          Text(
-            l10n.onboardingAccountTitle,
-            style: const TextStyle(
-              fontFamily: 'EB Garamond',
-              fontSize: TypeScale.titleLarge,
-              fontWeight: FontWeight.w700,
-              color: _ink,
-            ),
+          _SectionHeading(
+            title: l10n.onboardingReminderTitle,
+            body: l10n.onboardingReminderBody,
           ),
-          const SizedBox(height: 12),
-          user != null
-              ? _ChoiceTile(
-                  title: l10n.onboardingSignedInAs(
-                      user.displayName ?? user.email ?? ''),
-                  selected: true,
-                  onTap: () {},
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    OutlinedButton.icon(
-                      style: buttonStyle,
-                      icon: const Icon(Icons.account_circle_outlined),
-                      label: Text(l10n.accountSignInGoogle),
-                      onPressed: () => runSignIn(context, ref, google: true),
-                    ),
-                    if (apple) ...[
-                      const SizedBox(height: 10),
-                      OutlinedButton.icon(
-                        style: buttonStyle,
-                        icon: const Icon(Icons.apple),
-                        label: Text(l10n.accountSignInApple),
-                        onPressed: () => runSignIn(context, ref, google: false),
-                      ),
-                    ],
-                  ],
-                ),
+          const _ReminderCard(),
+          const SizedBox(height: 28),
+          _SectionHeading(
+            title: l10n.onboardingAccountTitle,
+            body: l10n.onboardingAccountBody,
+          ),
+          const _AccountButtons(),
           const SizedBox(height: 12),
         ],
       ),
+    );
+  }
+}
+
+class _SectionHeading extends StatelessWidget {
+  const _SectionHeading({required this.title, required this.body});
+
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Semantics(
+            header: true,
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontFamily: 'EB Garamond',
+                fontSize: TypeScale.titleLarge,
+                fontWeight: FontWeight.w700,
+                color: _ink,
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(body,
+              style: TextStyle(
+                  fontSize: TypeScale.body,
+                  height: 1.35,
+                  color: _muted.withValues(alpha: 0.7))),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReminderCard extends ConsumerWidget {
+  const _ReminderCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final reminders = ref.watch(remindersProvider);
+    final notifier = ref.read(remindersProvider.notifier);
+    final time =
+        TimeOfDay(hour: reminders.dailyHour, minute: reminders.dailyMinute);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Material(
+          color: _cream.withValues(alpha: 0.6),
+          borderRadius: BorderRadius.circular(Radii.lg),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            children: [
+              SwitchListTile.adaptive(
+                activeTrackColor: _terracotta,
+                value: reminders.dailyEnabled,
+                // Turning it on is what asks for notification permission,
+                // so the request comes right after this explanation.
+                onChanged: notifier.toggleDaily,
+                secondary: const Icon(Icons.notifications_active_outlined,
+                    color: _terracotta),
+                title: Text(l10n.onboardingReminderToggle,
+                    style: const TextStyle(
+                        fontSize: TypeScale.bodyLarge, color: _ink)),
+              ),
+              AnimatedSize(
+                duration: Motion.of(context, const Duration(milliseconds: 200)),
+                child: reminders.dailyEnabled
+                    ? ListTile(
+                        leading:
+                            const Icon(Icons.schedule_rounded, color: _muted),
+                        title: Text(l10n.onboardingReminderTime,
+                            style: const TextStyle(color: _ink)),
+                        trailing: Text(time.format(context),
+                            style: const TextStyle(
+                                fontSize: TypeScale.bodyLarge,
+                                fontWeight: FontWeight.w600,
+                                color: _terracotta)),
+                        onTap: () async {
+                          final picked = await showTimePicker(
+                              context: context, initialTime: time);
+                          if (picked != null) {
+                            notifier.setDailyTime(picked.hour, picked.minute);
+                          }
+                        },
+                      )
+                    : const SizedBox(width: double.infinity),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(l10n.onboardingReminderPermission,
+            style: TextStyle(
+                fontSize: TypeScale.body,
+                color: _muted.withValues(alpha: 0.65))),
+      ],
+    );
+  }
+}
+
+class _AccountButtons extends ConsumerWidget {
+  const _AccountButtons();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final user = ref.watch(accountUserProvider).value;
+    final apple = ref.watch(appleSignInAvailableProvider);
+    if (user != null) {
+      return _ChoiceTile(
+        title: l10n.onboardingSignedInAs(user.displayName ?? user.email ?? ''),
+        selected: true,
+        onTap: () {},
+      );
+    }
+    final buttonStyle = OutlinedButton.styleFrom(
+      foregroundColor: _ink,
+      backgroundColor: _cream,
+      minimumSize: const Size.fromHeight(52),
+      side: BorderSide(color: _muted.withValues(alpha: 0.25)),
+      shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(Radii.lg)),
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        OutlinedButton.icon(
+          style: buttonStyle,
+          icon: const Icon(Icons.account_circle_outlined),
+          label: Text(l10n.accountSignInGoogle),
+          onPressed: () => runSignIn(context, ref, google: true),
+        ),
+        if (apple) ...[
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            style: buttonStyle,
+            icon: const Icon(Icons.apple),
+            label: Text(l10n.accountSignInApple),
+            onPressed: () => runSignIn(context, ref, google: false),
+          ),
+        ],
+      ],
     );
   }
 }
