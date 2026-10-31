@@ -83,7 +83,7 @@ class _YourSpaceScreenState extends ConsumerState<YourSpaceScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final appThemeMode = ref.watch(themeProvider);
+    final appThemeMode = ref.watch(resolvedThemeProvider);
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,

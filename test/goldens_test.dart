@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:the_blessed_bible/state/theme_provider.dart';
 import 'package:the_blessed_bible/data/local_storage/preferences_service.dart';
 import 'package:the_blessed_bible/l10n/generated/app_localizations.dart';
 import 'package:the_blessed_bible/state/auth_provider.dart';
@@ -36,6 +37,15 @@ final _screens = <String, Widget Function()>{
 
 void _noop() {}
 
+class _FixedAutoTheme extends AutoThemeInputsNotifier {
+  @override
+  AutoThemeInputs build() {
+    const inputs = AutoThemeInputs(day: 0, brightness: Brightness.light);
+    AutoTheme.latest = inputs;
+    return inputs;
+  }
+}
+
 final _themes = <String, ThemeData Function()>{
   'light': () => AppTheme.lightTheme(1.0),
   'dark': () => AppTheme.darkTheme(1.0),
@@ -54,6 +64,8 @@ Future<void> _pump(WidgetTester tester, Widget screen, ThemeData theme,
     overrides: [
       preferencesProvider.overrideWithValue(PreferencesService(prefs)),
       authGatewayProvider.overrideWithValue(FakeAuthGateway()),
+      // Daily rotation depends on the date: pin it so goldens never drift.
+      autoThemeInputsProvider.overrideWith(_FixedAutoTheme.new),
     ],
     child: MaterialApp(
       debugShowCheckedModeBanner: false,

@@ -98,7 +98,7 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
     final typography = ref.watch(typographyProvider);
 
     final bookName = widget.book;
-    final appThemeMode = ref.watch(themeProvider);
+    final appThemeMode = ref.watch(resolvedThemeProvider);
     final is3DTheme = appThemeMode == AppThemeMode.dawn ||
         appThemeMode == AppThemeMode.lilies ||
         appThemeMode == AppThemeMode.roses ||
@@ -708,7 +708,7 @@ void showCommentaryBottomSheet(
         builder: (context, ref, _) {
           final tokens = Theme.of(context).extension<ReadingTokens>()!;
           final theme = Theme.of(context);
-          final appThemeMode = ref.watch(themeProvider);
+          final appThemeMode = ref.watch(resolvedThemeProvider);
           final is3DTheme = appThemeMode == AppThemeMode.dawn ||
               appThemeMode == AppThemeMode.lilies ||
               appThemeMode == AppThemeMode.roses ||

@@ -100,7 +100,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
           children: [
             Positioned.fill(
               child: AnimatedBackground(
-                appThemeMode: ref.watch(themeProvider),
+                appThemeMode: ref.watch(resolvedThemeProvider),
               ),
             ),
             SafeArea(

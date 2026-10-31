@@ -102,7 +102,9 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
     }
 
     final themeMode = ref.watch(themeProvider);
-    final resolvedTheme = themeMode.resolve(context);
+    // The theme on screen. For Daily rotation this is today's theme, picked
+    // from the light or dark pool to match the phone's setting.
+    final resolvedTheme = ref.watch(resolvedThemeProvider);
     final surfaceStyle = ref.watch(surfaceStyleProvider);
 
     ThemeData lightBase = resolvedTheme == AppThemeMode.lilies
@@ -147,7 +149,7 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
     }
 
     if (applyPaperlikeToDark) {
-      darkBase = themeMode == AppThemeMode.fresh
+      darkBase = resolvedTheme == AppThemeMode.fresh
           ? darkBase.applyFreshPaperlike()
           : darkBase.applyPaperlike();
     }
@@ -173,22 +175,11 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
           ? const Duration(milliseconds: 600)
           : Duration.zero,
       themeAnimationCurve: Curves.easeInOut,
-      themeMode: switch (themeMode) {
-        AppThemeMode.automatic => ThemeMode.system,
-        AppThemeMode.light => ThemeMode.light,
-        AppThemeMode.sepia => ThemeMode.light,
-        AppThemeMode.dawn => ThemeMode.dark,
-        AppThemeMode.lilies => ThemeMode.light,
-        AppThemeMode.roses => ThemeMode.light,
-        AppThemeMode.olives => ThemeMode.light,
-        AppThemeMode.priestlyPurple => ThemeMode.light,
-        AppThemeMode.galileeBlue => ThemeMode.light,
-        AppThemeMode.scarletRed => ThemeMode.light,
-        AppThemeMode.dusk => ThemeMode.dark,
-        AppThemeMode.fresh => ThemeMode.dark,
-        AppThemeMode.dark => ThemeMode.dark,
-        AppThemeMode.oled => ThemeMode.dark,
-      },
+      // Always the resolved theme's own brightness. Daily rotation used to
+      // map to ThemeMode.system, so a light theme of the day on a phone in
+      // dark mode showed the plain dark theme instead (and the reverse),
+      // while screens drew that day's backgrounds on top.
+      themeMode: resolvedTheme.isDark ? ThemeMode.dark : ThemeMode.light,
       theme: lightBase,
       darkTheme: darkBase,
       // One gate for the whole app: onboarding, then the splash until the

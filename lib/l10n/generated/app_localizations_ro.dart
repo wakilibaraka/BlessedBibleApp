@@ -2185,6 +2185,11 @@ class AppLocalizationsRo extends AppLocalizations {
       'O lumină animată discretă în spatele textului';
 
   @override
+  String settingsThemeDailyToday(String theme) {
+    return 'Astăzi: $theme';
+  }
+
+  @override
   String get settingsThemeGroupFoundations => 'TEMELII';
 
   @override

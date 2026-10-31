@@ -2172,6 +2172,11 @@ class AppLocalizationsTl extends AppLocalizations {
       'Banayad na gumagalaw na liwanag sa likod ng teksto';
 
   @override
+  String settingsThemeDailyToday(String theme) {
+    return 'Ngayon: $theme';
+  }
+
+  @override
   String get settingsThemeGroupFoundations => 'MGA SALIGAN';
 
   @override

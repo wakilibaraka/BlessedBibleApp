@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../data/local_storage/preferences_service.dart';
+
 enum AppThemeMode {
   automatic,
   light,
@@ -22,42 +24,172 @@ enum AppThemeMode {
   scarletRed
 }
 
-extension AppThemeModeExtension on AppThemeMode {
-  AppThemeMode resolve([BuildContext? context]) {
-    if (this == AppThemeMode.automatic) {
-      final days = DateTime.now().millisecondsSinceEpoch ~/ 86400000;
-      const cycle = [
-        AppThemeMode.light,
-        AppThemeMode.sepia,
-        AppThemeMode.dawn,
-        AppThemeMode.fresh,
-        AppThemeMode.lilies,
-        AppThemeMode.roses,
-        AppThemeMode.olives,
-        AppThemeMode.dusk,
-        AppThemeMode.priestlyPurple,
-        AppThemeMode.galileeBlue,
-        AppThemeMode.scarletRed
-      ];
-      return cycle[days % cycle.length];
+/// Picks the theme shown while the user is on [AppThemeMode.automatic]
+/// ("Daily rotation").
+///
+/// The rule is deliberately simple so it is predictable:
+/// * one theme per local calendar day (it changes at the user's midnight,
+///   not at midnight UTC), and
+/// * the pool follows the phone's light/dark setting, so a phone in dark
+///   mode only ever rotates through dark themes and vice versa.
+class AutoTheme {
+  AutoTheme._();
+
+  static const lightCycle = [
+    AppThemeMode.light,
+    AppThemeMode.sepia,
+    AppThemeMode.lilies,
+    AppThemeMode.roses,
+    AppThemeMode.olives,
+    AppThemeMode.priestlyPurple,
+    AppThemeMode.galileeBlue,
+    AppThemeMode.scarletRed,
+  ];
+
+  static const darkCycle = [
+    AppThemeMode.dusk,
+    AppThemeMode.dawn,
+    AppThemeMode.fresh,
+    AppThemeMode.dark,
+  ];
+
+  /// Days since 1970-01-01 for the *local* date of [time].
+  static int dayNumber(DateTime time) {
+    final local = time.toLocal();
+    return DateTime.utc(local.year, local.month, local.day)
+            .millisecondsSinceEpoch ~/
+        Duration.millisecondsPerDay;
+  }
+
+  static AppThemeMode pick(int day, Brightness brightness) {
+    final cycle = brightness == Brightness.dark ? darkCycle : lightCycle;
+    return cycle[day % cycle.length];
+  }
+
+  /// What [resolve] uses when no provider is at hand. Kept in step with
+  /// [autoThemeInputsProvider] so both always agree on today's theme.
+  static AutoThemeInputs latest = AutoThemeInputs.now();
+}
+
+/// The two things the daily rotation depends on.
+@immutable
+class AutoThemeInputs {
+  final int day;
+  final Brightness brightness;
+
+  const AutoThemeInputs({required this.day, required this.brightness});
+
+  factory AutoThemeInputs.now() => AutoThemeInputs(
+        day: AutoTheme.dayNumber(DateTime.now()),
+        brightness:
+            WidgetsBinding.instance.platformDispatcher.platformBrightness,
+      );
+
+  @override
+  bool operator ==(Object other) =>
+      other is AutoThemeInputs &&
+      other.day == day &&
+      other.brightness == brightness;
+
+  @override
+  int get hashCode => Object.hash(day, brightness);
+}
+
+/// Tracks the day and the phone's light/dark setting for the daily rotation.
+///
+/// A light/dark switch on the phone applies straight away. The day only moves
+/// on when the app comes back to the foreground, so the theme never changes
+/// under someone who is reading across midnight.
+class AutoThemeInputsNotifier extends Notifier<AutoThemeInputs>
+    with WidgetsBindingObserver {
+  @override
+  AutoThemeInputs build() {
+    final binding = WidgetsBinding.instance;
+    binding.addObserver(this);
+    ref.onDispose(() => binding.removeObserver(this));
+    return _publish(AutoThemeInputs.now());
+  }
+
+  AutoThemeInputs _publish(AutoThemeInputs inputs) {
+    AutoTheme.latest = inputs;
+    return inputs;
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    state = _publish(AutoThemeInputs(
+      day: state.day,
+      brightness: WidgetsBinding.instance.platformDispatcher.platformBrightness,
+    ));
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      this.state = _publish(AutoThemeInputs.now());
     }
-    return this;
+  }
+}
+
+final autoThemeInputsProvider =
+    NotifierProvider<AutoThemeInputsNotifier, AutoThemeInputs>(
+        AutoThemeInputsNotifier.new);
+
+/// The theme actually on screen: the user's pick, or today's theme from the
+/// daily rotation. Anything that draws with theme colours should watch this
+/// rather than [themeProvider], which is the user's *choice* (and may be
+/// [AppThemeMode.automatic]).
+final resolvedThemeProvider = Provider<AppThemeMode>((ref) {
+  final mode = ref.watch(themeProvider);
+  if (mode != AppThemeMode.automatic) return mode;
+  final inputs = ref.watch(autoThemeInputsProvider);
+  return AutoTheme.pick(inputs.day, inputs.brightness);
+});
+
+extension AppThemeModeExtension on AppThemeMode {
+  /// Today's theme for [AppThemeMode.automatic], otherwise this mode.
+  /// Prefer watching [resolvedThemeProvider], which also rebuilds when the
+  /// phone switches between light and dark.
+  AppThemeMode resolve([BuildContext? context]) {
+    if (this != AppThemeMode.automatic) return this;
+    final inputs = AutoTheme.latest;
+    final brightness = (context == null
+            ? null
+            : MediaQuery.maybePlatformBrightnessOf(context)) ??
+        inputs.brightness;
+    return AutoTheme.pick(inputs.day, brightness);
+  }
+
+  /// Whether this theme is drawn on a dark background.
+  bool get isDark {
+    switch (resolve()) {
+      case AppThemeMode.dark:
+      case AppThemeMode.oled:
+      case AppThemeMode.dawn:
+      case AppThemeMode.dusk:
+      case AppThemeMode.fresh:
+        return true;
+      default:
+        return false;
+    }
   }
 
   bool get isFirmamentTheme {
-    return this == AppThemeMode.dawn ||
-        this == AppThemeMode.fresh ||
-        this == AppThemeMode.dusk;
+    final mode = resolve();
+    return mode == AppThemeMode.dawn ||
+        mode == AppThemeMode.fresh ||
+        mode == AppThemeMode.dusk;
   }
 
   bool get isSanctuaryTheme {
-    return this == AppThemeMode.priestlyPurple ||
-        this == AppThemeMode.galileeBlue ||
-        this == AppThemeMode.scarletRed;
+    final mode = resolve();
+    return mode == AppThemeMode.priestlyPurple ||
+        mode == AppThemeMode.galileeBlue ||
+        mode == AppThemeMode.scarletRed;
   }
 
   String get subGreeting {
-    switch (this) {
+    switch (resolve()) {
       case AppThemeMode.dark:
       case AppThemeMode.oled:
       case AppThemeMode.dusk:
@@ -71,16 +203,17 @@ extension AppThemeModeExtension on AppThemeMode {
   }
 
   bool get is3DTheme {
-    return this == AppThemeMode.dawn ||
-        this == AppThemeMode.lilies ||
-        this == AppThemeMode.roses ||
-        this == AppThemeMode.olives ||
-        this == AppThemeMode.dusk ||
-        this == AppThemeMode.fresh;
+    final mode = resolve();
+    return mode == AppThemeMode.dawn ||
+        mode == AppThemeMode.lilies ||
+        mode == AppThemeMode.roses ||
+        mode == AppThemeMode.olives ||
+        mode == AppThemeMode.dusk ||
+        mode == AppThemeMode.fresh;
   }
 
   Color get backgroundColor {
-    switch (this) {
+    switch (resolve()) {
       case AppThemeMode.dawn:
         return AppColors.dawnBackground;
       case AppThemeMode.lilies:
@@ -100,7 +233,7 @@ extension AppThemeModeExtension on AppThemeMode {
   }
 
   Color get redLetterColor {
-    switch (this) {
+    switch (resolve()) {
       case AppThemeMode.dark:
       case AppThemeMode.oled:
       case AppThemeMode.dusk:
@@ -114,7 +247,7 @@ extension AppThemeModeExtension on AppThemeMode {
   }
 
   Color get starColor {
-    switch (this) {
+    switch (resolve()) {
       case AppThemeMode.dark:
       case AppThemeMode.oled:
       case AppThemeMode.dusk:
@@ -132,34 +265,44 @@ class ThemeNotifier extends Notifier<AppThemeMode> {
   static const _themeKey = 'app_theme_mode';
   static const _lockedThemeKey = 'theme_locked_mode'; // Legacy fallback
   static const _engineModeKey = 'theme_engine_mode'; // Legacy migration
+  static const _migratedKey = 'engine_migrated_v3';
 
   @override
   AppThemeMode build() {
-    _loadTheme();
-    return AppThemeMode.automatic;
+    // Preferences are loaded before runApp, so the saved theme is known on
+    // the very first frame. Reading it later (async) painted one frame in
+    // the default theme and then animated to the saved one on every launch.
+    final SharedPreferences prefs;
+    try {
+      prefs = ref.read(preferencesProvider).prefs;
+    } catch (_) {
+      // No preferences in this scope (some tests): load them async.
+      _loadAsync();
+      return AppThemeMode.automatic;
+    }
+    return _readSaved(prefs);
   }
 
-  Future<void> _loadTheme() async {
+  Future<void> _loadAsync() async {
     final prefs = await SharedPreferences.getInstance();
+    state = _readSaved(prefs);
+  }
 
-    // Migration from old Time-Based engine
-    final migrated = prefs.getBool('engine_migrated_v3') ?? false;
-    if (!migrated) {
-      final engineMode = prefs.getInt(_engineModeKey);
-      if (engineMode == 1) {
-        // 1 was ThemeEngineMode.timeBased
-        await prefs.setInt(_themeKey, AppThemeMode.automatic.index);
+  static AppThemeMode _readSaved(SharedPreferences prefs) {
+    // Migration from the old time-based engine: it becomes Daily rotation.
+    if (!(prefs.getBool(_migratedKey) ?? false)) {
+      if (prefs.getInt(_engineModeKey) == 1) {
+        prefs.setInt(_themeKey, AppThemeMode.automatic.index);
       }
-      await prefs.setBool('engine_migrated_v3', true);
+      prefs.setBool(_migratedKey, true);
     }
 
     final saved = prefs.getInt(_themeKey) ?? prefs.getInt(_lockedThemeKey);
     if (saved != null && saved >= 0 && saved < AppThemeMode.values.length) {
-      state = AppThemeMode.values[saved];
-    } else {
-      // By default themes change daily (automatic mode).
-      state = AppThemeMode.automatic;
+      return AppThemeMode.values[saved];
     }
+    // Default: Daily rotation.
+    return AppThemeMode.automatic;
   }
 
   Future<void> setTheme(AppThemeMode mode) async {

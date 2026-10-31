@@ -37,7 +37,7 @@ class _DictionaryV2ScreenState extends ConsumerState<DictionaryV2Screen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final appThemeMode = ref.watch(themeProvider);
+    final appThemeMode = ref.watch(resolvedThemeProvider);
     final results = ref.watch(dictionarySearchProvider(_query));
     final savedWords = ref.watch(bookmarkedWordsProvider).asData?.value ?? {};
 

@@ -589,6 +589,7 @@
   "settingsAutoOpenSingleShortSubtitle": "Y aller directement s'il n'y a qu'un résultat",
   "settingsBackgroundGlow": "Activer la lueur de fond",
   "settingsBackgroundGlowSubtitle": "Une douce lumière animée derrière le texte",
+  "settingsThemeDailyToday": "Aujourd’hui : {theme}",
   "settingsThemeGroupFoundations": "FONDEMENTS",
   "settingsThemeDawn": "Aube",
   "settingsThemeFresh": "Frais",

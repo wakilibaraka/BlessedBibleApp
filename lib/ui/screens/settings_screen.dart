@@ -1314,7 +1314,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                         Navigator.of(ctx).pop();
                         await ref
                             .read(themeProvider.notifier)
-                            .setTheme(AppThemeMode.light);
+                            .setTheme(AppThemeMode.automatic);
                         await ref
                             .read(typographyProvider.notifier)
                             .setFontFamily('Lexend');

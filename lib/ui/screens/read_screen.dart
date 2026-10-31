@@ -905,7 +905,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     );
 
     final theme = Theme.of(context);
-    final appThemeMode = ref.watch(themeProvider);
+    final appThemeMode = ref.watch(resolvedThemeProvider);
     final typography = ref.watch(typographyProvider);
     ref.watch(pericopesProvider); // Trigger rebuild on load
     final pericopesNotifier = ref.read(pericopesProvider.notifier);

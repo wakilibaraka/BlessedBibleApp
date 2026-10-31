@@ -397,6 +397,8 @@ class _ThemePickerBodyState extends ConsumerState<ThemePickerBody> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _DailyRotationTile(currentMode: currentMode),
+        const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
@@ -684,10 +686,10 @@ class _ThemePillState extends ConsumerState<_ThemePill>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isSelected = widget.currentMode == widget.mode ||
-        (widget.currentMode == AppThemeMode.automatic &&
-            widget.mode == AppThemeMode.automatic.resolve(context) &&
-            widget.mode != AppThemeMode.automatic);
+    // Only the user's own pick is selected. Under Daily rotation the
+    // rotation tile is selected instead: highlighting today's theme here too
+    // made it look like that theme had been chosen and locked in.
+    final isSelected = widget.currentMode == widget.mode;
 
     final bgLuminance =
         (isSelected ? widget.fillColor : theme.colorScheme.surface)
@@ -1314,6 +1316,117 @@ class _SurfaceStyleTile extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Picker label for a theme, matching the pill it sits on.
+String _themeLabel(BuildContext context, AppThemeMode mode) {
+  final l10n = context.l10n;
+  final label = switch (mode) {
+    AppThemeMode.automatic => l10n.onboardingThemeDaily,
+    AppThemeMode.light => l10n.settingsThemeDawn,
+    AppThemeMode.sepia => l10n.settingsThemeFresh,
+    AppThemeMode.dark => l10n.settingsThemeDuskOled,
+    AppThemeMode.oled => l10n.settingsThemeOledDark,
+    AppThemeMode.dawn => l10n.settingsThemeSun,
+    AppThemeMode.fresh => l10n.settingsThemeMoon,
+    AppThemeMode.dusk => l10n.settingsThemeStars,
+    AppThemeMode.lilies => l10n.settingsThemeLilies,
+    AppThemeMode.roses => l10n.settingsThemeRoses,
+    AppThemeMode.olives => l10n.settingsThemeOlives,
+    AppThemeMode.priestlyPurple => l10n.settingsThemePurple,
+    AppThemeMode.galileeBlue => l10n.settingsThemeBlue,
+    AppThemeMode.scarletRed => l10n.settingsThemeRed,
+  };
+  return label.replaceAll('\n', ' ');
+}
+
+/// The "Daily rotation" (automatic) option. It was only offered during
+/// onboarding, so once someone picked a fixed theme there was no way back.
+class _DailyRotationTile extends ConsumerWidget {
+  final AppThemeMode currentMode;
+
+  const _DailyRotationTile({required this.currentMode});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final selected = currentMode == AppThemeMode.automatic;
+    final inputs = ref.watch(autoThemeInputsProvider);
+    final today = AutoTheme.pick(inputs.day, inputs.brightness);
+    final todayLabel =
+        l10n.settingsThemeDailyToday(_themeLabel(context, today));
+
+    return Semantics(
+      button: true,
+      selected: selected,
+      inMutuallyExclusiveGroup: true,
+      label: '${l10n.onboardingThemeDaily}. $todayLabel',
+      excludeSemantics: true,
+      child: Material(
+        color: selected
+            ? theme.primaryColor.withValues(alpha: 0.10)
+            : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(Radii.lg),
+          side: BorderSide(
+            color: selected
+                ? theme.primaryColor
+                : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+            width: selected ? 2 : 1,
+          ),
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(Radii.lg),
+          onTap: () {
+            HapticFeedback.selectionClick();
+            ref.read(themeProvider.notifier).setTheme(AppThemeMode.automatic);
+          },
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: kMinTouchTarget),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Row(
+                children: [
+                  Icon(Icons.auto_awesome_rounded,
+                      color: selected
+                          ? theme.primaryColor
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(l10n.onboardingThemeDaily,
+                            style: TextStyle(
+                                fontSize: TypeScale.body,
+                                fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 2),
+                        Text(l10n.onboardingThemeDailyDesc,
+                            style: TextStyle(
+                                fontSize: TypeScale.caption,
+                                color: theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.7))),
+                        const SizedBox(height: 4),
+                        Text(todayLabel,
+                            style: TextStyle(
+                                fontSize: TypeScale.caption,
+                                fontWeight: FontWeight.w600,
+                                color: theme.primaryColor)),
+                      ],
+                    ),
+                  ),
+                  if (selected)
+                    Icon(Icons.check_circle_rounded, color: theme.primaryColor),
+                ],
+              ),
+            ),
           ),
         ),
       ),

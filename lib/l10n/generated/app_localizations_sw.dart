@@ -2166,6 +2166,11 @@ class AppLocalizationsSw extends AppLocalizations {
       'Mwanga hafifu unaosonga nyuma ya msomaji';
 
   @override
+  String settingsThemeDailyToday(String theme) {
+    return 'Leo: $theme';
+  }
+
+  @override
   String get settingsThemeGroupFoundations => 'MISINGI';
 
   @override

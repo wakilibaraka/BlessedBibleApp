@@ -128,7 +128,7 @@ class MainNavScreen extends ConsumerWidget {
       const SettingsScreen(),
     ];
 
-    final appThemeMode = ref.watch(themeProvider);
+    final appThemeMode = ref.watch(resolvedThemeProvider);
 
     // Sheet style: a fresh selection pops the compact action sheet. The
     // reader owns the selection state, so we listen rather than poll.

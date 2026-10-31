@@ -151,7 +151,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   Widget build(BuildContext context) {
     final homeState = ref.watch(homeProvider);
-    final appThemeMode = ref.watch(themeProvider);
+    final appThemeMode = ref.watch(resolvedThemeProvider);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
