@@ -306,7 +306,11 @@ class BibleDatabaseService {
     try {
       for (var off = 0; off < bytes.length; off += chunk) {
         final end = (off + chunk > bytes.length) ? bytes.length : off + chunk;
-        out.add(bytes.sublist(off, end));
+        out.add(Uint8List.sublistView(bytes, off, end));
+        // Waiting for each chunk to reach the disk yields to the UI between
+        // chunks: the old tight loop held the main isolate for the whole
+        // 92 MB, so the splash spinner froze and progress jumped to the end.
+        await out.flush();
         // Copy phase reports 0..0.75; packs take it to ~0.95.
         _emitProgress(0.75 * end / bytes.length);
       }
