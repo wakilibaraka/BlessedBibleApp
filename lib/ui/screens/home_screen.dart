@@ -716,9 +716,12 @@ class StoryOfTheDaySection extends ConsumerWidget {
       data: (story) {
         if (story == null) return const SizedBox.shrink();
 
+        // The preview is plain text, so drop the retelling's bold/underline markers.
         final snippet = normalizeProse(story.retelling.trim().isNotEmpty
-            ? story.retelling
-            : story.keyVerse);
+                ? story.retelling
+                : story.keyVerse)
+            .replaceAll('**', '')
+            .replaceAll('__', '');
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.center,

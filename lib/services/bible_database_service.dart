@@ -332,7 +332,9 @@ class BibleDatabaseService {
   Future<void> _verifyCopiedDb(String dbPath) async {
     Database? tmp;
     try {
-      tmp = await openDatabase(dbPath, readOnly: true);
+      // Not read-only: the bundled core is in WAL mode, and a read-only
+      // connection cannot create the -shm index (SQLITE_CANTOPEN).
+      tmp = await openDatabase(dbPath);
       final qc = await tmp.rawQuery('PRAGMA quick_check');
       final ok = qc.isNotEmpty && '${qc.first.values.first}' == 'ok';
       final problems = ok ? await _probeCore(tmp) : ['integrity check failed'];
@@ -397,7 +399,7 @@ class BibleDatabaseService {
     try {
       // Never resurrect packs the user deleted.
       final deleted = await _packStore.deletedPackIds();
-      backupDb = await openDatabase(backupPath, readOnly: true);
+      backupDb = await openDatabase(backupPath); // WAL: see _verifyCopiedDb
       await _packStore.extractFromDatabase(
         backupDb,
         shouldExtract: (id) =>
