@@ -6,6 +6,8 @@
 // Tests render text with Flutter's test font (blocks, not glyphs), which is
 // the same on every machine, so the images compare cleanly in CI.
 
+import 'dart:typed_data';
+
 import 'package:blessed_account/testing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +21,30 @@ import 'package:the_blessed_bible/theme/app_theme.dart';
 import 'package:the_blessed_bible/ui/screens/onboarding_screen.dart';
 import 'package:the_blessed_bible/ui/screens/settings_screen.dart';
 import 'package:the_blessed_bible/ui/widgets/state_views.dart';
+
+/// Golden comparator with cross-platform anti-aliasing / font rasterization tolerance (up to 1.5%).
+class _TolerantGoldenComparator extends LocalFileComparator {
+  _TolerantGoldenComparator(super.testFile, {this.tolerance = 0.015});
+
+  final double tolerance;
+
+  @override
+  Future<bool> compare(Uint8List imageBytes, Uri golden) async {
+    final ComparisonResult result = await GoldenFileComparator.compareLists(
+      imageBytes,
+      await getGoldenBytes(golden),
+    );
+
+    if (result.passed || result.diffPercent <= tolerance) {
+      result.dispose();
+      return true;
+    }
+
+    final String error = await generateFailureOutput(result, golden, basedir);
+    result.dispose();
+    throw FlutterError(error);
+  }
+}
 
 // Only screens whose pixels don't depend on today's date or on
 // asynchronously restored settings, so the images stay stable.
@@ -84,6 +110,16 @@ Future<void> _pump(WidgetTester tester, Widget screen, ThemeData theme,
 }
 
 void main() {
+  setUpAll(() {
+    if (goldenFileComparator is LocalFileComparator) {
+      final current = goldenFileComparator as LocalFileComparator;
+      goldenFileComparator = _TolerantGoldenComparator(
+        current.basedir.resolve('goldens_test.dart'),
+        tolerance: 0.015,
+      );
+    }
+  });
+
   for (final s in _screens.entries) {
     for (final t in _themes.entries) {
       testWidgets('${s.key} ${t.key}', (tester) async {

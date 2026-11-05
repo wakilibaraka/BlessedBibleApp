@@ -46,6 +46,20 @@ Map<String, dynamic> testCustomPlan() => {
       ],
     };
 
+Future<ReadingPlanState> _waitForPlan(
+  ProviderContainer container,
+  String planId, {
+  Duration timeout = const Duration(seconds: 5),
+}) async {
+  var state = container.read(readingPlanProvider(planId));
+  final deadline = DateTime.now().add(timeout);
+  while (state.isLoading && DateTime.now().isBefore(deadline)) {
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    state = container.read(readingPlanProvider(planId));
+  }
+  return state;
+}
+
 void main() {
   // rootBundle (canon index for atom building) needs a binding even in
   // plain unit tests. Real async (no FakeAsync), so asset reads complete.
@@ -66,12 +80,8 @@ void main() {
           testCustomPlan(),
         );
 
-    // Trigger provider creation (starts async load).
-    container.read(readingPlanProvider('custom-1'));
-    // Let the async load finish.
-    await Future<void>.delayed(const Duration(milliseconds: 200));
-
-    final loaded = container.read(readingPlanProvider('custom-1'));
+    // Trigger provider creation and wait for async load to finish.
+    final loaded = await _waitForPlan(container, 'custom-1');
     expect(loaded.error, isNull);
     expect(loaded.isLoading, isFalse);
     expect(loaded.planData.length, 2);
@@ -100,10 +110,7 @@ void main() {
           'custom-1',
           testCustomPlan(),
         );
-    container.read(readingPlanProvider('custom-1'));
-    await Future<void>.delayed(const Duration(milliseconds: 200));
-
-    final state = container.read(readingPlanProvider('custom-1'));
+    final state = await _waitForPlan(container, 'custom-1');
     expect(state.error, isNull);
     expect(state.completedAtomIds, isNotEmpty);
     // Atom rule agrees with the legacy rule after backfill.
@@ -126,8 +133,7 @@ void main() {
           'custom-1',
           testCustomPlan(),
         );
-    container.read(readingPlanProvider('custom-1'));
-    await Future<void>.delayed(const Duration(milliseconds: 200));
+    await _waitForPlan(container, 'custom-1');
 
     final notifier = container.read(readingPlanProvider('custom-1').notifier);
     notifier.markReadingComplete(2);
@@ -162,8 +168,7 @@ void main() {
           'custom-1',
           testCustomPlan(),
         );
-    container.read(readingPlanProvider('custom-1'));
-    await Future<void>.delayed(const Duration(milliseconds: 200));
+    await _waitForPlan(container, 'custom-1');
 
     final notifier = container.read(readingPlanProvider('custom-1').notifier);
     notifier.markReadingComplete(1);
@@ -202,8 +207,7 @@ void main() {
           'custom-1',
           testCustomPlan(),
         );
-    container.read(readingPlanProvider('custom-1'));
-    await Future<void>.delayed(const Duration(milliseconds: 200));
+    await _waitForPlan(container, 'custom-1');
 
     final notifier = container.read(readingPlanProvider('custom-1').notifier);
     // Legacy single day still works when the set is empty.
@@ -238,8 +242,7 @@ void main() {
           'custom-1',
           testCustomPlan(),
         );
-    container.read(readingPlanProvider('custom-1'));
-    await Future<void>.delayed(const Duration(milliseconds: 200));
+    await _waitForPlan(container, 'custom-1');
 
     final notifier = container.read(readingPlanProvider('custom-1').notifier);
     notifier.markAllPreviousRead(2);
@@ -259,10 +262,7 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    container.read(readingPlanProvider('chronological_1yr'));
-    await Future<void>.delayed(const Duration(milliseconds: 500));
-
-    final state = container.read(readingPlanProvider('chronological_1yr'));
+    final state = await _waitForPlan(container, 'chronological_1yr');
     expect(state.error, isNull);
     expect(state.planData.length, 365);
     // Day 1 reads Genesis 1-3: three chapter entries for the prompt.
@@ -287,8 +287,7 @@ void main() {
           'custom-1',
           testCustomPlan(),
         );
-    container.read(readingPlanProvider('custom-1'));
-    await Future<void>.delayed(const Duration(milliseconds: 500));
+    await _waitForPlan(container, 'custom-1');
 
     var notifier = container.read(readingPlanProvider('custom-1').notifier);
     notifier
@@ -299,8 +298,7 @@ void main() {
 
     // Partial multi-chapter day: marking one chapter stays honest —
     // atoms spanning beyond the chapter are correctly left alone.
-    container.read(readingPlanProvider('chronological_1yr'));
-    await Future<void>.delayed(const Duration(milliseconds: 800));
+    await _waitForPlan(container, 'chronological_1yr');
     notifier =
         container.read(readingPlanProvider('chronological_1yr').notifier);
     notifier
