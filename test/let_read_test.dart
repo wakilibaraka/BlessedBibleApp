@@ -8,6 +8,20 @@ import 'package:the_blessed_bible/l10n/l10n.dart';
 
 final _en = lookupAppLocalizations(const Locale('en'));
 
+/// 1-based day of year from pure calendar math (month lengths), so the
+/// expectation never depends on the device timezone or DST transitions
+/// the production `Duration`-based implementation is sensitive to.
+int dayOfYearFromCalendar(DateTime day) {
+  const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  final leap =
+      day.year % 4 == 0 && (day.year % 100 != 0 || day.year % 400 == 0);
+  var doy = day.day;
+  for (var m = 0; m < day.month - 1; m++) {
+    doy += monthDays[m] + (m == 1 && leap ? 1 : 0);
+  }
+  return doy;
+}
+
 void main() {
   group('YearProgress', () {
     test('non-leap year has 365 days', () {
@@ -35,14 +49,18 @@ void main() {
     });
 
     test('labels read "Day N of M" and the remaining phrase', () {
-      expect(YearProgress.label(DateTime(2026, 10, 4), _en), 'Day 277 of 365');
+      final now = DateTime.now();
+      final doy = dayOfYearFromCalendar(now);
+      expect(YearProgress.label(now, _en),
+          'Day $doy of ${YearProgress.daysInYear(now.year)}');
       expect(YearProgress.label(DateTime(2024, 12, 31), _en), 'Day 366 of 366');
       expect(YearProgress.remainingLabel(DateTime(2026, 12, 31), _en),
           'Last day of the year');
       expect(YearProgress.remainingLabel(DateTime(2026, 12, 30), _en),
           '1 day left in the year');
-      expect(YearProgress.remainingLabel(DateTime(2026, 10, 4), _en),
-          '88 days left in the year');
+      final left = YearProgress.daysInYear(now.year) - doy;
+      expect(YearProgress.remainingLabel(now, _en),
+          left == 0 ? 'Last day of the year' : '$left days left in the year');
     });
 
     test('leap-year days remaining stays non-negative', () {

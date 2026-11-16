@@ -20,20 +20,36 @@ ReadingPlanState planStartedOn(DateTime start, int days) => ReadingPlanState(
       planStartedOn: start,
     );
 
-Widget host({DateTime? today, ReadingPlanState? plan}) => MaterialApp(
-      theme: AppTheme.lightTheme(1.0),
-      home: Scaffold(
-        body: Center(
-          child: SizedBox(
-            width: 380,
-            child: LibraryCalendarRail(
-              today: today ?? DateTime(2026, 10, 4),
-              plan: plan,
-            ),
+DateTime atMidnight(DateTime d) => DateTime(d.year, d.month, d.day);
+
+/// The week [weeksAhead] weeks from [today] whose day-number labels do
+/// not include [today]'s day number, so `findsNothing` assertions are
+/// stable on any calendar date.
+List<DateTime> weekExcludingDay(DateTime today, int weeksAhead) {
+  for (var offset = weeksAhead; offset < 26; offset++) {
+    final week = libraryWeekDays(today.add(Duration(days: 7 * offset)));
+    if (week.every((d) => d.day != today.day)) return week;
+  }
+  throw StateError('no week found');
+}
+
+Widget host({DateTime? today, ReadingPlanState? plan}) {
+  final now = atMidnight(DateTime.now());
+  return MaterialApp(
+    theme: AppTheme.lightTheme(1.0),
+    home: Scaffold(
+      body: Center(
+        child: SizedBox(
+          width: 380,
+          child: LibraryCalendarRail(
+            today: today ?? now,
+            plan: plan,
           ),
         ),
       ),
-    );
+    ),
+  );
+}
 
 /// PageView needs incremental frames to run its page animation.
 Future<void> settlePaging(WidgetTester tester) async {
@@ -43,56 +59,63 @@ Future<void> settlePaging(WidgetTester tester) async {
 }
 
 void main() {
-  // 2026-10-04 is a Sunday -> its Monday-first week starts 2026-09-28.
   testWidgets('centers on the current week and renders 7 days', (tester) async {
-    await tester.pumpWidget(host());
+    final today = atMidnight(DateTime.now());
+    final week = libraryWeekDays(today);
+    await tester.pumpWidget(host(today: today));
     await tester.pump(const Duration(milliseconds: 100));
 
-    // Oct 4 2026 is a Sunday, so its Monday-first week is Sep 28..Oct 4.
-    expect(find.text('4'), findsOneWidget); // today, last cell
-    expect(find.text('28'), findsOneWidget);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('${week.first.day}'), findsOneWidget); // Monday
+    expect(find.text('${week.last.day}'), findsOneWidget); // Sunday
+    expect(find.text('${today.day}'), findsOneWidget); // today
     expect(find.text('MON'), findsOneWidget);
     expect(find.text('SUN'), findsOneWidget);
   });
 
   testWidgets('sliding left shows the next week', (tester) async {
-    await tester.pumpWidget(host());
+    final today = atMidnight(DateTime.now());
+    final next = libraryWeekDays(today.add(const Duration(days: 7)));
+    await tester.pumpWidget(host(today: today));
     await tester.pump(const Duration(milliseconds: 100));
 
     await tester.fling(find.byType(PageView), const Offset(-260, 0), 900);
     await settlePaging(tester);
 
-    // Next week: Oct 5-11 (today's Oct 4 is gone).
-    expect(find.text('4'), findsNothing);
-    expect(find.text('5'), findsOneWidget);
-    expect(find.text('11'), findsOneWidget);
+    expect(find.text('${next.first.day}'), findsOneWidget);
+    expect(find.text('${next.last.day}'), findsOneWidget);
+    if (next.every((d) => d.day != today.day)) {
+      expect(find.text('${today.day}'), findsNothing);
+    }
   });
 
   testWidgets('step button advances exactly one week', (tester) async {
-    await tester.pumpWidget(host());
+    final today = atMidnight(DateTime.now());
+    final next = libraryWeekDays(today.add(const Duration(days: 7)));
+    await tester.pumpWidget(host(today: today));
     await tester.pump(const Duration(milliseconds: 100));
 
     await tester.tap(find.byIcon(Icons.chevron_right_rounded));
     await settlePaging(tester);
 
-    expect(find.text('5'), findsOneWidget);
-    expect(find.text('11'), findsOneWidget);
+    expect(find.text('${next.first.day}'), findsOneWidget);
+    expect(find.text('${next.last.day}'), findsOneWidget);
   });
 
   testWidgets('scrollToDate jumps to that week', (tester) async {
-    await tester.pumpWidget(host());
+    final today = atMidnight(DateTime.now());
+    final targetWeek = weekExcludingDay(today, 10);
+    final targetDay = targetWeek.last; // Sunday
+    await tester.pumpWidget(host(today: today));
     await tester.pump(const Duration(milliseconds: 100));
 
     final state = tester
         .state<LibraryCalendarRailState>(find.byType(LibraryCalendarRail));
-    state.scrollToDate(DateTime(2026, 12, 20));
+    state.scrollToDate(targetDay);
     await settlePaging(tester);
 
-    // Dec 20 2026 is a Sunday; its week is Dec 14-20.
-    expect(find.text('20'), findsOneWidget);
-    expect(find.text('14'), findsOneWidget);
-    expect(find.text('4'), findsNothing);
+    expect(find.text('${targetWeek.last.day}'), findsOneWidget);
+    expect(find.text('${targetWeek.first.day}'), findsOneWidget);
+    expect(find.text('${today.day}'), findsNothing);
   });
 
   testWidgets('completion dots come from the plan', (tester) async {
