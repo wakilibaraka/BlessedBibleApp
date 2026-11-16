@@ -100,3 +100,14 @@ assets/bible/bible_*.db
 
 # FVM (Flutter version is pinned in .fvmrc)
 .fvm/
+
+# Unsupported platform folders (Android and iOS are the only targets).
+# Flutter regenerates these on some commands; never commit them.
+/linux/
+/macos/
+/windows/
+
+# Local-only working copies and generated reports
+/.consolidation-wt/
+/flutter_application_1/
+/graphify-out/
