@@ -124,7 +124,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
   Future<String> _packsDirPath() async {
     // Mirrors TranslationPackStore's layout.
     final dir = Directory(
-        '${(await getApplicationSupportDirectory()).path}/translations');
+        '${(await getApplicationSupportDirectory()).path}/packs');
     return dir.path;
   }
 

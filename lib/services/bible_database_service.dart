@@ -34,6 +34,7 @@ class BibleDatabaseService {
   /// KJV-Strong's becomes a downloadable pack.
   static const int contentVersion = 3;
   static const String _contentVersionKey = 'content_version';
+  static const String _schemaReadyVersionKey = 'bible_db_schema_ready_v';
   static const String _repairAttemptsKey = 'content_repair_attempts';
   static const int _maxRepairAttempts = 2;
 
@@ -127,6 +128,23 @@ class BibleDatabaseService {
     final stored = _storedContentVersion(prefs);
 
     final dbFile = File(dbPath);
+    Database? installedDb;
+
+    // Fast path for normal launches when the current content & schema version
+    // have already been verified on disk.
+    if (stored == contentVersion &&
+        prefs.getInt(_schemaReadyVersionKey) == contentVersion &&
+        await dbFile.exists()) {
+      final fastDb = await _openFast(dbPath);
+      final fastProblems = await _probeCore(fastDb, fast: true);
+      if (fastProblems.isEmpty) {
+        return fastDb;
+      }
+      try {
+        await fastDb.close();
+      } catch (_) {}
+    }
+
     if (!await dbFile.exists() || stored < contentVersion) {
       if (stored == 2 && await dbFile.exists()) {
         // V2 -> V3 layout migration: KJV-Strong's leaves the core for a
@@ -136,7 +154,8 @@ class BibleDatabaseService {
           await _migrateV2ToV3(dbPath, prefs);
         } catch (e) {
           stderr.writeln('DB v2->v3 migration failed, reinstalling: $e');
-          await _installFromAsset(dbPath, prefs, preservePacks: true);
+          installedDb =
+              await _installFromAsset(dbPath, prefs, preservePacks: true);
         }
       } else if (stored == 1 && await dbFile.exists()) {
         // P2 layout migration: extract translations into pack files
@@ -146,10 +165,11 @@ class BibleDatabaseService {
           await _migrateToPacks(dbPath, prefs);
         } catch (e) {
           stderr.writeln('DB pack migration failed, reinstalling: $e');
-          await _installFromAsset(dbPath, prefs, preservePacks: true);
+          installedDb =
+              await _installFromAsset(dbPath, prefs, preservePacks: true);
         }
       } else {
-        await _installFromAsset(
+        installedDb = await _installFromAsset(
           dbPath,
           prefs,
           preservePacks: await dbFile.exists(),
@@ -157,9 +177,15 @@ class BibleDatabaseService {
       }
     }
 
-    // Bundled packs must be present (fresh installs, repairs, or packs
-    // lost outside the app). Cheap no-op when everything is in place;
-    // never resurrects packs the user deleted.
+    if (installedDb != null) {
+      await _clearRepairAttempts(prefs);
+      await prefs.setInt(_schemaReadyVersionKey, contentVersion);
+      return installedDb;
+    }
+
+    // Bundled packs must be present in catalog (fresh installs, repairs, or
+    // upgrades). Cheap metadata-only registration; never resurrects packs the
+    // user deleted.
     await _packStore.ensureBundledPacks(
       skipIds: await _packStore.deletedPackIds(),
     );
@@ -191,9 +217,10 @@ class BibleDatabaseService {
       db = await _openGuarded(dbPath);
     }
 
-    var problems = await _probeCore(db);
+    var problems = await _probeCore(db, fast: true);
     if (problems.isEmpty) {
       await _clearRepairAttempts(prefs);
+      await prefs.setInt(_schemaReadyVersionKey, contentVersion);
       return db;
     }
 
@@ -212,24 +239,17 @@ class BibleDatabaseService {
     } catch (_) {}
     _db = null;
     _emitProgress(0);
-    await _installFromAsset(dbPath, prefs, preservePacks: true);
-    db = await _openGuarded(dbPath);
-    problems = await _probeCore(db);
-    if (problems.isEmpty) {
-      await _clearRepairAttempts(prefs);
-      return db;
-    }
-    await _recordRepairAttempt(prefs);
-    throw StateError(
-      'Bible database failed verification after repair (${problems.join('; ')}). '
-      'Please check storage space, then retry or reinstall the app.',
-    );
+    db = await _installFromAsset(dbPath, prefs, preservePacks: true);
+    await _clearRepairAttempts(prefs);
+    await prefs.setInt(_schemaReadyVersionKey, contentVersion);
+    return db;
   }
 
   /// Copies the bundled asset into place atomically, verifies it, preserves
   /// user-downloaded translation packs from the previous file (best effort),
-  /// then stamps the content version. Throws on failure; callers retry later.
-  Future<void> _installFromAsset(
+  /// then stamps the content version and returns the open [Database].
+  /// Throws on failure; callers retry later.
+  Future<Database> _installFromAsset(
     String dbPath,
     SharedPreferences prefs, {
     required bool preservePacks,
@@ -250,15 +270,16 @@ class BibleDatabaseService {
     }
 
     var copyOk = false;
+    Database? verifiedDb;
     try {
       await _copyAssetDb(dbPath);
-      await _verifyCopiedDb(dbPath);
+      verifiedDb = await _verifyCopiedDb(dbPath);
       copyOk = true;
       if (backupForPreserve != null) {
         await _preserveDownloadedPacks(dbPath, backupForPreserve);
       }
-      // Bundled packs must be present on every fresh install / repair.
-      // Skips packs the user deleted; no-op when everything is in place.
+      // Register bundled packs in catalog.json (metadata-only; pack DBs copy
+      // on demand when opened).
       await _packStore.ensureBundledPacks(
         skipIds: await _packStore.deletedPackIds(),
         onProgress: (p) => _emitProgress(0.8 + 0.15 * p),
@@ -270,6 +291,9 @@ class BibleDatabaseService {
       }
     } catch (e) {
       stderr.writeln('DB install error: $e');
+      try {
+        await verifiedDb?.close();
+      } catch (_) {}
       if (!copyOk) {
         try {
           if (await dbFile.exists()) await dbFile.delete();
@@ -290,28 +314,26 @@ class BibleDatabaseService {
     } catch (_) {}
 
     await prefs.setInt(_contentVersionKey, contentVersion);
+    await prefs.setInt(_schemaReadyVersionKey, contentVersion);
     await prefs.setInt('db_version', _legacyRequiredDbVersion);
     _emitProgress(1.0);
+    return verifiedDb;
   }
 
-  /// Streams the bundled asset to [dbPath] in chunks so first-run UI can
-  /// show progress. Deletes the partial file on failure.
+  /// Streams the bundled asset to [dbPath] in 4 MB chunks so first-run UI can
+  /// show progress without forcing 48 individual disk flushes.
   Future<void> _copyAssetDb(String dbPath) async {
     await Directory(dirname(dbPath)).create(recursive: true);
     final data = await rootBundle.load('assets/bible/$_dbName');
     final bytes =
         data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-    const chunk = 1024 * 1024;
+    const chunk = 4 * 1024 * 1024;
     final out = File(dbPath).openWrite();
     try {
       for (var off = 0; off < bytes.length; off += chunk) {
         final end = (off + chunk > bytes.length) ? bytes.length : off + chunk;
         out.add(Uint8List.sublistView(bytes, off, end));
-        // Waiting for each chunk to reach the disk yields to the UI between
-        // chunks: the old tight loop held the main isolate for the whole
-        // 92 MB, so the splash spinner froze and progress jumped to the end.
-        await out.flush();
-        // Copy phase reports 0..0.75; packs take it to ~0.95.
+        await Future<void>.delayed(Duration.zero);
         _emitProgress(0.75 * end / bytes.length);
       }
       await out.flush();
@@ -327,33 +349,32 @@ class BibleDatabaseService {
     }
   }
 
-  /// Opens a freshly copied database read-only and runs a full integrity
-  /// check plus the core schema probe. Throws if anything is wrong.
-  Future<void> _verifyCopiedDb(String dbPath) async {
-    Database? tmp;
+  /// Opens a freshly copied database with schema hooks, runs a fast core
+  /// schema probe, and returns the open [Database] handle so [_initDB] does
+  /// not need to close and re-open it.
+  Future<Database> _verifyCopiedDb(String dbPath) async {
+    final db = await _openGuarded(dbPath);
     try {
-      // Not read-only: the bundled core is in WAL mode, and a read-only
-      // connection cannot create the -shm index (SQLITE_CANTOPEN).
-      tmp = await openDatabase(dbPath);
-      final qc = await tmp.rawQuery('PRAGMA quick_check');
-      final ok = qc.isNotEmpty && '${qc.first.values.first}' == 'ok';
-      final problems = ok ? await _probeCore(tmp) : ['integrity check failed'];
+      final problems = await _probeCore(db, fast: true);
       if (problems.isNotEmpty) {
         throw StateError(
             'Copied database failed verification: ${problems.join('; ')}');
       }
       _emitProgress(0.8);
-    } finally {
+      return db;
+    } catch (_) {
       try {
-        await tmp?.close();
+        await db.close();
       } catch (_) {}
+      rethrow;
     }
   }
 
-  /// Cheap structural probe used on every open: required tables present,
-  /// `translations` queryable, and the KJV backbone (never-missing content)
-  /// contains verses. Never throws — returns problem descriptions.
-  Future<List<String>> _probeCore(Database db) async {
+  /// Structural probe used on open: required tables present, `translations`
+  /// queryable, and the KJV + BBE backbone contains verses. When [fast] is
+  /// true, uses O(1) `LIMIT 1` index probes instead of scanning 62,204 rows
+  /// with `COUNT(*)`. Never throws — returns problem descriptions.
+  Future<List<String>> _probeCore(Database db, {bool fast = false}) async {
     final problems = <String>[];
     try {
       final rows = await db
@@ -372,11 +393,19 @@ class BibleDatabaseService {
       // Both backbone translations must be present and readable.
       for (final entry in {'kjv': 'KJV', 'bbe': 'BBE'}.entries) {
         try {
-          final rows = await db.rawQuery(
-              "SELECT COUNT(*) AS c FROM verses WHERE translation_id = '${entry.key}'");
-          final count = (rows.first['c'] as num?)?.toInt() ?? 0;
-          if (count == 0) {
-            problems.add('${entry.value} backbone has no verses');
+          if (fast) {
+            final probe = await db.rawQuery(
+                "SELECT 1 FROM verses WHERE translation_id = '${entry.key}' LIMIT 1");
+            if (probe.isEmpty) {
+              problems.add('${entry.value} backbone has no verses');
+            }
+          } else {
+            final rows = await db.rawQuery(
+                "SELECT COUNT(*) AS c FROM verses WHERE translation_id = '${entry.key}'");
+            final count = (rows.first['c'] as num?)?.toInt() ?? 0;
+            if (count == 0) {
+              problems.add('${entry.value} backbone has no verses');
+            }
           }
         } catch (e) {
           problems.add('${entry.value} backbone unreadable: $e');
@@ -604,6 +633,21 @@ class BibleDatabaseService {
     return false;
   }
 
+  /// Fast open used on normal launches once [_schemaReadyVersionKey] matches
+  /// [contentVersion], skipping redundant `ALTER TABLE` and `CREATE TABLE`
+  /// queries on every startup.
+  Future<Database> _openFast(String dbPath) {
+    return openDatabase(
+      dbPath,
+      readOnly: false,
+      onConfigure: (db) async {
+        try {
+          await db.rawQuery('PRAGMA journal_mode=WAL;');
+        } catch (_) {}
+      },
+    );
+  }
+
   /// Opens the installed database. Hooks are fully guarded so a partial or
   /// corrupt file can never throw here — [_initDB] verifies and repairs via
   /// [_probeCore] instead.
@@ -672,6 +716,16 @@ class BibleDatabaseService {
   Future<Database> _dbForTranslation(String translationId) async {
     if (TranslationPackStore.isCoreId(translationId)) return database;
     return _packStore.openPack(translationId);
+  }
+
+  /// Pre-materializes a bundled translation pack in the background (if not
+  /// a core translation) so selecting it during onboarding has zero delay.
+  Future<void> ensureTranslationReady(String translationId) async {
+    if (TranslationPackStore.isCoreId(translationId)) {
+      await database;
+      return;
+    }
+    await _packStore.ensurePackInstalled(translationId);
   }
 
   Future<List<TranslationInfo>> getTranslations() async {
@@ -752,6 +806,54 @@ class BibleDatabaseService {
       where: 'translation_id = ? AND book_number = ?',
       whereArgs: [translationId, bookNumber],
       orderBy: 'chapter ASC, verse ASC',
+    );
+  }
+
+  /// A contiguous range of books' verses in canonical order (`startBook`..`endBook`
+  /// inclusive). Used by [BibleNotifier] to load the 66-book KJV backbone in
+  /// 6 batched queries instead of 66 individual platform-channel round-trips.
+  Future<List<Map<String, dynamic>>> getBooksVersesRange(
+      String translationId, int startBook, int endBook) async {
+    final db = await _dbForTranslation(translationId);
+    return db.query(
+      'verses',
+      columns: ['book_number', 'chapter', 'verse', 'text'],
+      where: 'translation_id = ? AND book_number BETWEEN ? AND ?',
+      whereArgs: [translationId, startBook, endBook],
+      orderBy: 'book_number ASC, chapter ASC, verse ASC',
+    );
+  }
+
+  /// Fast single-row lookup for Word of the Day by deterministic [seed],
+  /// avoiding loading all 8,686 dictionary definitions (5.14 MB) on startup.
+  Future<({String normalizedWord, String displayHeadword, String definition})?>
+      getDictionaryWordForSeed(int seed, int pickIndex) async {
+    final db = await database;
+    final maxRes = await db.rawQuery('SELECT MAX(rowid) AS m FROM dictionary');
+    final maxRowId = (maxRes.firstOrNull?['m'] as num?)?.toInt() ?? 0;
+    if (maxRowId <= 0) return null;
+    final targetRow = (pickIndex % maxRowId) + 1;
+    var rows = await db.query(
+      'dictionary',
+      columns: ['normalized_word', 'display_headword', 'definition'],
+      where: 'rowid >= ?',
+      whereArgs: [targetRow],
+      orderBy: 'rowid ASC',
+      limit: 1,
+    );
+    if (rows.isEmpty) {
+      rows = await db.query(
+        'dictionary',
+        columns: ['normalized_word', 'display_headword', 'definition'],
+        limit: 1,
+      );
+    }
+    if (rows.isEmpty) return null;
+    final r = rows.first;
+    return (
+      normalizedWord: r['normalized_word'] as String? ?? '',
+      displayHeadword: r['display_headword'] as String? ?? '',
+      definition: r['definition'] as String? ?? '',
     );
   }
 

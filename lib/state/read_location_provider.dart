@@ -51,7 +51,8 @@ class ReadLocationNotifier extends Notifier<ReadLocationState> {
         bookAbbrev: (lastLoc['bookAbbrev'] as String? ?? 'gn').toLowerCase(),
         bookName: lastLoc['bookName'] as String? ?? 'Genesis',
         chapter: lastLoc['chapter'] as int? ?? 1,
-        requestedVerse: (lastLoc['verseIndex'] as int? ?? 0) + 1,
+        // Leave requestedVerse null on cold start so ReadScreen restores
+        // initialScrollIndex directly without triggering a 600ms jump/highlight.
       );
     }
 
@@ -85,7 +86,7 @@ class ReadLocationNotifier extends Notifier<ReadLocationState> {
       name ??= abbrev;
     }
 
-    state = state.copyWith(
+    final nextState = state.copyWith(
       bookAbbrev: abbrev,
       bookName: name,
       chapter: chapter,
@@ -94,6 +95,23 @@ class ReadLocationNotifier extends Notifier<ReadLocationState> {
       openCommentary: openCommentary,
       clearCommentary:
           !openCommentary && (bookAbbrev != null || chapter != null),
+    );
+    state = nextState;
+
+    // Persist chapter/book changes immediately so closing the app after
+    // switching chapters (even without scrolling vertically) keeps the new
+    // reading location across restarts.
+    final prefs = ref.read(preferencesProvider);
+    final savedVerseIndex = verse != null && verse > 0
+        ? verse - 1
+        : (prefs.getChapterScrollPosition(
+                nextState.bookAbbrev, nextState.chapter) ??
+            0);
+    prefs.saveLastReadLocation(
+      bookAbbrev: nextState.bookAbbrev,
+      bookName: nextState.bookName,
+      chapter: nextState.chapter,
+      verseIndex: savedVerseIndex,
     );
   }
 

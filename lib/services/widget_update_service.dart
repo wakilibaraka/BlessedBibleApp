@@ -17,6 +17,8 @@ final widgetUpdateServiceProvider = Provider<WidgetUpdateService>((ref) {
 
 class WidgetUpdateService {
   final Ref _ref;
+  Timer? _initialSyncTimer;
+  bool _disposed = false;
   static const String appGroupId =
       'group.com.yourdomain.blessedbible'; // iOS App Group ID
 
@@ -26,15 +28,25 @@ class WidgetUpdateService {
   static const String streakWidgetName = 'StreakWidgetProvider';
 
   WidgetUpdateService(this._ref) {
+    _ref.onDispose(() {
+      _disposed = true;
+      _initialSyncTimer?.cancel();
+    });
     _init();
   }
 
   Future<void> _init() async {
     // Set iOS App Group
     await HomeWidget.setAppGroupId(appGroupId);
+    if (_disposed) return;
 
-    // Initial sync
-    unawaited(syncAllWidgets());
+    // Defer the bulk 15-call platform-channel sync until after the initial
+    // Home screen frames have settled.
+    _initialSyncTimer = Timer(const Duration(seconds: 2), () {
+      if (!_disposed) {
+        unawaited(syncAllWidgets());
+      }
+    });
 
     // Listen to HomeProvider for VOTD
     _ref.listen(homeProvider, (previous, next) {

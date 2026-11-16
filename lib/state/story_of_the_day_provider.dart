@@ -102,11 +102,10 @@ DevotionalStory pickStoryOfTheDay(
 
 /// Delivers today's Bible Story from the 500-story devotional collection.
 /// The pick is remembered for the day, so reading today's story does not
-/// swap it for another one.
+/// swap it for another one. Loads only the single target book's JSON file
+/// via `index.json` instead of decoding all 66 book files on startup.
 final storyOfTheDayProvider = FutureProvider<DevotionalStory?>((ref) async {
-  final stories = await ref.watch(devotionalStoriesProvider.future);
-  if (stories.isEmpty) return null;
-
+  final service = ref.watch(devotionalServiceProvider);
   final day = ref.watch(todayProvider);
   final mode = ref.watch(storySelectionModeProvider);
   final prefs = ref.read(preferencesProvider).prefs;
@@ -114,13 +113,38 @@ final storyOfTheDayProvider = FutureProvider<DevotionalStory?>((ref) async {
 
   if (prefs.getString('sotd_day') == dayKey) {
     final savedId = prefs.getString('sotd_id');
-    for (final story in stories) {
-      if (story.id == savedId) return story;
+    if (savedId != null && savedId.isNotEmpty) {
+      final cachedStory = await service.loadStoryById(savedId);
+      if (cachedStory != null) return cachedStory;
     }
   }
-  final story =
-      pickStoryOfTheDay(stories, day, mode, ref.read(devotionalReadProvider));
+
+  final total = await service.totalCount();
+  if (total <= 0) return null;
+
+  final order = List<int>.generate(total, (i) => i);
+  if (mode == StorySelectionMode.randomized) {
+    order.shuffle(Random(20260101));
+  }
+  final dayIndex = DateTime.utc(day.year, day.month, day.day)
+      .difference(DateTime.utc(2026, 1, 1))
+      .inDays;
+  final start = ((dayIndex % total) + total) % total;
+  final read = ref.read(devotionalReadProvider);
+
+  DevotionalStory? chosen;
+  for (var step = 0; step < total; step++) {
+    final candidate =
+        await service.loadStoryAtGlobalIndex(order[(start + step) % total]);
+    if (candidate != null && !read.contains(candidate.id)) {
+      chosen = candidate;
+      break;
+    }
+  }
+  chosen ??= await service.loadStoryAtGlobalIndex(order[start]);
+  if (chosen == null) return null;
+
   await prefs.setString('sotd_day', dayKey);
-  await prefs.setString('sotd_id', story.id);
-  return story;
+  await prefs.setString('sotd_id', chosen.id);
+  return chosen;
 });

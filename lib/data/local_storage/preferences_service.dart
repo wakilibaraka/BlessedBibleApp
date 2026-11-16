@@ -583,6 +583,28 @@ class PreferencesService {
     prefs.setBool(_onboardingCompleteKey, value);
   }
 
+  // --- Daily Home Content Cache (VOTD / WOTD / SOTD) ---
+  Map<String, dynamic>? getDailyCacheJson(String cacheKey, String dateKey) {
+    final raw = prefs.getString('daily_cache_$cacheKey');
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      if (decoded['_dateKey'] != dateKey) return null;
+      return decoded;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> saveDailyCacheJson(
+      String cacheKey, String dateKey, Map<String, dynamic> data) async {
+    final payload = <String, dynamic>{
+      ...data,
+      '_dateKey': dateKey,
+    };
+    await prefs.setString('daily_cache_$cacheKey', jsonEncode(payload));
+  }
+
   /// Clears all study and progress data associated with a user account.
   Future<void> clearAllUserData() async {
     final keys = [

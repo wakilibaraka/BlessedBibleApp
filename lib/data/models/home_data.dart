@@ -53,6 +53,24 @@ class VerseOfTheDay {
         _buildSnippet = commentarySnippet;
 
   late final String? commentarySnippet = _snippet ?? _buildSnippet?.call();
+
+  Map<String, dynamic> toJson() => {
+        'reference': reference,
+        'text': text,
+        if (commentarySnippet != null) 'commentarySnippet': commentarySnippet,
+        if (author != null) 'author': author,
+        if (sourceTitle != null) 'sourceTitle': sourceTitle,
+        'isDevotional': isDevotional,
+      };
+
+  factory VerseOfTheDay.fromJson(Map<String, dynamic> json) => VerseOfTheDay(
+        json['reference'] as String? ?? 'Revelation 14:12',
+        json['text'] as String? ?? '',
+        commentarySnippet: json['commentarySnippet'] as String?,
+        author: json['author'] as String?,
+        sourceTitle: json['sourceTitle'] as String?,
+        isDevotional: json['isDevotional'] as bool? ?? false,
+      );
 }
 
 class StudyProgress {

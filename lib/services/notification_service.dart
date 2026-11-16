@@ -82,6 +82,7 @@ class NotificationService {
 
   Future<void> scheduleDailyReminder(int hour, int minute,
       {bool askPermission = true}) async {
+    await initialize();
     if (askPermission) await requestPermissions();
     final l10n = await _strings();
 
@@ -114,6 +115,7 @@ class NotificationService {
 
   Future<void> schedulePrayerReminder(int hour, int minute,
       {bool askPermission = true}) async {
+    await initialize();
     if (askPermission) await requestPermissions();
     final l10n = await _strings();
 
@@ -146,6 +148,7 @@ class NotificationService {
 
   Future<void> scheduleWeeklyReminder(int weekday, int hour, int minute,
       {bool askPermission = true}) async {
+    await initialize();
     if (askPermission) await requestPermissions();
     final l10n = await _strings();
 
@@ -184,6 +187,7 @@ class NotificationService {
 
   Future<void> scheduleSabbathReminder(double lat, double lng,
       {bool askPermission = true}) async {
+    await initialize();
     if (askPermission) await requestPermissions();
     final l10n = await _strings();
 
@@ -278,6 +282,7 @@ class NotificationService {
     }
 
     if (!enabled) return;
+    await initialize();
     if (askPermission) await requestPermissions();
     final l10n = await _strings();
     final details = NotificationDetails(

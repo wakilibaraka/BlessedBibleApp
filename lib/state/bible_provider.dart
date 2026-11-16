@@ -41,14 +41,17 @@ class BibleNotifier extends Notifier<BibleState> {
       // network). The query below also drives DB install/verify/repair, so
       // the splash screen stays active until content is fully ready.
       //
-      // Read one book at a time. A single 31k-row query was decoded from
-      // the platform channel on the UI isolate and then copied again into
-      // a parsing isolate, which froze the splash for a few seconds. Each
-      // book is a small reply that parses within a frame, and awaiting
-      // between books lets the spinner keep turning.
+      // Read in 6 multi-book batches (11 books per batch) instead of 66
+      // individual round-trips across the platform channel, cutting IPC
+      // overhead by 11x while keeping each batch small enough for smooth
+      // frame budgets.
       final booksList = <BibleBook>[];
-      for (var book = 1; book <= kBibleBookNames.length; book++) {
-        final rows = await bibleDbService.getBookVerses('kjv', book);
+      const batchSize = 11;
+      for (var start = 1; start <= kBibleBookNames.length; start += batchSize) {
+        final end = (start + batchSize - 1 > kBibleBookNames.length)
+            ? kBibleBookNames.length
+            : start + batchSize - 1;
+        final rows = await bibleDbService.getBooksVersesRange('kjv', start, end);
         booksList.addAll(parseBibleRows(rows));
       }
 

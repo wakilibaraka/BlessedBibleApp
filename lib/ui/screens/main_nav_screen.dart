@@ -55,10 +55,10 @@ class _StaggeredTabStack extends StatefulWidget {
 }
 
 class _StaggeredTabStackState extends State<_StaggeredTabStack> {
-  // Lets Home's own first frames (and its data) settle before the hidden
-  // tabs start building.
-  static const _firstDelay = Duration(milliseconds: 600);
-  static const _gap = Duration(milliseconds: 120);
+  // Lets Home's own first frames, entrance animations, and initial data
+  // settle completely before hidden offscreen tabs start warming up.
+  static const _firstDelay = Duration(milliseconds: 1500);
+  static const _gap = Duration(milliseconds: 250);
 
   late final Set<int> _built = {widget.index};
   Timer? _timer;

@@ -79,13 +79,7 @@ class RemindersNotifier extends Notifier<RemindersState> {
   RemindersState build() {
     final prefs = ref.watch(preferencesProvider);
 
-    // Initialize Notification Service on build (best effort: no platform
-    // plugin in tests, or notifications unavailable, must not throw).
-    ref.read(notificationServiceProvider).initialize().catchError((Object e) {
-      logDebug('notification init failed (non-fatal): $e');
-    });
-
-    return RemindersState(
+    final initial = RemindersState(
       sabbathEnabled: prefs.getSabbathReminderEnabled(),
       sabbathLat: prefs.getSabbathLocationLat(),
       sabbathLng: prefs.getSabbathLocationLng(),
@@ -102,6 +96,20 @@ class RemindersNotifier extends Notifier<RemindersState> {
       prayerHour: prefs.getPrayerReminderHour(),
       prayerMinute: prefs.getPrayerReminderMinute(),
     );
+
+    // Only initialize NotificationService (and parse the IANA timezone DB)
+    // during build when at least one reminder is already active. Otherwise,
+    // initialization happens lazily when a reminder is enabled.
+    if (initial.dailyEnabled ||
+        initial.prayerEnabled ||
+        initial.customWeeklyEnabled ||
+        initial.sabbathEnabled) {
+      ref.read(notificationServiceProvider).initialize().catchError((Object e) {
+        logDebug('notification init failed (non-fatal): $e');
+      });
+    }
+
+    return initial;
   }
 
   void toggleSabbath(bool value) {

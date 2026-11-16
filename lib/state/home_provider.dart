@@ -1,6 +1,7 @@
 import 'dart:async';
 import '../utils/prose.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../data/local_storage/preferences_service.dart';
 import '../services/content_sync_service.dart';
 import '../data/models/home_data.dart';
 import 'notes_provider.dart';
@@ -179,23 +180,42 @@ class HomeNotifier extends Notifier<HomeData> {
   }
 
   HomeData _fetchData(List<PersonalNote> notes) {
-    final pool = ref.watch(votdPoolProvider);
+    final prefs = ref.watch(preferencesProvider);
     final overridesAsync = ref.watch(votdOverrideProvider);
     final overrides = overridesAsync.value ?? {};
-    final bibleState = ref.watch(bibleProvider);
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
+    final todayString =
+        '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final overrideRef = overrides[todayString];
+    final cacheDateKey =
+        overrideRef != null ? '$todayString:$overrideRef' : todayString;
+
+    // Fast path: if today's Verse of the Day is already cached in
+    // SharedPreferences, return it immediately without loading the 18.3 MB
+    // commentary dataset on Frame 1.
+    final cachedJson = prefs.getDailyCacheJson('votd', cacheDateKey);
+    if (cachedJson != null &&
+        (cachedJson['text'] as String? ?? '').isNotEmpty) {
+      final recentNotes = notes.reversed.take(3).toList();
+      return HomeData(
+        verseOfTheDay: VerseOfTheDay.fromJson(cachedJson),
+        activeStudy: null,
+        quickLinks: const ["John 3:16", "Psalm 23:1", "Hebrews 11:1"],
+        recentNotes: recentNotes,
+        mostReadVerses: const [],
+      );
+    }
+
+    final pool = ref.watch(votdPoolProvider);
+    final bibleState = ref.watch(bibleProvider);
+
     final dayIndex =
         today.difference(DateTime(2026, 1, 1)).inDays % pool.length;
     VerseOfTheDay votd = pool[dayIndex];
 
-    final todayString =
-        '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
-
-    if (overrides.containsKey(todayString)) {
-      final overrideRef = overrides[todayString]!;
-
+    if (overrideRef != null) {
       final pooledOverride = pool.firstWhereOrNull(
           (v) => v.reference.toLowerCase() == overrideRef.toLowerCase());
       if (pooledOverride != null) {
@@ -229,6 +249,13 @@ class HomeNotifier extends Notifier<HomeData> {
           }
         }
       }
+    }
+
+    // Persist today's resolved VOTD once the full pool has loaded so all
+    // subsequent launches today render instantaneously without loading
+    // commentaryProvider.
+    if (pool.length > 1 && votd.text.isNotEmpty) {
+      unawaited(prefs.saveDailyCacheJson('votd', cacheDateKey, votd.toJson()));
     }
 
     // Show the 3 most recent notes

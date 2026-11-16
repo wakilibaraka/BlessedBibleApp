@@ -11,7 +11,6 @@ import '../utils/log.dart';
 /// `Firebase.initializeApp`.
 Future<void> initCrashReporting({required bool enabled}) async {
   final crashlytics = FirebaseCrashlytics.instance;
-  await crashlytics.setCrashlyticsCollectionEnabled(enabled && !kDebugMode);
 
   FlutterError.onError = (FlutterErrorDetails details) {
     if (kDebugMode) {
@@ -28,6 +27,8 @@ Future<void> initCrashReporting({required bool enabled}) async {
     }
     return true; // Handled; keep the app running.
   };
+
+  await crashlytics.setCrashlyticsCollectionEnabled(enabled && !kDebugMode);
 }
 
 /// Records a handled problem (no personal data) as a non-fatal Crashlytics

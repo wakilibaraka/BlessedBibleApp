@@ -278,7 +278,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         ? votdRef.substring(votdLastSpace + 1).split(':').first
         : '1';
     final votdChapter = int.tryParse(votdChapterStr) ?? 1;
-    final hasVotdCommentary =
+    final hasVotdCommentary = (excerpt != null && excerpt.isNotEmpty) ||
         ref.watch(commentaryForChapterProvider((votdBook, votdChapter)));
 
     return Padding(

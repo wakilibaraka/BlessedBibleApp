@@ -6,7 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local_storage/preferences_service.dart';
 import '../../l10n/l10n.dart';
+import '../../services/bible_database_service.dart';
+import '../../services/translation_pack_store.dart';
 import '../../state/auth_provider.dart';
+import '../../state/bible_provider.dart';
 import '../../state/profile_provider.dart';
 import '../../state/locale_provider.dart';
 import '../../state/read_settings_provider.dart';
@@ -60,6 +63,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   late ReadingLayout _readingLayout;
   late String _secondaryTranslation;
   bool _finishing = false;
+  Timer? _prewarmTimer;
 
   @override
   void initState() {
@@ -75,10 +79,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     _primaryTranslation = _language.bibleId;
     _readingLayout = ref.read(readSettingsProvider).readingLayout;
     _secondaryTranslation = _language.code == 'en' ? 'bbe' : 'kjv';
+
+    // Pre-warm the core Bible database and KJV backbone in the background
+    // after the initial onboarding screen settles, so tapping "Skip" or
+    // "Begin reading" lands directly on HomeScreen without a splash pause.
+    _prewarmTimer = Timer(const Duration(milliseconds: 600), () {
+      if (!mounted) return;
+      ref.read(bibleProvider);
+      if (!TranslationPackStore.isCoreId(_primaryTranslation)) {
+        unawaited(bibleDbService
+            .ensureTranslationReady(_primaryTranslation)
+            .catchError((_) {}));
+      }
+    });
   }
 
   @override
   void dispose() {
+    _prewarmTimer?.cancel();
     _pages.dispose();
     super.dispose();
   }
@@ -90,6 +108,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       _primaryTranslation = language.bibleId;
       _secondaryTranslation = language.code == 'en' ? 'bbe' : 'kjv';
     });
+    if (!TranslationPackStore.isCoreId(language.bibleId)) {
+      unawaited(bibleDbService
+          .ensureTranslationReady(language.bibleId)
+          .catchError((_) {}));
+    }
     // Switch the interface straight away so the rest of the flow is
     // readable in the chosen language.
     await ref.read(appLocaleProvider.notifier).setLanguage(language.code);
@@ -99,11 +122,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final translations = ref.read(activeTranslationProvider.notifier);
     final secondary = ref.read(secondaryTranslationProvider.notifier);
     final readSettings = ref.read(readSettingsProvider.notifier);
+    if (!TranslationPackStore.isCoreId(_primaryTranslation)) {
+      unawaited(bibleDbService
+          .ensureTranslationReady(_primaryTranslation)
+          .catchError((_) {}));
+    }
     await translations.setTranslation(_primaryTranslation);
     await readSettings.setReadingLayout(_readingLayout);
     if (_readingLayout == ReadingLayout.single) {
       await secondary.setTranslation(null);
     } else {
+      if (!TranslationPackStore.isCoreId(_secondaryTranslation)) {
+        unawaited(bibleDbService
+            .ensureTranslationReady(_secondaryTranslation)
+            .catchError((_) {}));
+      }
       await secondary.setTranslation(_secondaryTranslation);
     }
   }
@@ -503,9 +536,8 @@ class _BiblePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final available = ref.watch(availableTranslationsProvider).value ?? [];
 
-    final knownMeta = <String, ({String name, String sub})>{
+    const knownMeta = <String, ({String name, String sub})>{
       'kjv': (
         name: 'King James Version',
         sub: 'Traditional • KJV',
@@ -534,21 +566,21 @@ class _BiblePage extends ConsumerWidget {
         name: 'Tagalog Unlocked Literal Bible',
         sub: 'Tagalog • ULB',
       ),
+      'spa_r09': (
+        name: 'Reina-Valera 1909',
+        sub: 'Español • RV1909',
+      ),
+      'por_blj': (
+        name: 'Bíblia Livre',
+        sub: 'Português • BLIVRE',
+      ),
     };
 
     String nameOf(String id) {
-      for (final t in available) {
-        if (t.translationId == id) return t.translationName;
-      }
       return knownMeta[id]?.name ?? id.toUpperCase();
     }
 
     String subOf(String id) {
-      for (final t in available) {
-        if (t.translationId == id) {
-          return '${t.abbreviation} • ${t.languageName}';
-        }
-      }
       return knownMeta[id]?.sub ?? id.toUpperCase();
     }
 
@@ -557,9 +589,9 @@ class _BiblePage extends ConsumerWidget {
       primaryIds.add(language.bibleId);
     }
     primaryIds.addAll(['kjv', 'bbe']);
-    for (final t in available) {
-      if (!primaryIds.contains(t.translationId)) {
-        primaryIds.add(t.translationId);
+    for (final id in knownMeta.keys) {
+      if (!primaryIds.contains(id)) {
+        primaryIds.add(id);
       }
     }
 

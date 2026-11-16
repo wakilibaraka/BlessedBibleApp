@@ -28,6 +28,7 @@ import 'main_nav_screen.dart' show kBottomDockHeight, kBottomDockInset;
 import '../../data/models/bible_model.dart';
 import '../../state/bible_provider.dart';
 import '../../state/dictionary_provider.dart';
+import '../../state/nav_provider.dart';
 
 import '../../state/read_settings_provider.dart';
 import '../../state/surface_style_provider.dart';
@@ -299,10 +300,27 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
   int? _navigatedVerseIndex;
   Timer? _scrollDebounceTimer;
+  VoidCallback? _pendingScrollSave;
   Timer? _visitTimer;
   Timer? _scrollEndTimer;
 
   Timer? _pageDebounceTimer;
+  VoidCallback? _pendingPageSave;
+
+  void _flushPendingReadState() {
+    if (_pageDebounceTimer?.isActive ?? false) {
+      _pageDebounceTimer?.cancel();
+      final fn = _pendingPageSave;
+      _pendingPageSave = null;
+      fn?.call();
+    }
+    if (_scrollDebounceTimer?.isActive ?? false) {
+      _scrollDebounceTimer?.cancel();
+      final fn = _pendingScrollSave;
+      _pendingScrollSave = null;
+      fn?.call();
+    }
+  }
 
   final ValueNotifier<bool> _isScrolling = ValueNotifier(false);
 
@@ -418,7 +436,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        ref.read(streakProvider.notifier).markReadToday();
+        if (ref.read(navProvider) == 1) {
+          ref.read(streakProvider.notifier).markReadToday();
+        }
 
         // The reader is built after Home, so a verse opened from Home in
         // the meantime is already waiting for it.
@@ -428,7 +448,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         // Cancellable (not Future.delayed) so tests disposing the tree
         // don't trip on a pending timer — and so it never fires post-dispose.
         _hintTimer = Timer(const Duration(seconds: 2), () {
-          if (!mounted) return;
+          if (!mounted || ref.read(navProvider) != 1) return;
           final prefs = ref.read(preferencesProvider);
           if (!prefs.showReadingTips) return;
 
@@ -499,9 +519,12 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Release wakelock when app goes to background, re-enable on resume
+    // Release wakelock and flush any debounced scroll/page position when the
+    // app goes to background or closes; re-enable wakelock on resume.
     if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.inactive) {
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden) {
+      _flushPendingReadState();
       WakelockPlus.disable();
     } else if (state == AppLifecycleState.resumed) {
       final readSettings = ref.read(readSettingsProvider);
@@ -511,6 +534,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
 
   @override
   void dispose() {
+    _flushPendingReadState();
     _hintTimer?.cancel();
     _scrollDebounceTimer?.cancel();
     _visitTimer?.cancel();
@@ -907,20 +931,33 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
     final theme = Theme.of(context);
     final appThemeMode = ref.watch(resolvedThemeProvider);
     final typography = ref.watch(typographyProvider);
-    ref.watch(pericopesProvider); // Trigger rebuild on load
+    final isReadTabActive = ref.watch(navProvider.select((i) => i == 1));
+    ref.listen<int>(navProvider, (prev, next) {
+      if (next == 1 && prev != 1) {
+        ref.read(streakProvider.notifier).markReadToday();
+      }
+    });
+
+    if (isReadTabActive) {
+      ref.watch(pericopesProvider); // Trigger rebuild on load
+      ref.watch(commentaryProvider); // trigger rebuild on state changes
+    }
     final pericopesNotifier = ref.read(pericopesProvider.notifier);
     final readSettings = ref.watch(readSettingsProvider);
     final selectedVerses = ref.watch(readSelectionProvider);
 
-    ref.watch(commentaryProvider); // trigger rebuild on state changes
-    final commentaryNotifier = ref.read(commentaryProvider.notifier);
-    final Set<String> versesWithCommentary =
-        commentaryNotifier.versesWithCommentarySet;
-    final Set<String> versesWithDevotionals =
-        commentaryNotifier.versesWithDevotionalsSet;
-    final Set<String> versesWithNotes = commentaryNotifier.versesWithNotesSet;
-    final Set<String> chaptersWithCommentary =
-        commentaryNotifier.chaptersWithCommentarySet;
+    final Set<String> versesWithCommentary = isReadTabActive
+        ? ref.read(commentaryProvider.notifier).versesWithCommentarySet
+        : const <String>{};
+    final Set<String> versesWithDevotionals = isReadTabActive
+        ? ref.read(commentaryProvider.notifier).versesWithDevotionalsSet
+        : const <String>{};
+    final Set<String> versesWithNotes = isReadTabActive
+        ? ref.read(commentaryProvider.notifier).versesWithNotesSet
+        : const <String>{};
+    final Set<String> chaptersWithCommentary = isReadTabActive
+        ? ref.read(commentaryProvider.notifier).chaptersWithCommentarySet
+        : const <String>{};
 
     final bibleState = ref.watch(bibleProvider);
     final isLoading = bibleState.isLoading;
@@ -1019,8 +1056,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                   });
 
                                   _pageDebounceTimer?.cancel();
-                                  _pageDebounceTimer = Timer(
-                                      const Duration(milliseconds: 120), () {
+                                  _pendingPageSave = () {
                                     if (!mounted) return;
                                     final fc = flatChapters[pageIndex];
                                     final currentLoc =
@@ -1040,6 +1076,12 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                             chapter: fc.chapter.number,
                                           );
                                     }
+                                  };
+                                  _pageDebounceTimer = Timer(
+                                      const Duration(milliseconds: 120), () {
+                                    final fn = _pendingPageSave;
+                                    _pendingPageSave = null;
+                                    fn?.call();
                                   });
                                   _clearSelection();
                                 },
@@ -1084,29 +1126,34 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                             currentVerses.length) {
                                           _scrollDebounceTimer?.cancel();
                                           _visitTimer?.cancel();
-                                          _scrollDebounceTimer = Timer(
-                                              const Duration(milliseconds: 500),
-                                              () {
+                                          final visibleIdx = firstVisible.index;
+                                          final currentBookName = fc.book.name;
+                                          final currentChapter =
+                                              fc.chapter.number;
+                                          final currentAbbrev =
+                                              fc.book.abbreviation;
+                                          _pendingScrollSave = () {
                                             if (!mounted) return;
-                                            final currentBookName =
-                                                fc.book.name;
-                                            final currentChapter =
-                                                fc.chapter.number;
-                                            final currentAbbrev =
-                                                fc.book.abbreviation;
                                             final prefs =
                                                 ref.read(preferencesProvider);
                                             prefs.saveLastReadLocation(
                                               bookAbbrev: currentAbbrev,
                                               bookName: currentBookName,
                                               chapter: currentChapter,
-                                              verseIndex: firstVisible.index,
+                                              verseIndex: visibleIdx,
                                             );
                                             prefs.saveChapterScrollPosition(
                                               currentAbbrev,
                                               currentChapter,
-                                              firstVisible.index,
+                                              visibleIdx,
                                             );
+                                          };
+                                          _scrollDebounceTimer = Timer(
+                                              const Duration(milliseconds: 500),
+                                              () {
+                                            final fn = _pendingScrollSave;
+                                            _pendingScrollSave = null;
+                                            fn?.call();
                                           });
                                           _visitTimer = Timer(
                                               const Duration(seconds: 4), () {
@@ -1369,22 +1416,26 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                       .languageCode ==
                                                                   'en';
                                                           final chapterDictMap =
-                                                              ref.watch(
-                                                                  chapterUnderlineMapProvider(
-                                                                      ChapterUnderlineArgs(
-                                                            bookNumber: allBooks
-                                                                    .indexOf(fc
-                                                                        .book) +
-                                                                1,
-                                                            chapterNumber: fc
-                                                                .chapter.number,
-                                                            verses: verses,
-                                                            isEnglish:
-                                                                isEnglish,
-                                                            translationId:
-                                                                transInfo
-                                                                    .translationId,
-                                                          )));
+                                                              isReadTabActive
+                                                                  ? ref.watch(
+                                                                      chapterUnderlineMapProvider(
+                                                                          ChapterUnderlineArgs(
+                                                                      bookNumber: allBooks.indexOf(fc.book) +
+                                                                          1,
+                                                                      chapterNumber: fc
+                                                                          .chapter
+                                                                          .number,
+                                                                      verses:
+                                                                          verses,
+                                                                      isEnglish:
+                                                                          isEnglish,
+                                                                      translationId:
+                                                                          transInfo
+                                                                              .translationId,
+                                                                    )))
+                                                                  : const <int,
+                                                                      Set<
+                                                                          int>>{};
                                                           if (index ==
                                                               verses.length) {
                                                             final bool

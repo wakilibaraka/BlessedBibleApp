@@ -82,8 +82,17 @@ class AppLocaleNotifier extends Notifier<Locale?> {
 
   Future<void> _rescheduleNotifications() async {
     try {
-      await ref.read(remindersProvider.notifier).rescheduleAll();
-      await resyncPlanReminders(ref);
+      final prefs = ref.read(preferencesProvider);
+      final hasAnyReminder = prefs.getDailyReminderEnabled() ||
+          prefs.getPrayerReminderEnabled() ||
+          prefs.getCustomWeeklyEnabled() ||
+          prefs.getSabbathReminderEnabled();
+      if (hasAnyReminder) {
+        await ref.read(remindersProvider.notifier).rescheduleAll();
+      }
+      if (prefs.getActivePlanIds().isNotEmpty) {
+        await resyncPlanReminders(ref);
+      }
     } catch (e) {
       logDebug('notification reschedule after language change failed: $e');
     }

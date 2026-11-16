@@ -32,8 +32,12 @@ import 'state/locale_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  final prefs = PreferencesService(await SharedPreferences.getInstance());
+  late final SharedPreferences rawPrefs;
+  await Future.wait([
+    Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
+    SharedPreferences.getInstance().then((p) => rawPrefs = p),
+  ]);
+  final prefs = PreferencesService(rawPrefs);
   registerFontLicenses();
 
   // Branded fallback instead of the red error screen in release builds.
@@ -45,15 +49,6 @@ void main() async {
   };
 
   final authGateway = FirebaseAuthGateway();
-  // Independent of each other, so they run side by side. None of them may
-  // stop the app from starting: a throw here (e.g. Google Play services
-  // missing or out of date) used to leave the native splash up forever.
-  await Future.wait([
-    _guardStartup('Crash reporting setup',
-        () => initCrashReporting(enabled: prefs.crashReportsEnabled)),
-    activateAppCheck(),
-    _guardStartup('Google sign-in setup', authGateway.initialize),
-  ]);
 
   runApp(
     ProviderScope(
@@ -64,6 +59,17 @@ void main() async {
       child: const TheBlessedBibleApp(),
     ),
   );
+
+  // Defer Play Integrity / DeviceCheck and Google Sign-In IPC until after
+  // Flutter schedules its first frame so the native splash dismisses faster.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    Future.wait([
+      _guardStartup('Crash reporting setup',
+          () => initCrashReporting(enabled: prefs.crashReportsEnabled)),
+      activateAppCheck(),
+      _guardStartup('Google sign-in setup', authGateway.initialize),
+    ]);
+  });
 }
 
 Future<void> _guardStartup(String what, Future<void> Function() step) async {
@@ -186,7 +192,7 @@ class _TheBlessedBibleAppState extends ConsumerState<TheBlessedBibleApp> {
       // offline Bible is ready, then home. Screens flip these states
       // instead of replacing the root route, so there is always a page.
       home: AnimatedSwitcher(
-        duration: Motion.of(context, Motion.slow),
+        duration: Motion.of(context, Motion.fast),
         child: !hasCompletedOnboarding
             ? const OnboardingScreen(key: ValueKey('onboarding'))
             : (isBibleLoading

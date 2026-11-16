@@ -71,9 +71,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       _animationController
         ..duration = Motion.of(context, const Duration(milliseconds: 500))
         ..forward();
-      _focusTimer = Timer(const Duration(milliseconds: 150), () {
-        if (mounted) _focusNode.requestFocus();
-      });
+      // Only request keyboard focus if the Search tab is actually visible
+      // (prevents background warm-up in _StaggeredTabStack from stealing focus).
+      if (ref.read(navProvider) == 2) {
+        _focusTimer = Timer(const Duration(milliseconds: 150), () {
+          if (mounted && ref.read(navProvider) == 2) {
+            _focusNode.requestFocus();
+          }
+        });
+      }
     });
   }
 

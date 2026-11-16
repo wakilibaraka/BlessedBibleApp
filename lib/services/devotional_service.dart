@@ -158,6 +158,44 @@ class DevotionalService {
     }
     return sum;
   }
+
+  /// Loads a single story by its ID (e.g. `GEN-001`) by loading only its
+  /// owning book JSON file instead of all 66 book files.
+  Future<DevotionalStory?> loadStoryById(String id) async {
+    final dash = id.indexOf('-');
+    if (dash > 0) {
+      final prefix = id.substring(0, dash);
+      try {
+        final stories = await loadBook(prefix);
+        for (final s in stories) {
+          if (s.id == id) return s;
+        }
+      } catch (_) {}
+    }
+    final all = await loadAllStoryRefs();
+    for (final s in all) {
+      if (s.id == id) return s;
+    }
+    return null;
+  }
+
+  /// Resolves the story at [globalIndex] (0..totalCount-1) using `index.json`
+  /// book counts so only the single target book's JSON file is loaded.
+  Future<DevotionalStory?> loadStoryAtGlobalIndex(int globalIndex) async {
+    final books = await loadIndex();
+    var remaining = globalIndex;
+    for (final b in books) {
+      if (remaining < b.count) {
+        final stories = await loadBook(b.prefix);
+        if (remaining >= 0 && remaining < stories.length) {
+          return stories[remaining];
+        }
+        break;
+      }
+      remaining -= b.count;
+    }
+    return null;
+  }
 }
 
 /// A bundled artwork plate plus its caption and owning book prefix.

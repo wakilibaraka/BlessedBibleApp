@@ -94,6 +94,82 @@ class TranslationPackStore {
     'spa_r09',
   ];
 
+  /// Static catalog metadata for bundled packs so translation lists can be
+  /// populated immediately without extracting all 35.4 MB of pack files
+  /// on first launch.
+  static const Map<String, PackMeta> bundledPackMeta = {
+    'fra_lsg': PackMeta(
+      id: 'fra_lsg',
+      languageCode: 'fr',
+      languageName: 'French',
+      translationName: 'Louis Segond 1910',
+      abbreviation: 'LSG',
+      license: 'Public Domain',
+      isComplete: true,
+      source: 'bundled',
+    ),
+    'ita_dio': PackMeta(
+      id: 'ita_dio',
+      languageCode: 'it',
+      languageName: 'Italian',
+      translationName: 'Diodati 1885',
+      abbreviation: 'DIO',
+      license: 'Public Domain',
+      isComplete: true,
+      source: 'bundled',
+    ),
+    'por_blj': PackMeta(
+      id: 'por_blj',
+      languageCode: 'pt',
+      languageName: 'Portuguese',
+      translationName: 'Bíblia Livre',
+      abbreviation: 'BLIVRE',
+      license: 'CC BY 4.0',
+      isComplete: true,
+      source: 'bundled',
+    ),
+    'ron_btf': PackMeta(
+      id: 'ron_btf',
+      languageCode: 'ro',
+      languageName: 'Romanian',
+      translationName: 'Romanian BTF Bible',
+      abbreviation: 'BTF',
+      license: 'Public Domain',
+      isComplete: true,
+      source: 'bundled',
+    ),
+    'spa_r09': PackMeta(
+      id: 'spa_r09',
+      languageCode: 'es',
+      languageName: 'Spanish',
+      translationName: 'Reina Valera 1909',
+      abbreviation: 'RV1909',
+      license: 'Public Domain',
+      isComplete: true,
+      source: 'bundled',
+    ),
+    'swh_ulb': PackMeta(
+      id: 'swh_ulb',
+      languageCode: 'sw',
+      languageName: 'Swahili',
+      translationName: 'Swahili Unlocked Literal Bible',
+      abbreviation: 'ULB',
+      license: 'CC BY-SA 4.0',
+      isComplete: true,
+      source: 'bundled',
+    ),
+    'tgl_ulb': PackMeta(
+      id: 'tgl_ulb',
+      languageCode: 'tl',
+      languageName: 'Tagalog',
+      translationName: 'Tagalog Unlocked Literal Bible',
+      abbreviation: 'ULB',
+      license: 'CC BY-SA 4.0',
+      isComplete: true,
+      source: 'bundled',
+    ),
+  };
+
   /// Packs withdrawn from the app (e.g. found to be under copyright).
   /// Removed from devices that installed them on the next start.
   static const List<String> retiredPackIds = [];
@@ -189,20 +265,48 @@ class TranslationPackStore {
     await prefs.setStringList(_deletedPacksKey, list.toList());
   }
 
-  /// Installed packs = catalog entries whose file actually exists.
+  /// Installed packs = non-deleted bundled packs (available offline on demand)
+  /// plus downloaded catalog entries whose file actually exists on disk.
   Future<List<PackMeta>> installedPacks() async {
     final catalog = await readCatalog();
+    final deleted = await deletedPackIds();
     final out = <PackMeta>[];
+    final seen = <String>{};
+
+    for (final id in bundledPackIds) {
+      if (deleted.contains(id)) continue;
+      final meta = catalog[id] ?? bundledPackMeta[id];
+      if (meta != null) {
+        out.add(meta);
+        seen.add(id);
+      }
+    }
+
     for (final entry in catalog.entries) {
+      if (seen.contains(entry.key)) continue;
       final file = await _packFile(entry.key);
       if (await file.exists()) out.add(entry.value);
     }
     return out;
   }
 
-  /// Opens a pack database read-only (cached). Throws [StateError] with a
-  /// human-readable message when the pack is not installed — callers render
-  /// restore/download UI instead of blank content.
+  /// Ensures a single bundled pack is materialized to disk on demand.
+  Future<void> ensurePackInstalled(String id) async {
+    if (isCoreId(id)) return;
+    final file = await _packFile(id);
+    if (await file.exists()) return;
+    if (!bundledPackIds.contains(id)) return;
+    await _copyAssetPack(id, file);
+    final catalog = await readCatalog();
+    catalog[id] =
+        bundledPackMeta[id] ?? await _metaFromPackFile(id, file, source: 'bundled');
+    await _writeCatalog(catalog);
+  }
+
+  /// Opens a pack database read-only (cached). Bundled packs that have not
+  /// been deleted by the user are copied from `assets/packs/` on demand.
+  /// Throws [StateError] with a human-readable message when the pack is not
+  /// installed — callers render restore/download UI instead of blank content.
   Future<Database> openPack(String id) async {
     if (isCoreId(id)) {
       throw StateError("'$id' lives in the core database, not a pack.");
@@ -210,6 +314,12 @@ class TranslationPackStore {
     final cached = _open[id];
     if (cached != null && cached.isOpen) return cached;
     final file = await _packFile(id);
+    if (!await file.exists()) {
+      final deleted = await deletedPackIds();
+      if (bundledPackIds.contains(id) && !deleted.contains(id)) {
+        await ensurePackInstalled(id);
+      }
+    }
     if (!await file.exists()) {
       throw StateError(
           "Translation '$id' is not installed. Restore or download it to read.");
@@ -219,8 +329,9 @@ class TranslationPackStore {
     return db;
   }
 
-  /// Copies every bundled pack that should be present (missing file, or
-  /// present file with no catalog entry). Skips user-deleted packs.
+  /// Registers bundled pack metadata in `catalog.json` without eagerly
+  /// copying all 35.4 MB of `.db` files on first boot. Individual bundled
+  /// pack files are copied lazily on demand by [openPack] / [ensurePackInstalled].
   Future<void> ensureBundledPacks({
     void Function(double progress)? onProgress,
     Set<String>? skipIds,
@@ -238,16 +349,19 @@ class TranslationPackStore {
         onProgress?.call(done / bundledPackIds.length);
         continue;
       }
-      final file = await _packFile(id);
-      if (!await file.exists()) {
-        await _copyAssetPack(id, file);
-        catalog[id] = await _metaFromPackFile(id, file, source: 'bundled');
-        changed = true;
-      } else if (!catalog.containsKey(id)) {
-        try {
+      if (!catalog.containsKey(id)) {
+        final staticMeta = bundledPackMeta[id];
+        if (staticMeta != null) {
+          catalog[id] = staticMeta;
+          changed = true;
+        } else {
+          final file = await _packFile(id);
+          if (!await file.exists()) {
+            await _copyAssetPack(id, file);
+          }
           catalog[id] = await _metaFromPackFile(id, file, source: 'bundled');
           changed = true;
-        } catch (_) {}
+        }
       }
       onProgress?.call(done / bundledPackIds.length);
     }
@@ -260,25 +374,35 @@ class TranslationPackStore {
         data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     final tmp = File('${dest.path}.tmp');
     await tmp.writeAsBytes(bytes, flush: true);
-    await _verifyPackFile(id, tmp.path);
+    await _verifyPackFile(id, tmp.path, fast: true);
     await tmp.rename(dest.path);
   }
 
-  Future<void> _verifyPackFile(String id, String path) async {
+  Future<void> _verifyPackFile(String id, String path,
+      {bool fast = false}) async {
     final db = await openDatabase(path, readOnly: true);
     try {
-      final qc = await db.rawQuery('PRAGMA quick_check');
-      if ('${qc.first.values.first}' != 'ok') {
-        throw StateError('pack $id failed integrity check');
+      if (!fast) {
+        final qc = await db.rawQuery('PRAGMA quick_check');
+        if ('${qc.first.values.first}' != 'ok') {
+          throw StateError('pack $id failed integrity check');
+        }
       }
       final rows = await db.query('translations', limit: 1);
       if (rows.isEmpty || (rows.first['translation_id'] as String?) != id) {
         throw StateError('pack $id has no matching translations row');
       }
-      final n = Sqflite.firstIntValue(
-              await db.rawQuery('SELECT COUNT(*) AS c FROM verses')) ??
-          0;
-      if (n < 30000) throw StateError('pack $id has too few verses: $n');
+      if (fast) {
+        final probe = await db.rawQuery('SELECT 1 FROM verses LIMIT 1');
+        if (probe.isEmpty) {
+          throw StateError('pack $id has no verses');
+        }
+      } else {
+        final n = Sqflite.firstIntValue(
+                await db.rawQuery('SELECT COUNT(*) AS c FROM verses')) ??
+            0;
+        if (n < 30000) throw StateError('pack $id has too few verses: $n');
+      }
     } finally {
       await db.close();
     }
