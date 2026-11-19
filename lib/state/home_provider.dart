@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../data/let_read.dart';
 import '../utils/prose.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local_storage/preferences_service.dart';
@@ -211,9 +212,7 @@ class HomeNotifier extends Notifier<HomeData> {
     final pool = ref.watch(votdPoolProvider);
     final bibleState = ref.watch(bibleProvider);
 
-    final dayIndex =
-        today.difference(DateTime(2026, 1, 1)).inDays % pool.length;
-    VerseOfTheDay votd = pool[dayIndex];
+    VerseOfTheDay votd = pool[votdIndexFor(pool.length, today)];
 
     if (overrideRef != null) {
       final pooledOverride = pool.firstWhereOrNull(

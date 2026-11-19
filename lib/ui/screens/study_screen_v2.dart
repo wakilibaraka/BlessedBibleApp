@@ -13,6 +13,7 @@ import '../../state/study_layout_provider.dart';
 import 'today_screen.dart';
 import 'votd_archive_screen.dart';
 import '../../data/study_greetings.dart';
+import '../../data/let_read.dart';
 import '../../state/user_data_provider.dart'
     show bookmarksProvider, highlightsProvider;
 import '../../data/local_storage/preferences_service.dart';
@@ -1106,11 +1107,8 @@ class _VotdCard extends ConsumerWidget {
     final pool = ref.watch(votdPoolProvider);
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final epoch = DateTime(2026, 1, 1);
-    final dayIndex =
-        pool.isEmpty ? 0 : today.difference(epoch).inDays % pool.length;
-    final validIndex = dayIndex < 0 ? dayIndex + pool.length : dayIndex;
-    final votdEntry = pool.isEmpty ? null : pool[validIndex];
+    final votdEntry =
+        pool.isEmpty ? null : pool[votdIndexFor(pool.length, today)];
     const iconBox = 34.0;
 
     void openArchive() => onOpen(const VotdArchiveScreen());
