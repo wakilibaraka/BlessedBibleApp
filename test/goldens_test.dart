@@ -1,10 +1,22 @@
 // Phase 6 chunk 8: golden snapshots of key screens, so visual changes show
-// up in review instead of on a device. Regenerate after an intended change:
+// up in review instead of on a device.
+//
+// The test font (blocks, not glyphs) makes layout identical everywhere, but
+// antialiasing is still rasterized by the host engine: on the same commit and
+// the same Flutter version, this Mac and Linux CI differ on 0.04-1.35% of
+// pixels, all of them edge pixels, with no layout, colour or content change
+// and fully deterministically (identical bytes on repeated runs). So each
+// host compares against the set generated on it: goldens/linux for CI and
+// goldens/macos for developer machines. Both sets are compared exactly, pixel
+// for pixel, with no tolerance; nothing is skipped.
+//
+// Regenerate the set for the host you are on after an intended visual change:
 //
 //   flutter test --update-goldens test/goldens_test.dart
 //
-// Tests render text with Flutter's test font (blocks, not glyphs), which is
-// the same on every machine, so the images compare cleanly in CI.
+// Commit both sets and say in the PR which one changed and why.
+
+import 'dart:io';
 
 import 'package:blessed_account/testing.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +47,10 @@ final _screens = <String, Widget Function()>{
 };
 
 void _noop() {}
+
+/// Baselines are per-host because of the antialiasing difference described at
+/// the top of this file.
+String _golden(String name) => 'goldens/${Platform.operatingSystem}/$name.png';
 
 final _themes = <String, ThemeData Function()>{
   'light': () => AppTheme.lightTheme(1.0),
@@ -77,7 +93,7 @@ void main() {
       testWidgets('${s.key} ${t.key}', (tester) async {
         await _pump(tester, s.value(), t.value());
         await expectLater(find.byType(MaterialApp),
-            matchesGoldenFile('goldens/${s.key}_${t.key}.png'));
+            matchesGoldenFile(_golden('${s.key}_${t.key}')));
       });
     }
   }
@@ -89,7 +105,7 @@ void main() {
       await _pump(tester, const OnboardingScreen(), AppTheme.lightTheme(1.0),
           prefsValues: {OnboardingScreen.pageKey: page});
       await expectLater(find.byType(MaterialApp),
-          matchesGoldenFile('goldens/onboarding_step${page + 1}.png'));
+          matchesGoldenFile(_golden('onboarding_step${page + 1}')));
     });
   }
 
