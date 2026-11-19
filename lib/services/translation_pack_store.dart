@@ -298,8 +298,8 @@ class TranslationPackStore {
     if (!bundledPackIds.contains(id)) return;
     await _copyAssetPack(id, file);
     final catalog = await readCatalog();
-    catalog[id] =
-        bundledPackMeta[id] ?? await _metaFromPackFile(id, file, source: 'bundled');
+    catalog[id] = bundledPackMeta[id] ??
+        await _metaFromPackFile(id, file, source: 'bundled');
     await _writeCatalog(catalog);
   }
 

@@ -51,7 +51,8 @@ class BibleNotifier extends Notifier<BibleState> {
         final end = (start + batchSize - 1 > kBibleBookNames.length)
             ? kBibleBookNames.length
             : start + batchSize - 1;
-        final rows = await bibleDbService.getBooksVersesRange('kjv', start, end);
+        final rows =
+            await bibleDbService.getBooksVersesRange('kjv', start, end);
         booksList.addAll(parseBibleRows(rows));
       }
 
