@@ -143,7 +143,9 @@ class _CommentaryLibraryV2ScreenState
                     ..sort();
                   final visibleEntries = _selectedSource.isEmpty
                       ? entries
-                      : entries.where((e) => e.source == _selectedSource).toList();
+                      : entries
+                          .where((e) => e.source == _selectedSource)
+                          .toList();
                   // book -> chapter -> entry count
                   final Map<String, Map<int, int>> books = {};
                   final Map<String, String> authors = {};
@@ -185,7 +187,8 @@ class _CommentaryLibraryV2ScreenState
                               fillColor: theme.colorScheme.surface,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(Radii.lg),
-                                borderSide: BorderSide(color: theme.dividerColor),
+                                borderSide:
+                                    BorderSide(color: theme.dividerColor),
                               ),
                             ),
                             items: [
