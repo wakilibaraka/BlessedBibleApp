@@ -75,7 +75,8 @@ void main() {
 
     expect(find.byType(CommentaryVerseCard), findsOneWidget);
     expect(find.text('Daniel 11:27'), findsWidgets);
-    expect(find.textContaining('both these kings'), findsOneWidget);
+    expect(find.textContaining('both these kings', findRichText: true),
+        findsOneWidget);
     // Paragraphs are rendered by VerseLinkText (lazily built list).
     expect(find.byType(VerseLinkText), findsAtLeastNWidgets(2));
     // Refined eyebrow: source uppercased, author in the footer.

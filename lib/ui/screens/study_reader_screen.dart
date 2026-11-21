@@ -43,7 +43,7 @@ import '../../models/pericope_entry.dart';
 import '../../l10n/l10n.dart';
 import '../../theme/design_tokens.dart';
 
-enum StudyMode { plan, deepDive }
+enum StudyMode { plan, deepDive, passage }
 
 class StudySessionPayload {
   final StudyMode mode;
@@ -58,6 +58,10 @@ class StudySessionPayload {
   final int? deepDiveVerse;
   final String? deepDiveVerseText;
 
+  /// Verse to emphasise and scroll to on open (deep links from the commentary
+  /// card and the Verse of the Day). Null opens the chapter at its top.
+  final int? initialVerse;
+
   const StudySessionPayload.plan({
     required this.planId,
     required this.dayNum,
@@ -66,7 +70,8 @@ class StudySessionPayload {
         deepDiveBook = null,
         deepDiveChapter = null,
         deepDiveVerse = null,
-        deepDiveVerseText = null;
+        deepDiveVerseText = null,
+        initialVerse = null;
 
   const StudySessionPayload.deepDive({
     required this.deepDiveBook,
@@ -76,7 +81,24 @@ class StudySessionPayload {
   })  : mode = StudyMode.deepDive,
         planId = null,
         dayNum = null,
-        initialPassageIndex = null;
+        initialPassageIndex = null,
+        initialVerse = null;
+
+  /// A single chapter opened from elsewhere ("read in context"): the same
+  /// reading UI a plan day uses, with [verse] emphasised and scrolled to.
+  const StudySessionPayload.passage({
+    required String bookName,
+    required int chapter,
+    int? verse,
+  })  : mode = StudyMode.passage,
+        planId = null,
+        dayNum = null,
+        initialPassageIndex = null,
+        deepDiveBook = bookName,
+        deepDiveChapter = chapter,
+        deepDiveVerse = verse,
+        deepDiveVerseText = null,
+        initialVerse = verse;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -198,10 +220,15 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
   List<_PassageData> _passages = [];
   bool _loaded = false;
 
+  /// The verse a deep link asked for. Emphasised until the reader interacts.
+  int? _focusVerse;
+  final Map<int, GlobalKey> _verseKeys = {};
+
   @override
   void initState() {
     super.initState();
     _passageIndex = widget.payload.initialPassageIndex ?? 0;
+    _focusVerse = widget.payload.initialVerse;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _resolvePassages();
     });
@@ -213,7 +240,9 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
 
     final resolved = <_PassageData>[];
 
-    if (widget.payload.mode == StudyMode.deepDive) {
+    // Deep dives and "read in context" links both name a book and chapter;
+    // only plan days resolve their passages from a reading plan.
+    if (widget.payload.mode != StudyMode.plan) {
       final bName = widget.payload.deepDiveBook!;
       final cNum = widget.payload.deepDiveChapter!;
 
@@ -302,6 +331,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
             .clamp(0, (resolved.length - 1).clamp(0, resolved.length));
         _loaded = true;
       });
+      if (_focusVerse != null) _scrollToFocusVerse();
     }
   }
 
@@ -318,6 +348,30 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
     setState(() {
       _passageIndex = idx;
       _selectedVerses.clear();
+      _focusVerse = null;
+    });
+  }
+
+  /// Scrolls the deep-linked verse into view once its row exists. The list is
+  /// a plain ListView (see the notes at the top of this file), so this uses the
+  /// row's own context rather than an item-scroll controller — no retrying
+  /// against a controller that may not be attached.
+  void _scrollToFocusVerse([int attempt = 0]) {
+    final verse = _focusVerse;
+    if (verse == null || !mounted) return;
+    final rowContext = _verseKeys[verse]?.currentContext;
+    if (rowContext != null) {
+      Scrollable.ensureVisible(
+        rowContext,
+        alignment: 0.12,
+        duration: Motion.of(context, const Duration(milliseconds: 400)),
+        curve: Curves.easeOutCubic,
+      );
+      return;
+    }
+    if (attempt >= 12) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _scrollToFocusVerse(attempt + 1);
     });
   }
 
@@ -356,6 +410,7 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
 
   void _toggleVerseSelection(int verseNum) {
     setState(() {
+      _focusVerse = null;
       if (_selectedVerses.contains(verseNum)) {
         _selectedVerses.remove(verseNum);
       } else {
@@ -792,6 +847,10 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                               verse.number);
                           final isSelected =
                               _selectedVerses.contains(verse.number);
+                          // A deep-linked verse keeps its accent wash until the
+                          // reader taps or selects something.
+                          final isFocused =
+                              _focusVerse == verse.number && !isSelected;
                           final isBookmarked = bookmarks.contains(verseKey);
                           void openVerseMenu() {
                             showModalBottomSheet<void>(
@@ -892,6 +951,8 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                 ),
                               ],
                               Semantics(
+                                key: _verseKeys.putIfAbsent(
+                                    verse.number, GlobalKey.new),
                                 selected: isSelected,
                                 // Screen readers reach the long-press menu
                                 // by name.
@@ -918,6 +979,8 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                     openVerseMenu();
                                   },
                                   child: AnimatedContainer(
+                                    key: ValueKey(
+                                        'verse-${passage.chapterNum}-${verse.number}'),
                                     duration: Motion.of(context,
                                         const Duration(milliseconds: 200)),
                                     padding: const EdgeInsets.symmetric(
@@ -930,10 +993,17 @@ class _StudyReaderScreenState extends ConsumerState<StudyReaderScreen> {
                                                   alpha: 0.4)
                                               : theme.primaryColor
                                                   .withValues(alpha: 0.15))
-                                          : (highlightColor != null
-                                              ? highlightColor.withValues(
-                                                  alpha: 0.3)
-                                              : Colors.transparent),
+                                          : isFocused
+                                              ? accent.withValues(alpha: 0.13)
+                                              : (highlightColor != null
+                                                  ? highlightColor.withValues(
+                                                      alpha: 0.3)
+                                                  : Colors.transparent),
+                                      border: isFocused
+                                          ? Border(
+                                              left: BorderSide(
+                                                  color: accent, width: 3))
+                                          : null,
                                       borderRadius:
                                           BorderRadius.circular(Radii.sm),
                                     ),

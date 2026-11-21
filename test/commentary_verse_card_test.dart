@@ -89,9 +89,10 @@ void main() {
         tester.widget<CommentaryVerseCard>(find.byType(CommentaryVerseCard));
     expect(card.reference, 'Daniel 11:26');
     expect(card.verseText, _verse26);
-    expect(find.text(_verse26), findsOneWidget);
+    // The card renders rich text (markup + tappable references).
+    expect(find.textContaining(_verse26, findRichText: true), findsOneWidget);
     // The caller's text belongs to 11:27, not to the verse being labelled.
-    expect(find.text(_verse27), findsNothing);
+    expect(find.textContaining(_verse27, findRichText: true), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }

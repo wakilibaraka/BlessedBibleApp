@@ -36,8 +36,24 @@ void main() {
       expect(normalizeProse('Dan.11:27 and 1.5'), 'Dan.11:27 and 1.5');
     });
 
-    test('drops zero-width characters', () {
+    test('drops zero-width characters and soft hyphens', () {
       expect(normalizeProse('be\u200bhold'), 'behold');
+      expect(normalizeProse('be\u00adhold'), 'behold');
+    });
+
+    test('heals a sentence glued to the next word by the OCR pass', () {
+      expect(normalizeProse('Yet they asked.no explanation from Jesus.'),
+          'Yet they asked. no explanation from Jesus.');
+      expect(normalizeProse('that they might have.it more abundantly'),
+          'that they might have. it more abundantly');
+      // Abbreviations are three letters or fewer, so they keep their shape.
+      expect(normalizeProse('i.e., thrones; e.g., Dan. 7:9'),
+          'i.e., thrones; e.g., Dan. 7:9');
+    });
+
+    test('keeps a hyphenated word whole across a hard wrap', () {
+      expect(normalizeProse('the God-\ngiven mercy'), 'the God-given mercy');
+      expect(normalizeProse('a well-\n  known fact'), 'a well-known fact');
     });
   });
 
@@ -178,9 +194,35 @@ void main() {
     ));
     expect(find.text('Daniel 11:27'), findsOneWidget);
     expect(
-      find.textContaining('And both these kings'),
+      find.textContaining('And both these kings', findRichText: true),
       findsOneWidget,
     );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the verse card renders markup and tappable references',
+      (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      home: const Scaffold(
+        body: CommentaryVerseCard(
+          reference: 'Daniel 11:27',
+          verseText: 'See **Daniel 11:27** for the __wider__ setting.',
+          ink: Color(0xFF221E18),
+          accent: Color(0xFF8A6A3B),
+          surface: Color(0xFFFBF7EF),
+          border: Color(0xFFE4DACB),
+          shadow: Color(0x22000000),
+          typography: TypographyState(),
+        ),
+      ),
+    ));
+
+    expect(find.textContaining('**', findRichText: true), findsNothing);
+    expect(find.textContaining('__', findRichText: true), findsNothing);
+    expect(
+        find.textContaining('Daniel 11:27', findRichText: true), findsWidgets);
     expect(tester.takeException(), isNull);
   });
 

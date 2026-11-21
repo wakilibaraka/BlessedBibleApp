@@ -40,6 +40,13 @@ void main() {
     expect(localizedReference('1 John 3:16', 'pt'), '1 João 3:16');
   });
 
+  test('chapter labels localize the book name', () {
+    expect(localizedChapterLabel('Genesis', 1, 'sw'), 'Mwanzo 1');
+    expect(localizedChapterLabel('Psalms', 23, 'fr'), 'Psaumes 23');
+    expect(localizedChapterLabel('Genesis', 2, 'en'), 'Genesis 2');
+    expect(localizedChapterLabel('Genesis', 2, 'de'), 'Genesis 2');
+  });
+
   test('unknown languages and non-book names fall back to the input', () {
     expect(localizedBookName('Genesis', 'en'), 'Genesis');
     expect(localizedBookName('Genesis', 'de'), 'Genesis');

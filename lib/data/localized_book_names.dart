@@ -498,6 +498,12 @@ String localizedBookName(String canonicalName, String languageCode) {
   return names[index];
 }
 
+/// "Mwanzo 1": a chapter label in the interface language, for the strings
+/// that take a book name and a chapter number separately.
+String localizedChapterLabel(
+        String canonicalBook, int chapter, String languageCode) =>
+    '${localizedBookName(canonicalBook, languageCode)} $chapter';
+
 extension LocalizedBookName on BuildContext {
   /// [canonicalName] in the interface language: "Mwanzo" for Genesis when the
   /// app is in Kiswahili, "Genesis" in English.
