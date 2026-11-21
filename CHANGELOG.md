@@ -4,6 +4,9 @@ All notable changes to The Blessed Bible. Newest first.
 
 ## [Unreleased]
 
+### Reader
+- **Read in context opens the chapter reader:** "Read in context" on the Verse of the Day, a commentary pull-quote, or a verse preview now opens the plan-style chapter reader at the named chapter with that verse accented and scrolled into view, instead of only switching to the Read tab.
+
 ### Performance
 - **Home opens without freezing:** Verse of the Day is picked without reworking every commentary entry, the other tabs build just after Home instead of with it, and the offline Bible loads book by book so the splash keeps moving.
 
@@ -16,6 +19,11 @@ All notable changes to The Blessed Bible. Newest first.
 
 ### Commentary
 - **The card quotes its own verse:** A commentary card opened in chapter mode now shows the text of the verse its heading names, instead of the verse you happened to select — no more verse 27's wording under a "Daniel 11:26" label.
+- **Quote cards keep their formatting:** Pull-quotes and the Story of the Day key verse render bold, underline, and tappable scripture references like the body text, instead of printing `**` and `__`.
+- **Fewer broken words:** Words hyphenated across a print line break are rejoined, OCR sentences glued to the next word are spaced apart, and soft hyphens no longer reach the reader.
+
+### Localization
+- **The plan card speaks your language:** The mark-done card in the plan reader localizes its book name, so Kiswahili shows "Mwanzo 1" instead of "Genesis 1".
 
 ### Account
 - **Sign out to a guest:** One sheet asks whether to keep your study data and your name on this device (both ticked). You always land as a guest, under your name or "Guest".
