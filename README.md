@@ -2,7 +2,7 @@
 
 [![Release](https://img.shields.io/github/v/release/wakilibaraka/BlessedBibleApp?include_prereleases&style=flat-square&color=blue)](https://github.com/wakilibaraka/BlessedBibleApp/releases)
 [![CI Status](https://img.shields.io/github/actions/workflow/status/wakilibaraka/BlessedBibleApp/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/wakilibaraka/BlessedBibleApp/actions)
-[![Flutter](https://img.shields.io/badge/Flutter-3.47.8%2B-02569B?style=flat-square&logo=flutter)](https://flutter.dev)
+[![Flutter](https://img.shields.io/badge/Flutter-3.47.6%2B-02569B?style=flat-square&logo=flutter)](https://flutter.dev)
 [![License](https://img.shields.io/badge/License-Proprietary-red?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20(in%20progress)-green?style=flat-square)](https://github.com/wakilibaraka/BlessedBibleApp)
 
@@ -45,7 +45,7 @@ Get the latest release APKs directly from [GitHub Releases](https://github.com/w
 - **Visual Library as a Shelf of Books**: Replaces flat lists with gorgeous volume covers featuring author imprints, spines, and scripture scope (*The Desire of Ages*, *Prophets and Kings*, *Patriarchs and Prophets*, *Daniel and the Revelation*).
 - **2-Tap Chapter Navigation**: Tap any volume to view its title page, chapter index, and scope, with a canonical by-book index and fast search across authors and titles.
 - **Refined Editorial Layout**: Verse pull-quote hero cards, 1-tap filter pills, and source tags. Settings allows switching to the classic layout at any time.
-- **Prose Reflow & OCR Cleanup**: Eliminates scan noise, Gutenberg wrapper remnants, and print hard-wraps for smooth, fluid reading. Supports rich bold/underline styling and tappable inline scripture links.
+- **Prose Reflow & OCR Cleanup**: Reflows print hard-wraps, rejoins words broken across a line, repairs OCR-glued sentences, and drops zero-width and soft-hyphen noise. Verse pull-quote cards and the Story of the Day key verse render bold, underline, and tappable inline scripture links like the body text.
 
 ### 📤 Unified Share Suite, PDF Export & Gallery Save
 - **Standardized Multi-Mode Sharing**: A single, elegant share modal across verses, daily inspiration, Bible stories, and commentary entries.
@@ -56,8 +56,8 @@ Get the latest release APKs directly from [GitHub Releases](https://github.com/w
 
 ### 🌐 Full Multi-Language Localization
 - **6 Supported Languages**: English, French (`Français`), Italian (`Italiano`), Romanian (`Română`), Swahili (`Kiswahili`), and Tagalog.
-- **Complete Book Name Translation**: Bible book names follow the selected interface language everywhere — headers, book selectors, study tools, search, and reading plans.
-- **Reliable In-Context Reading**: Tapping "Read in context" resolves both book and chapter accurately with persistent verse accent highlighting.
+- **Complete Book Name Translation**: Bible book names follow the selected interface language everywhere — headers, book selectors, study tools, search, reading plans, and the plan reader's completion card.
+- **Read in Context, Properly**: "Read in context" on the Verse of the Day, a commentary pull-quote, or a verse preview opens the plan-style chapter reader on the named chapter, with that verse accented and scrolled into view.
 
 ### 📅 Redesigned Reading Plans & Plan Reader
 - **Streamlined Dashboard**: Date and reading streak hero at the top of your plans, keeping your daily goal front and center.
@@ -89,14 +89,14 @@ Get the latest release APKs directly from [GitHub Releases](https://github.com/w
 - **Local Storage**: Bundled SQLite database (`sqflite`), Git LFS data packs, and `shared_preferences`
 - **Cloud & Sync**: Firebase Auth, Cloud Firestore (with strict security rules), Firebase App Check, and Crashlytics
 - **Design Tokens**: Centralized token architecture (`AppPalette`, `TypeScale`, `Radii`, `Elevation`) ensuring consistent styling without raw magic values
-- **CI/CD Pipeline**: GitHub Actions running automated formatting, static analysis (`--fatal-infos`), 240+ unit/widget tests, golden snapshots, and R8/keystore release validation
+- **CI/CD Pipeline**: GitHub Actions running automated formatting, static analysis (`--fatal-infos`), 380+ unit/widget tests, golden snapshots, Firestore rules tests, and Android debug plus R8/keystore release builds
 
 ---
 
 ## 🚀 Developer Setup
 
 ### Prerequisites
-- [Flutter SDK](https://docs.flutter.dev/get-started/install) (pinned to **3.47.8** via `.fvmrc`)
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) (pinned to **3.47.6** via `.fvmrc`)
 - Android Studio / Android SDK (Platform 34+)
 - Xcode 15+ (for iOS development)
 - Git LFS (`git lfs install`)
