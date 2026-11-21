@@ -11,6 +11,8 @@ import '../../state/commentary_provider.dart';
 import '../../theme/reading_tokens.dart';
 import '../../l10n/l10n.dart';
 import '../../data/localized_book_names.dart';
+import '../../data/let_read.dart';
+import '../../utils/passage.dart';
 import '../../theme/design_tokens.dart';
 
 class VotdArchiveScreen extends ConsumerWidget {
@@ -25,12 +27,8 @@ class VotdArchiveScreen extends ConsumerWidget {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    // Create list of dates (most recent first)
-    final dates =
-        List.generate(7, (index) => today.subtract(Duration(days: index)));
-
-    // Epoch used for VotD calculation
-    final epoch = DateTime(2026, 1, 1);
+    // Calendar days, not 24-hour spans, so the rows survive a DST change.
+    final dates = recentCalendarDays(today, 7);
 
     final appThemeMode = ref.watch(resolvedThemeProvider);
     final is3DTheme = appThemeMode.is3DTheme;
@@ -84,12 +82,8 @@ class VotdArchiveScreen extends ConsumerWidget {
 
                   final pool = ref.watch(votdPoolProvider);
 
-                  // Compute VotD for this specific date
-                  final dayIndex = date.difference(epoch).inDays % pool.length;
-                  // Handle negative modulo correctly just in case
-                  final validDayIndex =
-                      dayIndex < 0 ? dayIndex + pool.length : dayIndex;
-                  final votdEntry = pool[validDayIndex];
+                  // Same rule as Home, so history replays what was shown.
+                  final votdEntry = pool[votdIndexFor(pool.length, date)];
                   final reference = votdEntry.reference;
                   final text = votdEntry.text;
 
@@ -106,8 +100,11 @@ class VotdArchiveScreen extends ConsumerWidget {
                     ).format(date);
                   }
 
-                  final bookName = reference.split(' ').first;
-                  final bookTag = bookName.toUpperCase();
+                  // "1 Kings 3:5" keeps "1 Kings" as its book; splitting on
+                  // spaces would tag the card "1".
+                  final bookTag =
+                      (PassageRef.parse(reference)?.bookName ?? reference)
+                          .toUpperCase();
 
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 16.0),
@@ -157,34 +154,23 @@ class VotdArchiveScreen extends ConsumerWidget {
                               ref
                                   .read(votdTrackerProvider.notifier)
                                   .markViewed(date);
-                              final refStr = reference;
-                              final lastSpaceIdx = refStr.lastIndexOf(' ');
-                              final bookName = lastSpaceIdx != -1
-                                  ? refStr.substring(0, lastSpaceIdx)
-                                  : refStr;
-                              final refParts = lastSpaceIdx != -1
-                                  ? refStr
-                                      .substring(lastSpaceIdx + 1)
-                                      .split(':')
-                                  : <String>[];
-                              final chapterNum = refParts.isNotEmpty
-                                  ? (int.tryParse(refParts[0]) ?? 1)
-                                  : 1;
-                              final verseNum = refParts.length > 1
-                                  ? int.tryParse(refParts[1])
-                                  : null;
+                              final parsed = PassageRef.parse(reference);
+                              if (parsed == null) return;
+                              final verseNum = parsed.wholeChapter
+                                  ? null
+                                  : parsed.startVerse;
 
                               // Only navigate if commentary exists
                               final hasComm = ref.read(
                                   commentaryForChapterProvider(
-                                      (bookName, chapterNum)));
+                                      (parsed.bookName, parsed.chapter)));
                               if (!hasComm) return;
 
                               Navigator.of(context)
                                   .push(CupertinoPageRoute<void>(
                                 builder: (_) => CommentaryHubScreen(
-                                  book: bookName,
-                                  chapter: chapterNum,
+                                  book: parsed.bookName,
+                                  chapter: parsed.chapter,
                                   verse: verseNum,
                                   verseText: null,
                                 ),

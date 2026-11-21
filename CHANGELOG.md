@@ -11,6 +11,12 @@ All notable changes to The Blessed Bible. Newest first.
 - **Full card text:** Study cards no longer cut off with "...". Verse of the Day shows the whole verse, and plan titles, readings and snippets show in full.
 - **Word of the Day card removed:** It no longer appears on Study. The Dictionary and its Word of the Day history are unchanged.
 
+### Verse of the Day
+- **No skipped or repeated verses:** The daily verse is picked by calendar day, not by elapsed time, so a clock change or a different time zone no longer makes the app skip a verse one day and show it twice later. Archive dates, tags and taps resolve to the same verse the card shows.
+
+### Commentary
+- **The card quotes its own verse:** A commentary card opened in chapter mode now shows the text of the verse its heading names, instead of the verse you happened to select — no more verse 27's wording under a "Daniel 11:26" label.
+
 ### Account
 - **Sign out to a guest:** One sheet asks whether to keep your study data and your name on this device (both ticked). You always land as a guest, under your name or "Guest".
 - **Reset this device:** Erases study data on this device only. Signed in, choose to sign out or stay signed in and re-download. Deleting this app's cloud data is a separate switch, off by default, confirmed by typing DELETE.

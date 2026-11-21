@@ -64,10 +64,16 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
   }
 
   String? _lookupVerseText(WidgetRef ref, int? verseNum) {
-    if (widget.verseText != null && widget.verseText!.isNotEmpty) {
+    if (verseNum == null) return null;
+    // A caller-supplied text belongs to the verse the view was opened with.
+    // Other verses (chapter scrolling, a deep dive without a verse) have to be
+    // read from the Bible, or the card quotes one verse under another's
+    // reference.
+    if (verseNum == widget.verse &&
+        widget.verseText != null &&
+        widget.verseText!.isNotEmpty) {
       return widget.verseText;
     }
-    if (verseNum == null) return null;
 
     final bibleState = ref.watch(bibleProvider);
     if (bibleState.books.isEmpty) return null;
@@ -78,10 +84,10 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
             b.name.toLowerCase() == widget.book.toLowerCase() ||
             b.abbreviation.toLowerCase() == widget.book.toLowerCase(),
       );
-      if (widget.chapter > 0 && widget.chapter <= book.chapters.length) {
-        final chapter = book.chapters[widget.chapter - 1];
-        if (verseNum > 0 && verseNum <= chapter.verses.length) {
-          return chapter.verses[verseNum - 1].text;
+      for (final chapter in book.chapters) {
+        if (chapter.number != widget.chapter) continue;
+        for (final verse in chapter.verses) {
+          if (verse.number == verseNum) return verse.text;
         }
       }
     } catch (_) {}
