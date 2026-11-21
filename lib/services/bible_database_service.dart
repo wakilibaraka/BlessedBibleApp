@@ -217,7 +217,7 @@ class BibleDatabaseService {
       db = await _openGuarded(dbPath);
     }
 
-    var problems = await _probeCore(db, fast: true);
+    final problems = await _probeCore(db, fast: true);
     if (problems.isEmpty) {
       await _clearRepairAttempts(prefs);
       await prefs.setInt(_schemaReadyVersionKey, contentVersion);

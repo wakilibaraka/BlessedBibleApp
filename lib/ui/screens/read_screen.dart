@@ -1420,8 +1420,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                   ? ref.watch(
                                                                       chapterUnderlineMapProvider(
                                                                           ChapterUnderlineArgs(
-                                                                      bookNumber: allBooks.indexOf(fc.book) +
-                                                                          1,
+                                                                      bookNumber:
+                                                                          allBooks.indexOf(fc.book) +
+                                                                              1,
                                                                       chapterNumber: fc
                                                                           .chapter
                                                                           .number,
@@ -1434,8 +1435,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                                                               .translationId,
                                                                     )))
                                                                   : const <int,
-                                                                      Set<
-                                                                          int>>{};
+                                                                      Set<int>>{};
                                                           if (index ==
                                                               verses.length) {
                                                             final bool
