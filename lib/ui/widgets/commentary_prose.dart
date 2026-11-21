@@ -4,6 +4,7 @@ import '../../state/typography_provider.dart';
 import '../../theme/design_tokens.dart';
 import '../../l10n/l10n.dart';
 import '../../utils/prose.dart';
+import 'verse_link_text.dart';
 
 /// The verse under discussion, as a pull-quote above the commentary.
 ///
@@ -39,6 +40,18 @@ class CommentaryVerseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final text = normalizeProse(verseText);
+
+    // The packs carry **bold** and __underline__ markers and scripture
+    // references; the pull-quote renders them like the commentary body does
+    // instead of showing the markers literally.
+    final cardStyle = theme.textTheme.titleMedium?.copyWith(
+      height: 1.6,
+      fontSize: typography.fontSize * 1.02,
+      fontFamily: typography.fontFamily,
+      fontStyle: typography.fontStyle,
+      fontWeight: FontWeight.w500,
+      color: ink,
+    );
 
     if (!refined) {
       return GestureDetector(
@@ -125,15 +138,23 @@ class CommentaryVerseCard extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 10),
-                        Text(
-                          text,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            height: 1.6,
-                            fontSize: typography.fontSize * 1.02,
-                            fontFamily: typography.fontFamily,
-                            fontStyle: typography.fontStyle,
-                            fontWeight: FontWeight.w500,
-                            color: ink,
+                        VerseLinkText(
+                          text: text,
+                          parseMarkup: true,
+                          defaultStyle: cardStyle,
+                          referenceStyle: cardStyle?.copyWith(
+                            color: accent,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          numberStyle: cardStyle?.copyWith(
+                            color: accent,
+                            fontWeight: FontWeight.w700,
+                            decoration: TextDecoration.underline,
+                            decorationColor: accent.withValues(alpha: 0.7),
+                          ),
+                          underlineStyle: cardStyle?.copyWith(
+                            decoration: TextDecoration.underline,
+                            decorationColor: accent.withValues(alpha: 0.7),
                           ),
                         ),
                         const SizedBox(height: 12),

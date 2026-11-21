@@ -412,15 +412,40 @@ class _BibleStoryReaderScreenState
                               ),
                             ),
                             const SizedBox(height: 8),
-                            Text(
-                              '“${stripQuotes(normalizeProse(_story.keyVerse))}”',
-                              style: theme.textTheme.titleMedium?.copyWith(
+                            Builder(builder: (context) {
+                              final style =
+                                  theme.textTheme.titleMedium?.copyWith(
                                 fontFamily: 'Cormorant Garamond',
                                 fontStyle: FontStyle.italic,
                                 fontWeight: FontWeight.w600,
                                 height: 1.4,
-                              ),
-                            ),
+                              );
+                              // Same markup and tappable references as the
+                              // retelling below, so the key verse is not the
+                              // one block that shows ** or __ literally.
+                              return VerseLinkText(
+                                text:
+                                    '“${stripQuotes(normalizeProse(_story.keyVerse))}”',
+                                parseMarkup: true,
+                                defaultStyle: style,
+                                referenceStyle: style?.copyWith(
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                numberStyle: style?.copyWith(
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.w700,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor:
+                                      theme.primaryColor.withValues(alpha: 0.7),
+                                ),
+                                underlineStyle: style?.copyWith(
+                                  decoration: TextDecoration.underline,
+                                  decorationColor:
+                                      theme.primaryColor.withValues(alpha: 0.7),
+                                ),
+                              );
+                            }),
                           ],
                         ),
                       ),
