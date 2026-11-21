@@ -8,7 +8,6 @@ import '../../models/commentary_entry.dart';
 import '../../models/study_content_category.dart';
 import '../../state/bible_provider.dart';
 import '../../state/commentary_provider.dart';
-import '../../state/read_location_provider.dart';
 import '../../state/read_settings_provider.dart';
 import '../../state/surface_style_provider.dart';
 import '../../state/theme_provider.dart';
@@ -17,6 +16,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/design_tokens.dart';
 import '../../theme/reading_tokens.dart';
 import '../widgets/commentary_prose.dart';
+import '../widgets/passage_reader_link.dart';
 import '../widgets/prose_text.dart';
 import '../widgets/commentary_view.dart' show shareCommentaryEntry;
 import '../widgets/state_views.dart';
@@ -143,9 +143,10 @@ class _CommentaryHubScreenState extends ConsumerState<CommentaryHubScreen> {
                     shadow: context.palette.shadow,
                     typography: typography,
                     onTap: () {
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                      openReaderAtVerse(
-                        ref,
+                      final navigator = Navigator.of(context);
+                      navigator.popUntil((route) => route.isFirst);
+                      pushPassageInChapterReader(
+                        navigator,
                         bookName: widget.book,
                         chapter: widget.chapter,
                         verse: widget.verse,

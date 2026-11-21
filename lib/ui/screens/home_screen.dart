@@ -16,7 +16,7 @@ import '../../state/votd_tracker_provider.dart';
 import '../../state/theme_provider.dart';
 import '../../state/nav_provider.dart';
 import '../../state/bible_nav_settings_provider.dart';
-import '../../state/read_location_provider.dart';
+import '../widgets/passage_reader_link.dart';
 import '../sheets/appearance_settings_sheet.dart';
 import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
@@ -308,17 +308,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             button: true,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () {
-                final refParts = votdRef.split(':');
-                final verseNum =
-                    refParts.length > 1 ? int.tryParse(refParts.last) : 1;
-                openReaderAtVerse(
-                  ref,
-                  bookName: votdBook,
-                  chapter: votdChapter,
-                  verse: verseNum,
-                );
-              },
+              onTap: () => openReferenceInChapterReader(context, votdRef),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,

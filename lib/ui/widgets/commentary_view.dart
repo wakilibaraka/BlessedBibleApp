@@ -18,7 +18,7 @@ import '../../models/study_content_category.dart';
 import 'share_sheet.dart';
 
 import '../screens/commentary_hub_screen.dart';
-import '../../state/read_location_provider.dart';
+import 'passage_reader_link.dart';
 import 'commentary_prose.dart';
 import 'prose_text.dart';
 import '../../l10n/l10n.dart';
@@ -369,11 +369,14 @@ class _CommentaryViewState extends ConsumerState<CommentaryView> {
                   shadow: context.palette.shadow,
                   typography: typography,
                   onTap: () {
-                    // Dismiss commentary hub back to root
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                    // Jump to verse in main reader
-                    openReaderAtVerse(
-                      ref,
+                    // Leave the commentary hub first, then open the chapter in
+                    // the reading UI with this verse emphasised. The navigator
+                    // is captured before popping: this widget's context is
+                    // gone once the routes above it are dismissed.
+                    final navigator = Navigator.of(context);
+                    navigator.popUntil((route) => route.isFirst);
+                    pushPassageInChapterReader(
+                      navigator,
                       bookName: bookName,
                       chapter: chapterNum,
                       verse: displayVerse,

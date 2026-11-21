@@ -5,7 +5,7 @@ import '../../data/localized_book_names.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/bible_provider.dart';
 import '../../state/typography_provider.dart';
-import '../../state/read_location_provider.dart';
+import 'passage_reader_link.dart';
 import '../../utils/passage.dart';
 import 'textured_glass_container.dart';
 
@@ -131,9 +131,12 @@ class VersePreviewModal extends ConsumerWidget {
                 width: double.infinity,
                 child: FilledButton.tonalIcon(
                   onPressed: () {
-                    Navigator.of(context).pop();
-                    openReaderAtVerse(
-                      ref,
+                    // Dismiss the sheet first, then open the chapter in the
+                    // reading UI at this verse — not the main Read tab.
+                    final navigator = Navigator.of(context);
+                    navigator.pop();
+                    pushPassageInChapterReader(
+                      navigator,
                       bookName: bookName,
                       chapter: chapter,
                       verse: startVerse,
