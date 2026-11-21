@@ -21,6 +21,7 @@ All notable changes to The Blessed Bible. Newest first.
 - **The card quotes its own verse:** A commentary card opened in chapter mode now shows the text of the verse its heading names, instead of the verse you happened to select — no more verse 27's wording under a "Daniel 11:26" label.
 - **Quote cards keep their formatting:** Pull-quotes and the Story of the Day key verse render bold, underline, and tappable scripture references like the body text, instead of printing `**` and `__`.
 - **Fewer broken words:** Words hyphenated across a print line break are rejoined, OCR sentences glued to the next word are spaced apart, and soft hyphens no longer reach the reader.
+- **Cleaner scanned text:** The Uriah Smith volumes' `:--` / `,--` shorthand is now a real em dash, inline `[Illustration: …]` plate captions are gone, and leaked page numbers (`{ 88-891 67`) no longer split sentences. Entries whose words the scan destroyed are left alone and listed in [`docs/commentary_reimport_needed.md`](docs/commentary_reimport_needed.md) for re-import.
 
 ### Localization
 - **The plan card speaks your language:** The mark-done card in the plan reader localizes its book name, so Kiswahili shows "Mwanzo 1" instead of "Genesis 1".
