@@ -3070,7 +3070,8 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                           ),
                           label: Text(
                               context.l10n.readMarkDoneContinue(
-                                  fc.book.name, fc.chapter.number),
+                                  context.bookNameInLocale(fc.book.name),
+                                  fc.chapter.number),
                               style: const TextStyle(
                                   fontSize: TypeScale.bodyLarge,
                                   fontWeight: FontWeight.w600)),
