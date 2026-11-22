@@ -41,6 +41,33 @@ from pathlib import Path
 
 ASSET = Path('assets/commentary/commentary.json')
 
+# Entries whose words are corrupted past what any rule can rebuild. They are
+# left untouched by --mechanical (a half-cleaned copy only hides the damage)
+# and tracked for re-import in docs/commentary_reimport_needed.md.
+REIMPORT_IDS = frozenset(
+    {
+        'c_da_5966d52c',
+        'c_da_0089988b',
+        'c_da_b8569e76',
+        'c_da_991f644d',
+        'c_th_4b11de6c',
+        'c_th_30d6af90',
+        'c_th_aabd1822',
+        'c_th_bb4f744e',
+        'c_th_bd6b5d00',
+        'c_th_4f247427',
+        'c_th_813190cb',
+        'c_th_06e5090d',
+        'c_th_0b0e7ca6',
+        'c_th_19b5452b',
+        'c_th_cb2a8dfb',
+        'c_th_c286c1e2',
+        'c_th_8249134f',
+        'c_th_b5fb54fd',
+        'c_th_b2ec8589',
+    }
+)
+
 # ---------------------------------------------------------------- text fixes
 
 LIGATURES = {
@@ -100,6 +127,25 @@ ARTISTS = re.compile(r'\b(?:[A-Z][A-Z’\'-]{1,}\s*,?\s*)+ARTIST\b')
 CAPS_RUN = re.compile(r'(?<!["“])(?:\b[A-Z][A-Z’\'-]{1,}\b[\s,:;\'"-]*){3,}')
 MULTI_PUNCT = re.compile(r'([,;:])\s*(?:[,.;:])+')
 SPACE_RUN = re.compile(r'[ \t]{2,}')
+# Uriah Smith's scans type a long dash as punctuation plus hyphens (":--",
+# ",--", ";--", ":---"). The punctuation belongs to the dash, so the whole
+# token becomes a single em dash.
+DASH_OCR = re.compile(r'[ \t]*[.,;:][ \t]*[-–—]{2,}[ \t]*')
+# The illustrated Patriarchs and Prophets plates were captured inline; the
+# bracketed text describes a plate, not the author's argument.
+ILLUSTRATION_CAPTION = re.compile(r'[ \t]*\[Illustration:[^\]]*\][ \t]*')
+# Running heads and page numbers that leaked into the body: "{ 88-891 67",
+# "108 £ 125-126 1", "210 £2091". The scanned page rule came through as a
+# brace or a currency glyph, so the whole run goes together. A glyph followed
+# directly by a full stop is a mangled scripture reference ("£26.36:26"), not
+# a page number, and is left for re-import.
+PAGE_MARKER_BRACE = re.compile(
+    r'[ \t]*\{\s*\d{1,4}\s*[-–]\s*\d{1,4}\]?(?:\s*\d{1,3})?\]?[ \t]*'
+)
+PAGE_MARKER_GLYPH = re.compile(
+    r'[ \t]*(?:\b\d{1,4}\s*)?[£¢]\s*\d{1,4}(?![\d.])'
+    r'(?:\s*[-–]\s*\d{1,4})?(?:\s*\d{1,3})?\]?[ \t]*'
+)
 
 WORD_RE = re.compile(r"[A-Za-z][A-Za-z'’\-]*")
 TOKEN_RE = re.compile(r'\S+')
@@ -120,12 +166,34 @@ READABLE_TOKEN = re.compile(
 )
 
 
+def mechanical_fixes(text: str) -> str:
+    """The repairs that need no judgement: dash OCR, plate captions, page marks.
+
+    Kept separate from :func:`normalize_text` so the pack can be swept for
+    these without the sentence-level rules that drop text.
+    """
+    original = text
+    text = ILLUSTRATION_CAPTION.sub(' ', text)
+    text = PAGE_MARKER_BRACE.sub(' ', text)
+    text = PAGE_MARKER_GLYPH.sub(' ', text)
+    text = DASH_OCR.sub(' — ', text)
+    if text == original:
+        # Whitespace elsewhere in the pack is left exactly as it was: only the
+        # entries these rules touched get tidied, so the diff stays tight.
+        return text
+    text = SPACE_RUN.sub(' ', text)
+    text = text.replace(' ,', ',').replace(' ;', ';')
+    text = re.sub(r'[ \t]+([.,;:!?])', r'\1', text)
+    return text.strip()
+
+
 def normalize_text(raw: str) -> str:
     text = html.unescape(html.unescape(raw))
     text = unicodedata.normalize('NFC', text)
     for bad, good in LIGATURES.items():
         text = text.replace(bad, good)
     text = text.replace('\r\n', '\n').replace('\r', '\n')
+    text = mechanical_fixes(text)
     text = GUTENBERG_LICENSE.sub(' ', text)
     text = PAGE_RANGE.sub(' ', text)
     text = CHAPTER_BASIS.sub(' ', text)
@@ -305,6 +373,12 @@ def junk_reason(body: str, vocabulary: set[str]) -> str | None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--write', action='store_true', help='rewrite the asset')
+    parser.add_argument(
+        '--mechanical',
+        action='store_true',
+        help='apply only dash, plate-caption and page-marker fixes; skip '
+        'entries listed for re-import',
+    )
     parser.add_argument('--show', type=int, default=0, help='print N repaired entries')
     parser.add_argument(
         '--force', action='store_true', help='write even if an entry collapses'
@@ -317,6 +391,41 @@ def main() -> int:
 
     data = json.loads(ASSET.read_text(encoding='utf-8'))
     entries = data['entries']
+
+    if args.mechanical:
+        changed = 0
+        skipped = 0
+        for entry in entries:
+            if entry['id'] in REIMPORT_IDS:
+                skipped += 1
+                continue
+            body = mechanical_fixes(entry['text'])
+            if body == entry['text']:
+                continue
+            changed += 1
+            if args.show > 0:
+                args.show -= 1
+                print('-' * 70)
+                print(f"{entry['source']} {entry['scope']}")
+                for line in difflib.unified_diff(
+                    entry['text'].split(), body.split(), 'before', 'after',
+                    lineterm='', n=2,
+                ):
+                    print(' '.join(line.split()))
+            entry['text'] = body
+        print(f'entries: {len(entries)}')
+        print(f'mechanically repaired: {changed}')
+        print(f'left for re-import: {skipped}')
+        if args.write:
+            ASSET.write_text(
+                json.dumps(data, ensure_ascii=False, indent=2) + '\n',
+                encoding='utf-8',
+            )
+            print(f'\nwrote {ASSET}')
+        else:
+            print('\ndry run; pass --write to update the asset')
+        return 0
+
     vocabulary = build_vocabulary(entries)
 
     kept: list[dict] = []
