@@ -4280,4 +4280,30 @@ class AppLocalizationsTl extends AppLocalizations {
   @override
   String get miscPrayerGuide =>
       'Gabayan Mo ang aking mga hakbang sa pag-asa at kapayapaan, nagtitiwala sa Iyong tapat na mga pangako.';
+
+  @override
+  String get audioUnavailable => 'Walang rekording para sa kabanatang ito';
+
+  @override
+  String get audioNetworkError =>
+      'Hindi ma-load ang audio. Suriin ang koneksyon.';
+
+  @override
+  String get audioSpeed => 'Bilis ng pag-play';
+
+  @override
+  String get audioOffline => 'Naka-save sa device na ito';
+
+  @override
+  String get audioDownload => 'I-download ang kabanata';
+
+  @override
+  String get audioClearDownloads => 'I-clear ang mga download';
+
+  @override
+  String get audioStreamNote =>
+      'Nag-stream habang nakikinig · ~1 MB bawat kabanata';
+
+  @override
+  String get audioListen => 'Makinig';
 }

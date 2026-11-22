@@ -44,6 +44,7 @@ import '../../data/models/translation_model.dart';
 import '../../state/hints_provider.dart';
 import '../../models/share_content.dart';
 import '../../services/share_service.dart';
+import '../widgets/audio_bible_sheet.dart';
 import '../widgets/share_sheet.dart';
 import '../widgets/radial_action_menu.dart';
 import '../widgets/cross_references_sheet.dart';
@@ -809,6 +810,26 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               Icons.keyboard_arrow_down_rounded,
               size: 16,
               color: tokens.readingInk.withValues(alpha: 0.7),
+            ),
+            const SizedBox(width: 6),
+            // Kept inside the pill: a separate top-row button would squeeze
+            // the centred book/chapter label on narrow phones.
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => showAudioBibleSheet(
+                context,
+                book: currentBookName,
+                chapter: currentChapter,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(2),
+                child: Icon(
+                  Icons.headphones_rounded,
+                  size: 17,
+                  color: tokens.readingInk.withValues(alpha: 0.8),
+                  semanticLabel: context.l10n.audioListen,
+                ),
+              ),
             ),
           ],
         ],

@@ -4276,4 +4276,30 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get miscPrayerGuide =>
       'Guida i miei passi nella speranza e nella pace, confidando nelle tue promesse fedeli.';
+
+  @override
+  String get audioUnavailable => 'Nessuna registrazione per questo capitolo';
+
+  @override
+  String get audioNetworkError =>
+      'Impossibile caricare l\'audio. Controlla la connessione.';
+
+  @override
+  String get audioSpeed => 'Velocità di riproduzione';
+
+  @override
+  String get audioOffline => 'Salvato su questo dispositivo';
+
+  @override
+  String get audioDownload => 'Scarica capitolo';
+
+  @override
+  String get audioClearDownloads => 'Elimina download';
+
+  @override
+  String get audioStreamNote =>
+      'In streaming durante l\'ascolto · ~1 MB per capitolo';
+
+  @override
+  String get audioListen => 'Ascolta';
 }

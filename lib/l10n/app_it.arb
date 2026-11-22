@@ -1197,5 +1197,13 @@
   "miscEmotionPeace": "pace",
   "miscPrayerComfort": "Signore, donami conforto e forza mentre oggi affronto sentimenti di {emotion}.",
   "miscPrayerScripture": "Concedimi la grazia di meditare la Scrittura, in particolare {verse}.",
-  "miscPrayerGuide": "Guida i miei passi nella speranza e nella pace, confidando nelle tue promesse fedeli."
+  "miscPrayerGuide": "Guida i miei passi nella speranza e nella pace, confidando nelle tue promesse fedeli.",
+  "audioUnavailable": "Nessuna registrazione per questo capitolo",
+  "audioNetworkError": "Impossibile caricare l'audio. Controlla la connessione.",
+  "audioSpeed": "Velocità di riproduzione",
+  "audioOffline": "Salvato su questo dispositivo",
+  "audioDownload": "Scarica capitolo",
+  "audioClearDownloads": "Elimina download",
+  "audioStreamNote": "In streaming durante l'ascolto · ~1 MB per capitolo",
+  "audioListen": "Ascolta"
 }

@@ -7,6 +7,11 @@ All notable changes to The Blessed Bible. Newest first.
 ### Reader
 - **Read in context opens the chapter reader:** "Read in context" on the Verse of the Day, a commentary pull-quote, or a verse preview now opens the plan-style chapter reader at the named chapter with that verse accented and scrolled into view, instead of only switching to the Read tab.
 
+### Audio Bible
+- **Listen to the chapter you are reading:** a headphones button in the reader plays the public-domain World English Bible narration for that chapter, streamed one chapter at a time (~0.2–1 MB) instead of bundling gigabytes of audio.
+- **Offline by choice, capped:** downloading a single chapter makes it play without a connection. The cache is capped at 200 MB, the oldest downloads are dropped first, and the player clears them on request.
+- **Continuous listening:** chapters auto-advance in reading order across book boundaries, with 10-second skips and 0.75×–2× speed.
+
 ### Performance
 - **Home opens without freezing:** Verse of the Day is picked without reworking every commentary entry, the other tabs build just after Home instead of with it, and the offline Bible loads book by book so the splash keeps moving.
 

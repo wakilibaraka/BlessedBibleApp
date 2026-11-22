@@ -1197,5 +1197,13 @@
   "miscEmotionPeace": "amani",
   "miscPrayerComfort": "Bwana, nipe faraja na nguvu ninapopitia hisia za {emotion} leo.",
   "miscPrayerScripture": "Nijalie neema ya kutafakari Maandiko, hasa {verse}.",
-  "miscPrayerGuide": "Uongoze hatua zangu katika tumaini na amani, nikitumaini ahadi zako za uaminifu."
+  "miscPrayerGuide": "Uongoze hatua zangu katika tumaini na amani, nikitumaini ahadi zako za uaminifu.",
+  "audioUnavailable": "Hakuna rekodi ya sura hii",
+  "audioNetworkError": "Imeshindwa kupakia sauti. Angalia muunganisho wako.",
+  "audioSpeed": "Kasi ya usikilizaji",
+  "audioOffline": "Imehifadhiwa kwenye kifaa hiki",
+  "audioDownload": "Pakua sura",
+  "audioClearDownloads": "Futa vipakuliwa",
+  "audioStreamNote": "Inatiririka unaposikiliza · ~MB 1 kwa sura",
+  "audioListen": "Sikiliza"
 }
