@@ -1197,5 +1197,13 @@
   "miscEmotionPeace": "paix",
   "miscPrayerComfort": "Seigneur, apporte-moi réconfort et force face à ce sentiment de {emotion} aujourd'hui.",
   "miscPrayerScripture": "Accorde-moi la grâce de méditer les Écritures, en particulier {verse}.",
-  "miscPrayerGuide": "Guide mes pas dans l'espérance et la paix, confiant en tes promesses fidèles."
+  "miscPrayerGuide": "Guide mes pas dans l'espérance et la paix, confiant en tes promesses fidèles.",
+  "audioUnavailable": "Aucun enregistrement pour ce chapitre",
+  "audioNetworkError": "Impossible de charger l'audio. Vérifiez votre connexion.",
+  "audioSpeed": "Vitesse de lecture",
+  "audioOffline": "Enregistré sur cet appareil",
+  "audioDownload": "Télécharger le chapitre",
+  "audioClearDownloads": "Supprimer les téléchargements",
+  "audioStreamNote": "Diffusé pendant l'écoute · ~1 Mo par chapitre",
+  "audioListen": "Écouter"
 }

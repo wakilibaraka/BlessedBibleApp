@@ -7298,6 +7298,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Guide my steps in hope and peace, trusting in Your faithful promises.'**
   String get miscPrayerGuide;
+
+  /// No description provided for @audioUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No recording for this chapter'**
+  String get audioUnavailable;
+
+  /// No description provided for @audioNetworkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load the audio. Check your connection.'**
+  String get audioNetworkError;
+
+  /// No description provided for @audioSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Playback speed'**
+  String get audioSpeed;
+
+  /// No description provided for @audioOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved on this device'**
+  String get audioOffline;
+
+  /// No description provided for @audioDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Download chapter'**
+  String get audioDownload;
+
+  /// No description provided for @audioClearDownloads.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear downloads'**
+  String get audioClearDownloads;
+
+  /// No description provided for @audioStreamNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Streams while you listen · about 1 MB a chapter'**
+  String get audioStreamNote;
+
+  /// No description provided for @audioListen.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen'**
+  String get audioListen;
 }
 
 class _AppLocalizationsDelegate

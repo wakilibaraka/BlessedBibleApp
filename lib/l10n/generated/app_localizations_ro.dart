@@ -4300,4 +4300,29 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get miscPrayerGuide =>
       'Călăuzește-mi pașii în nădejde și pace, încrezându-mă în promisiunile Tale credincioase.';
+
+  @override
+  String get audioUnavailable => 'Nu există înregistrare pentru acest capitol';
+
+  @override
+  String get audioNetworkError =>
+      'Audio-ul nu a putut fi încărcat. Verifică conexiunea.';
+
+  @override
+  String get audioSpeed => 'Viteza de redare';
+
+  @override
+  String get audioOffline => 'Salvat pe acest dispozitiv';
+
+  @override
+  String get audioDownload => 'Descarcă capitolul';
+
+  @override
+  String get audioClearDownloads => 'Șterge descărcările';
+
+  @override
+  String get audioStreamNote => 'Redat online · ~1 MB pe capitol';
+
+  @override
+  String get audioListen => 'Ascultă';
 }

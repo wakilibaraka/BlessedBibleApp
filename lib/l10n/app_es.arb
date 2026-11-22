@@ -1197,5 +1197,13 @@
   "miscEmotionPeace": "peace",
   "miscPrayerComfort": "Lord, bring comfort and strength as I navigate feelings of {emotion} today.",
   "miscPrayerScripture": "Grant me the grace to reflect on scripture, especially {verse}.",
-  "miscPrayerGuide": "Guide my steps in hope and peace, trusting in Your faithful promises."
+  "miscPrayerGuide": "Guide my steps in hope and peace, trusting in Your faithful promises.",
+  "audioUnavailable": "No hay grabación para este capítulo",
+  "audioNetworkError": "No se pudo cargar el audio. Revisa tu conexión.",
+  "audioSpeed": "Velocidad de reproducción",
+  "audioOffline": "Guardado en este dispositivo",
+  "audioDownload": "Descargar capítulo",
+  "audioClearDownloads": "Borrar descargas",
+  "audioStreamNote": "Se transmite al escuchar · ~1 MB por capítulo",
+  "audioListen": "Escuchar"
 }

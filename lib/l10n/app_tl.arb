@@ -1197,5 +1197,13 @@
   "miscEmotionPeace": "kapayapaan",
   "miscPrayerComfort": "Panginoon, bigyan Mo ako ng aliw at lakas habang dinaranas ko ang {emotion} ngayon.",
   "miscPrayerScripture": "Ipagkaloob Mo sa akin ang biyayang pagnilayan ang Kasulatan, lalo na ang {verse}.",
-  "miscPrayerGuide": "Gabayan Mo ang aking mga hakbang sa pag-asa at kapayapaan, nagtitiwala sa Iyong tapat na mga pangako."
+  "miscPrayerGuide": "Gabayan Mo ang aking mga hakbang sa pag-asa at kapayapaan, nagtitiwala sa Iyong tapat na mga pangako.",
+  "audioUnavailable": "Walang rekording para sa kabanatang ito",
+  "audioNetworkError": "Hindi ma-load ang audio. Suriin ang koneksyon.",
+  "audioSpeed": "Bilis ng pag-play",
+  "audioOffline": "Naka-save sa device na ito",
+  "audioDownload": "I-download ang kabanata",
+  "audioClearDownloads": "I-clear ang mga download",
+  "audioStreamNote": "Nag-stream habang nakikinig · ~1 MB bawat kabanata",
+  "audioListen": "Makinig"
 }

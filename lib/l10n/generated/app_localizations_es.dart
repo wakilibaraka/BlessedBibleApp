@@ -4267,4 +4267,29 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get miscPrayerGuide =>
       'Guide my steps in hope and peace, trusting in Your faithful promises.';
+
+  @override
+  String get audioUnavailable => 'No hay grabación para este capítulo';
+
+  @override
+  String get audioNetworkError =>
+      'No se pudo cargar el audio. Revisa tu conexión.';
+
+  @override
+  String get audioSpeed => 'Velocidad de reproducción';
+
+  @override
+  String get audioOffline => 'Guardado en este dispositivo';
+
+  @override
+  String get audioDownload => 'Descargar capítulo';
+
+  @override
+  String get audioClearDownloads => 'Borrar descargas';
+
+  @override
+  String get audioStreamNote => 'Se transmite al escuchar · ~1 MB por capítulo';
+
+  @override
+  String get audioListen => 'Escuchar';
 }

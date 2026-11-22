@@ -4253,4 +4253,29 @@ class AppLocalizationsSw extends AppLocalizations {
   @override
   String get miscPrayerGuide =>
       'Uongoze hatua zangu katika tumaini na amani, nikitumaini ahadi zako za uaminifu.';
+
+  @override
+  String get audioUnavailable => 'Hakuna rekodi ya sura hii';
+
+  @override
+  String get audioNetworkError =>
+      'Imeshindwa kupakia sauti. Angalia muunganisho wako.';
+
+  @override
+  String get audioSpeed => 'Kasi ya usikilizaji';
+
+  @override
+  String get audioOffline => 'Imehifadhiwa kwenye kifaa hiki';
+
+  @override
+  String get audioDownload => 'Pakua sura';
+
+  @override
+  String get audioClearDownloads => 'Futa vipakuliwa';
+
+  @override
+  String get audioStreamNote => 'Inatiririka unaposikiliza · ~MB 1 kwa sura';
+
+  @override
+  String get audioListen => 'Sikiliza';
 }

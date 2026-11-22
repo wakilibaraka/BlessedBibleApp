@@ -2342,5 +2342,13 @@
       }
     }
   },
-  "miscPrayerGuide": "Guide my steps in hope and peace, trusting in Your faithful promises."
+  "miscPrayerGuide": "Guide my steps in hope and peace, trusting in Your faithful promises.",
+  "audioUnavailable": "No recording for this chapter",
+  "audioNetworkError": "Couldn't load the audio. Check your connection.",
+  "audioSpeed": "Playback speed",
+  "audioOffline": "Saved on this device",
+  "audioDownload": "Download chapter",
+  "audioClearDownloads": "Clear downloads",
+  "audioStreamNote": "Streams while you listen · about 1 MB a chapter",
+  "audioListen": "Listen"
 }

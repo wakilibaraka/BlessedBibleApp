@@ -1197,5 +1197,13 @@
   "miscEmotionPeace": "pace",
   "miscPrayerComfort": "Doamne, dă-mi mângâiere și putere în fața sentimentelor de {emotion} de astăzi.",
   "miscPrayerScripture": "Dă-mi harul să cuget la Scriptură, mai ales la {verse}.",
-  "miscPrayerGuide": "Călăuzește-mi pașii în nădejde și pace, încrezându-mă în promisiunile Tale credincioase."
+  "miscPrayerGuide": "Călăuzește-mi pașii în nădejde și pace, încrezându-mă în promisiunile Tale credincioase.",
+  "audioUnavailable": "Nu există înregistrare pentru acest capitol",
+  "audioNetworkError": "Audio-ul nu a putut fi încărcat. Verifică conexiunea.",
+  "audioSpeed": "Viteza de redare",
+  "audioOffline": "Salvat pe acest dispozitiv",
+  "audioDownload": "Descarcă capitolul",
+  "audioClearDownloads": "Șterge descărcările",
+  "audioStreamNote": "Redat online · ~1 MB pe capitol",
+  "audioListen": "Ascultă"
 }
