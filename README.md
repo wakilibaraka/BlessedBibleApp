@@ -63,7 +63,9 @@ Get the latest release APKs directly from [GitHub Releases](https://github.com/w
 - **Streamlined Dashboard**: Date and reading streak hero at the top of your plans, keeping your daily goal front and center.
 - **1-Tap Direct Reading**: Open today's assigned chapters with a single tap from the Study Page or Plans Library.
 - **Segmented Reader**: Visual segmented progress bar for multi-passage days, "Up next" previews, and inline completion cards that mark your day done right in the reader.
-- **Custom Plan Builder**: Create your own custom reading journeys tailored to your personal pace and schedule.
+- **Custom Plan Builder**: Create your own custom reading journeys tailored to your personal pace and schedule, and change the day count later without losing progress.
+- **Completion Dates & Plan Streak**: Every finished day records the date it was read, so the plan page knows whether you read today and shows a consecutive-day streak. Catch-up dates the days it sweeps rather than claiming the whole plan was read today.
+- **Honest Progress**: Day completion survives re-partitioning (style changes, pace changes, imports) because progress is keyed by passage content, not by day number.
 
 ### 🎨 Dynamic Themes & Custom Typography
 - **14 Hand-Crafted Visual Themes**: Light, Dark, Sepia, OLED black, Earth, Paperlike, and Claymorphic styles with live recoloring.
@@ -89,7 +91,7 @@ Get the latest release APKs directly from [GitHub Releases](https://github.com/w
 - **Local Storage**: Bundled SQLite database (`sqflite`), Git LFS data packs, and `shared_preferences`
 - **Cloud & Sync**: Firebase Auth, Cloud Firestore (with strict security rules), Firebase App Check, and Crashlytics
 - **Design Tokens**: Centralized token architecture (`AppPalette`, `TypeScale`, `Radii`, `Elevation`) ensuring consistent styling without raw magic values
-- **CI/CD Pipeline**: GitHub Actions running automated formatting, static analysis (`--fatal-infos`), 380+ unit/widget tests, golden snapshots, Firestore rules tests, and Android debug plus R8/keystore release builds
+- **CI/CD Pipeline**: GitHub Actions running automated formatting, static analysis (`--fatal-infos`), 410+ unit/widget tests, golden snapshots, Firestore rules tests, and Android debug plus R8/keystore release builds
 
 ---
 

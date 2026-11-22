@@ -23,6 +23,12 @@ All notable changes to The Blessed Bible. Newest first.
 - **Fewer broken words:** Words hyphenated across a print line break are rejoined, OCR sentences glued to the next word are spaced apart, and soft hyphens no longer reach the reader.
 - **Cleaner scanned text:** The Uriah Smith volumes' `:--` / `,--` shorthand is now a real em dash, inline `[Illustration: …]` plate captions are gone, and leaked page numbers (`{ 88-891 67`) no longer split sentences. Entries whose words the scan destroyed are left alone and listed in [`docs/commentary_reimport_needed.md`](docs/commentary_reimport_needed.md) for re-import.
 
+### Reading Plans
+- **Completion dates:** every finished day records the date it was read, so a plan now knows whether you read today and when you last did. Days carried over from older builds stay readable, just undated.
+- **Plan streak:** the plan page shows a streak of consecutive days with a completed reading; today not being read yet does not break it, and a DST shift cannot skip or repeat a day.
+- **Repace keeps its progress:** changing a custom plan's day count used to rewrite the schedule but leave the old partition's atom ids behind, so the next load read the remapped days as incomplete. The new schedule's atoms are now recorded alongside the old ones.
+- **Catch-up is dated:** "mark all previous as read" dates the days it completes, keeps dates that already existed, and never touches the day you are on. Stray day numbers outside the plan are ignored.
+
 ### Localization
 - **The plan card speaks your language:** The mark-done card in the plan reader localizes its book name, so Kiswahili shows "Mwanzo 1" instead of "Genesis 1".
 

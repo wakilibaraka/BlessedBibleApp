@@ -118,6 +118,14 @@ class ReadingPlanState {
   final Set<int> completedReadings; // Set of day numbers (legacy)
   final List<PlanDayData> planData;
 
+  /// When each day was ticked off (local calendar date, date-only).
+  ///
+  /// Never used to decide completion — [isDayComplete] stays the single
+  /// source of truth — so a stale entry can never hide a reading. It exists
+  /// for history: "read today", the plan streak, and the last-read date.
+  /// Progress migrated from older builds has no entry.
+  final Map<int, DateTime> completedOn;
+
   /// Content-keyed completion: atom ids `Book|sc|sv|ec|ev` per passage.
   /// Stable across re-partitioning (repace never loses progress), unlike
   /// day numbers. Written alongside [completedReadings] (additive
@@ -147,6 +155,7 @@ class ReadingPlanState {
     this.restDays = const {},
     this.completedReadings = const {},
     this.planData = const [],
+    this.completedOn = const {},
     this.completedAtomIds = const {},
     this.dayAtoms = const {},
     this.error,
@@ -162,6 +171,52 @@ class ReadingPlanState {
   bool isRestWeekday(int appWeekday) => restDays.isNotEmpty
       ? restDays.contains(appWeekday)
       : restDay == appWeekday;
+
+  /// Local calendar date with the time dropped, so two dates on the same day
+  /// compare equal even across a DST shift.
+  static DateTime dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+
+  /// `2026-11-21` — the persisted form of a completion date.
+  static String dateKey(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-'
+      '${d.day.toString().padLeft(2, '0')}';
+
+  /// True when at least one reading was completed today (any passage).
+  bool get readToday {
+    final today = ReadingPlanState.dateOnly(DateTime.now());
+    return completedOn.values.any((d) => dateOnly(d) == today);
+  }
+
+  /// When [day] was completed, or null for progress carried over from a
+  /// build that did not record dates.
+  DateTime? completedAt(int day) => completedOn[day];
+
+  /// Most recent completion date in this plan, if any.
+  DateTime? get lastReadOn {
+    if (completedOn.isEmpty) return null;
+    return completedOn.values.reduce((a, b) => a.isAfter(b) ? a : b);
+  }
+
+  /// Consecutive days with at least one completed reading, in this plan.
+  ///
+  /// Today not being read yet does not break the streak — it only breaks once
+  /// yesterday is also empty, which is how reading streaks are counted. Dates
+  /// walk by calendar day (`day - 1`), so a DST shift cannot skip or repeat one.
+  int get readingStreak {
+    if (completedOn.isEmpty) return 0;
+    final keys = {for (final d in completedOn.values) dateKey(d)};
+    var cursor = ReadingPlanState.dateOnly(DateTime.now());
+    if (!keys.contains(dateKey(cursor))) {
+      cursor = DateTime(cursor.year, cursor.month, cursor.day - 1);
+      if (!keys.contains(dateKey(cursor))) return 0;
+    }
+    var streak = 0;
+    while (keys.contains(dateKey(cursor))) {
+      streak++;
+      cursor = DateTime(cursor.year, cursor.month, cursor.day - 1);
+    }
+    return streak;
+  }
 
   /// Effective day completion: the atom rule when atoms exist for the
   /// day (and any atom is recorded at all), otherwise the legacy
@@ -283,6 +338,7 @@ class ReadingPlanState {
     Set<int>? restDays,
     Set<int>? completedReadings,
     List<PlanDayData>? planData,
+    Map<int, DateTime>? completedOn,
     Set<String>? completedAtomIds,
     Map<int, List<String>>? dayAtoms,
     // Sentinel so callers can explicitly clear with error: null.
@@ -300,6 +356,7 @@ class ReadingPlanState {
       restDays: restDays ?? this.restDays,
       completedReadings: completedReadings ?? this.completedReadings,
       planData: planData ?? this.planData,
+      completedOn: completedOn ?? this.completedOn,
       completedAtomIds: completedAtomIds ?? this.completedAtomIds,
       // New readings invalidate cached atoms (rebuilt on next load).
       dayAtoms:
@@ -431,6 +488,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       Set<int> restDays = {};
       Set<int> completedReadings = {};
       Set<String> completedAtoms = {};
+      final Map<int, DateTime> completedOn = {};
       bool reminderEnabled = false;
       int reminderTimeHour = 8;
       int reminderTimeMinute = 0;
@@ -443,6 +501,18 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         if (prefsState.containsKey('completedAtoms')) {
           final list = prefsState['completedAtoms'] as List;
           completedAtoms = list.map((e) => e as String).toSet();
+        }
+        // Added after the first release of plans: absent on older installs
+        // and on cloud backups written before this build.
+        final rawDates = prefsState['completedOn'];
+        if (rawDates is Map) {
+          rawDates.forEach((key, value) {
+            final day = int.tryParse('$key');
+            final parsed = value is String ? DateTime.tryParse(value) : null;
+            if (day != null && parsed != null) {
+              completedOn[day] = ReadingPlanState.dateOnly(parsed);
+            }
+          });
         }
         if (prefsState['planStartedOn'] != null) {
           planStartedOn =
@@ -579,6 +649,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         restDays: restDays,
         completedReadings: completedReadings,
         completedAtomIds: completedAtoms,
+        completedOn: completedOn,
         dayAtoms: dayAtoms,
         reminderEnabled: reminderEnabled,
         reminderTimeHour: reminderTimeHour,
@@ -663,6 +734,10 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       'restDays': s.restDays.toList(),
       'completedReadings': s.completedReadings.toList(),
       'completedAtoms': s.completedAtomIds.toList(),
+      'completedOn': {
+        for (final e in s.completedOn.entries)
+          '${e.key}': ReadingPlanState.dateKey(e.value),
+      },
       'reminderEnabled': s.reminderEnabled,
       'reminderTimeHour': s.reminderTimeHour,
       'reminderTimeMinute': s.reminderTimeMinute,
@@ -690,6 +765,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       completedReadings: {},
       planData: customPlanData,
       completedAtomIds: {},
+      completedOn: {},
     );
     state = next;
     _saveToPrefs(next);
@@ -697,11 +773,21 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
   }
 
   void markReadingComplete(int day) {
+    // Guard the plan range so a stray day number cannot sit in
+    // completedReadings forever, but stay lenient while the schedule is still
+    // loading (planData empty): the reader can finish a day before the plan
+    // provider has parsed it, and that completion must not be dropped.
+    if (day < 1) return;
+    if (state.planData.isNotEmpty && day > state.planData.length) return;
     final newCompleted = Set<int>.from(state.completedReadings)..add(day);
     final newAtoms = Set<String>.from(state.completedAtomIds)
       ..addAll(state.dayAtoms[day] ?? const []);
+    final newDates = Map<int, DateTime>.from(state.completedOn)
+      ..[day] = ReadingPlanState.dateOnly(DateTime.now());
     final next = state.copyWith(
-        completedReadings: newCompleted, completedAtomIds: newAtoms);
+        completedReadings: newCompleted,
+        completedAtomIds: newAtoms,
+        completedOn: newDates);
     state = next;
     _saveToPrefs(next);
   }
@@ -710,8 +796,11 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     final newCompleted = Set<int>.from(state.completedReadings)..remove(day);
     final newAtoms = Set<String>.from(state.completedAtomIds)
       ..removeAll(state.dayAtoms[day] ?? const []);
+    final newDates = Map<int, DateTime>.from(state.completedOn)..remove(day);
     final next = state.copyWith(
-        completedReadings: newCompleted, completedAtomIds: newAtoms);
+        completedReadings: newCompleted,
+        completedAtomIds: newAtoms,
+        completedOn: newDates);
     state = next;
     _saveToPrefs(next);
   }
@@ -724,11 +813,18 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     final newCompleted = Set<int>.from(state.completedReadings)
       ..addAll(List.generate(last - 1, (i) => i + 1));
     final newAtoms = Set<String>.from(state.completedAtomIds);
+    final today = ReadingPlanState.dateOnly(DateTime.now());
+    final newDates = Map<int, DateTime>.from(state.completedOn);
     for (var d = 1; d < last; d++) {
       newAtoms.addAll(state.dayAtoms[d] ?? const []);
+      // Days already dated keep the date they were actually read; days
+      // swept up by catch-up are dated today, when that work happened.
+      newDates.putIfAbsent(d, () => today);
     }
     final next = state.copyWith(
-        completedReadings: newCompleted, completedAtomIds: newAtoms);
+        completedReadings: newCompleted,
+        completedAtomIds: newAtoms,
+        completedOn: newDates);
     state = next;
     _saveToPrefs(next);
   }
@@ -795,6 +891,7 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       planStartedOn: DateTime.now(),
       completedReadings: {},
       completedAtomIds: {},
+      completedOn: {},
     );
     state = next;
     _saveToPrefs(next);
@@ -839,8 +936,17 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
         newCompleted.add(d);
       }
     }
+    final today = ReadingPlanState.dateOnly(DateTime.now());
+    final newDates = Map<int, DateTime>.from(state.completedOn);
+    for (final d in newCompleted) {
+      // Only days this chapter completed get a date; carried-over progress
+      // keeps "unknown" rather than claiming it was read today.
+      if (!state.isDayComplete(d)) newDates.putIfAbsent(d, () => today);
+    }
     final next = state.copyWith(
-        completedReadings: newCompleted, completedAtomIds: newAtoms);
+        completedReadings: newCompleted,
+        completedAtomIds: newAtoms,
+        completedOn: newDates);
     state = next;
     _saveToPrefs(next);
   }
@@ -886,9 +992,24 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
       // Persist updated plan definition
       prefs.saveCustomPlan(_planId, result.newPlan.toJson());
 
-      // Persist updated progress
-      final next =
-          state.copyWith(completedReadings: result.newCompletedReadings);
+      // Persist updated progress. The NEW schedule's atoms must be added:
+      // keeping only the old partition's ids made isDayComplete() read the
+      // remapped days as incomplete on the next load, silently losing the
+      // progress this remap had just preserved. The old ids stay recorded so
+      // no completed content is forgotten (and a second repace still sees it).
+      final next = state.copyWith(
+        completedReadings: result.newCompletedReadings,
+        completedAtomIds: {
+          ...state.completedAtomIds,
+          ...atomsForCompletedDays(result.newPlan, result.newCompletedReadings),
+        },
+        // Day numbers move when the schedule is re-cut, so only dates from
+        // day numbers that survive are carried; the rest become unknown.
+        completedOn: {
+          for (final d in result.newCompletedReadings)
+            if (state.completedOn[d] != null) d: state.completedOn[d]!,
+        },
+      );
       state = next;
       _saveToPrefs(next);
 
@@ -900,6 +1021,18 @@ class ReadingPlanNotifier extends Notifier<ReadingPlanState> {
     }
   }
 }
+
+/// Content atoms for every day of [plan] that is complete in [completedDays].
+///
+/// Repace rebuilds `completedAtomIds` from this so the atom rule agrees with
+/// the remapped day numbers on the next load.
+Set<String> atomsForCompletedDays(ReadingPlan plan, Set<int> completedDays) => {
+      for (final day in plan.schedule)
+        if (completedDays.contains(day.dayNumber))
+          for (final portion in day.portions)
+            '${portion.book}|${portion.startChapter}|${portion.startVerse}|'
+                '${portion.endChapter}|${portion.endVerse}',
+    };
 
 final readingPlanProvider =
     NotifierProvider.family<ReadingPlanNotifier, ReadingPlanState, String>(

@@ -210,7 +210,13 @@ class _ReadingPlanDetailV2ScreenState
         title: _title(),
         meta: total == 0
             ? context.l10n.plansNoReadingsYet
-            : context.l10n.plansReadingDaysWeeks(total, (total / 7).ceil()),
+            // The streak sits with the plan's own stats: consecutive days on
+            // which this plan had a reading completed.
+            : [
+                context.l10n.plansReadingDaysWeeks(total, (total / 7).ceil()),
+                if (plan.readingStreak >= 2)
+                  context.l10n.todayStreakDays(plan.readingStreak),
+              ].join(' · '),
       ),
       if (started && total > 0) ...[
         const SizedBox(height: 14),
