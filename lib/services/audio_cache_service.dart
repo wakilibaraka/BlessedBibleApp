@@ -84,6 +84,65 @@ class AudioCacheService {
     }
   }
 
+  /// How often the cap is re-checked while a download of unknown length is
+  /// still streaming in. Small enough that a 200 MB cap cannot be blown by
+  /// more than this before the next eviction.
+  static const int capCheckInterval = 512 * 1024;
+
+  /// Writes [chunks] to this chapter's file, enforcing the cap as it goes.
+  ///
+  /// With a Content-Length the space is reserved up front; without one (a
+  /// chunked response) the partial size is counted against the cap every
+  /// [capCheckInterval] bytes, so the 200 MB limit holds either way. The
+  /// chapter being written is never evicted.
+  Future<void> storeStream(
+    String chapterId,
+    Stream<List<int>> chunks, {
+    int? totalBytes,
+    void Function(int received, int? total)? onProgress,
+  }) async {
+    final target = await fileFor(chapterId);
+    final partial = File('${target.path}.part');
+    final sink = partial.openWrite();
+    var received = 0;
+    var lastCapCheck = 0;
+    try {
+      if (totalBytes != null) {
+        await trimToCap(incomingBytes: totalBytes, keep: {chapterId});
+      }
+      await for (final chunk in chunks) {
+        sink.add(chunk);
+        received += chunk.length;
+        onProgress?.call(received, totalBytes);
+        if (totalBytes == null && received - lastCapCheck >= capCheckInterval) {
+          lastCapCheck = received;
+          await trimToCap(incomingBytes: received, keep: {chapterId});
+        }
+      }
+      await sink.flush();
+      await sink.close();
+      if (await target.exists()) await target.delete();
+      await partial.rename(target.path);
+      // Final pass: now that the file is on disk it is counted directly, so
+      // anything that slipped in during the transfer is trimmed here.
+      await trimToCap(keep: {chapterId});
+    } catch (_) {
+      try {
+        await sink.close();
+      } on StateError {
+        // The sink may already be closed by the failure path.
+      }
+      if (await partial.exists()) {
+        try {
+          await partial.delete();
+        } on FileSystemException {
+          // Nothing else to do; the user can retry.
+        }
+      }
+      rethrow;
+    }
+  }
+
   Future<void> clear() async {
     if (!await root.exists()) return;
     await for (final entity in root.list()) {

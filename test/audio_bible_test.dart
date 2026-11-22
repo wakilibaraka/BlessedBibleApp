@@ -87,6 +87,58 @@ void main() {
       expect(AudioBibleService.previous('Genesis', 1), isNull);
     });
 
+    test('a completion advances once, and never during another load', () {
+      // First completion for Genesis 1 advances.
+      expect(
+        AudioBibleService.advanceAfterCompletion(
+          book: 'Genesis',
+          chapter: 1,
+          consumedFor: null,
+          navigating: false,
+        ),
+        const AudioChapterRef('Genesis', 2),
+      );
+      // The same event arriving again is ignored.
+      expect(
+        AudioBibleService.advanceAfterCompletion(
+          book: 'Genesis',
+          chapter: 1,
+          consumedFor: AudioBibleService.chapterId('Genesis', 1),
+          navigating: false,
+        ),
+        isNull,
+      );
+      // A manual next already loading must not be raced.
+      expect(
+        AudioBibleService.advanceAfterCompletion(
+          book: 'Genesis',
+          chapter: 1,
+          consumedFor: null,
+          navigating: true,
+        ),
+        isNull,
+      );
+      // Nothing left to advance to, and nothing loaded yet.
+      expect(
+        AudioBibleService.advanceAfterCompletion(
+          book: 'Revelation',
+          chapter: 22,
+          consumedFor: null,
+          navigating: false,
+        ),
+        isNull,
+      );
+      expect(
+        AudioBibleService.advanceAfterCompletion(
+          book: null,
+          chapter: null,
+          consumedFor: null,
+          navigating: false,
+        ),
+        isNull,
+      );
+    });
+
     test('speed cycles and never leaves the supported range', () {
       expect(AudioBibleService.nextSpeed(1.0), 1.25);
       expect(AudioBibleService.nextSpeed(2.0), 0.75);
@@ -147,6 +199,60 @@ void main() {
       expect(await middle.exists(), isTrue);
       expect(await newest.exists(), isTrue);
       expect(await cache.totalBytes(), lessThanOrEqualTo(cache.maxBytes));
+    });
+
+    test('streams of unknown length still respect the cap', () async {
+      // Three 512 KB chapters with a 2 MB cap: the incoming 1 MB chapter only
+      // fits if an old one goes, and the server will not tell us its size.
+      final tight = AudioCacheService(temp, maxBytes: 2 * 1024 * 1024);
+      var age = 2020;
+      for (final name in ['Genesis:1', 'Genesis:2', 'Genesis:3']) {
+        final file = await tight.fileFor(name);
+        await file.writeAsBytes(List<int>.filled(512 * 1024, 0));
+        file.setLastModifiedSync(DateTime(age++, 1, 1));
+      }
+      var receivedTotal = 0;
+      int? reportedTotal;
+      Stream<List<int>> chunks() async* {
+        for (var i = 0; i < 4; i++) {
+          yield List<int>.filled(256 * 1024, 0);
+        }
+      }
+
+      await tight.storeStream(
+        'Genesis:4',
+        chunks(),
+        onProgress: (received, total) {
+          receivedTotal = received;
+          reportedTotal = total;
+        },
+      );
+
+      expect(receivedTotal, 1024 * 1024);
+      expect(reportedTotal, isNull,
+          reason: 'no Content-Length means no reported total');
+      expect(await tight.has('Genesis:4'), isTrue);
+      expect(await tight.totalBytes(), lessThanOrEqualTo(tight.maxBytes));
+      expect(await tight.has('Genesis:1'), isFalse,
+          reason: 'the oldest chapter is the one evicted');
+    });
+
+    test('streams that announce a length reserve space first', () async {
+      final tight = AudioCacheService(temp, maxBytes: 2 * 1024 * 1024);
+      var age = 2020;
+      for (final name in ['Genesis:1', 'Genesis:2']) {
+        final file = await tight.fileFor(name);
+        await file.writeAsBytes(List<int>.filled(900 * 1024, 0));
+        file.setLastModifiedSync(DateTime(age++, 1, 1));
+      }
+      final big = Stream<List<int>>.fromIterable(
+        [List<int>.filled(1024 * 1024, 0)],
+      );
+      await tight.storeStream('Genesis:3', big, totalBytes: 1024 * 1024);
+      expect(await tight.has('Genesis:3'), isTrue);
+      expect(await tight.has('Genesis:1'), isFalse,
+          reason: 'space is reserved before the first byte arrives');
+      expect(await tight.totalBytes(), lessThanOrEqualTo(tight.maxBytes));
     });
 
     test('never evicts the file being written', () async {

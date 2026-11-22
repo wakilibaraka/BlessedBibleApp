@@ -138,7 +138,11 @@ class _AudioBibleSheetState extends ConsumerState<AudioBibleSheet> {
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          value: audio.downloadProgress,
+                          // A server that sends no Content-Length gives no
+                          // fraction to show, so spin instead of sitting at 0.
+                          value: (audio.downloadProgress ?? 0) > 0
+                              ? audio.downloadProgress
+                              : null,
                         ),
                       ),
                     IconButton(

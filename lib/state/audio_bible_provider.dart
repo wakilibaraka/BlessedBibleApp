@@ -89,6 +89,15 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
   StreamSubscription<Duration?>? _durationSub;
   AudioCacheService? _cache;
 
+  /// Set while a chapter load started by auto-advance or the next/previous
+  /// buttons is in flight, so a second trigger is dropped instead of opening
+  /// two chapters at once.
+  bool _navigating = false;
+
+  /// The chapter id whose completion event has already been acted on. The
+  /// player can report `completed` more than once for the same source.
+  String? _consumedCompletion;
+
   @override
   AudioBibleState build() {
     ref.onDispose(() {
@@ -112,13 +121,21 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
             processing == ProcessingState.buffering,
       );
       if (processing == ProcessingState.completed) {
-        final next =
-            AudioBibleService.next(state.book ?? '', state.chapter ?? 0);
-        if (next != null) {
+        final completedBook = state.book;
+        final completedChapter = state.chapter;
+        final target = AudioBibleService.advanceAfterCompletion(
+          book: completedBook,
+          chapter: completedChapter,
+          consumedFor: _consumedCompletion,
+          navigating: _navigating,
+        );
+        if (target != null) {
+          _consumedCompletion =
+              AudioBibleService.chapterId(completedBook!, completedChapter!);
           // Continuous listening: move to the next chapter instead of
           // silently stopping at the end of a chapter.
-          unawaited(openChapter(next.bookName, next.chapter));
-        } else {
+          unawaited(_navigate(target));
+        } else if (!_navigating) {
           state = state.copyWith(playing: false);
         }
       }
@@ -178,6 +195,9 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
       return;
     }
 
+    // A new load is a new completion budget: replaying this chapter later
+    // must be allowed to advance again.
+    _consumedCompletion = null;
     state = state.copyWith(
       book: book,
       chapter: chapter,
@@ -243,17 +263,27 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
   Future<void> cycleSpeed() =>
       setSpeed(AudioBibleService.nextSpeed(state.speed));
 
+  /// Single entry point for every advance, so auto-advance and the buttons
+  /// cannot both start a load for the same tap.
+  Future<void> _navigate(AudioChapterRef target) async {
+    if (_navigating) return;
+    _navigating = true;
+    try {
+      await openChapter(target.bookName, target.chapter);
+    } finally {
+      _navigating = false;
+    }
+  }
+
   Future<void> nextChapter() async {
     final next = AudioBibleService.next(state.book ?? '', state.chapter ?? 0);
-    if (next != null) await openChapter(next.bookName, next.chapter);
+    if (next != null) await _navigate(next);
   }
 
   Future<void> previousChapter() async {
     final previous =
         AudioBibleService.previous(state.book ?? '', state.chapter ?? 0);
-    if (previous != null) {
-      await openChapter(previous.bookName, previous.chapter);
-    }
+    if (previous != null) await _navigate(previous);
   }
 
   /// Downloads the current chapter to the cache, keeping the on-disk total
@@ -267,8 +297,6 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
     }
     final id = AudioBibleService.chapterId(state.book!, state.chapter!);
     final cache = await _ensureCache();
-    final target = await cache.fileFor(id);
-    final partial = File('${target.path}.part');
     state = state.copyWith(downloadProgress: 0, failure: null);
 
     final client = http.Client();
@@ -277,32 +305,19 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
       if (response.statusCode != HttpStatus.ok) {
         throw HttpException('HTTP ${response.statusCode}', uri: Uri.parse(url));
       }
-      await cache.trimToCap(
-        incomingBytes: response.contentLength ?? 0,
-        keep: {id},
+      // The cache enforces the cap itself, including when the server sends
+      // no Content-Length.
+      await cache.storeStream(
+        id,
+        response.stream,
+        totalBytes: response.contentLength,
+        onProgress: (received, total) {
+          if (total != null && total > 0) {
+            state = state.copyWith(downloadProgress: received / total);
+          }
+        },
       );
-      final total = response.contentLength ?? 0;
-      final sink = partial.openWrite();
-      var received = 0;
-      await for (final chunk in response.stream) {
-        sink.add(chunk);
-        received += chunk.length;
-        if (total > 0) {
-          state = state.copyWith(downloadProgress: received / total);
-        }
-      }
-      await sink.flush();
-      await sink.close();
-      if (await target.exists()) await target.delete();
-      await partial.rename(target.path);
     } catch (_) {
-      if (await partial.exists()) {
-        try {
-          await partial.delete();
-        } on FileSystemException {
-          // Nothing else to do; the user can retry.
-        }
-      }
       state = state.copyWith(
         downloadProgress: null,
         failure: AudioFailure.network,

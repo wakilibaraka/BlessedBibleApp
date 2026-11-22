@@ -188,6 +188,22 @@ class AudioBibleService {
     return AudioChapterRef(before.bookName, before.chapters);
   }
 
+  /// The chapter a completion event should move to, or null when this event
+  /// must be ignored. Completion can fire more than once for the same source
+  /// and can race a manual next/previous, so a chapter's completion is
+  /// consumed exactly once and no advance starts while one is already in
+  /// flight.
+  static AudioChapterRef? advanceAfterCompletion({
+    required String? book,
+    required int? chapter,
+    required String? consumedFor,
+    required bool navigating,
+  }) {
+    if (navigating || book == null || chapter == null) return null;
+    if (consumedFor == chapterId(book, chapter)) return null;
+    return next(book, chapter);
+  }
+
   /// Cycles 0.75x -> 1x -> 1.25x -> 1.5x -> 2x -> 0.75x, snapping whatever
   /// the player reports to the nearest option so a restored speed cannot skip.
   static double nextSpeed(double current) {
