@@ -1,7 +1,7 @@
 # Graph Report - Blessed Bible  (2026-11-23)
 
 ## Corpus Check
-- 448 files · ~3,310,338 words
+- 448 files · ~3,310,155 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 138 file(s) not represented in the graph (top: .ttf 48, .xml 32, .db 14)
 - WARNING: 138 of 686 files seen (20%) have no supported extractor and are missing from this graph entirely. It may look complete while representing only part of the codebase.
@@ -12,7 +12,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `bf56b840`
+- Built from commit: `7b6ef5f7`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -226,20 +226,20 @@
 6. `_` - 35 edges
 7. `dependencies` - 33 edges
 8. `_ReadScreenState` - 32 edges
-9. `readingPlanProvider` - 30 edges
-10. `activeTranslationProvider` - 30 edges
+9. `activeTranslationProvider` - 30 edges
+10. `readingPlanProvider` - 30 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `4. Work breakdown (one PR each)` --references--> `merge()`  [INFERRED]
   docs/PHASE_5B_SYNC_PLAN.md → tool/build_topical.py
+- `_FixedAutoTheme` --inherits--> `AutoThemeInputsNotifier`  [EXTRACTED]
+  test/goldens_test.dart → lib/state/theme_provider.dart
 - `_FakeBible` --inherits--> `BibleNotifier`  [EXTRACTED]
   test/commentary_verse_card_test.dart → lib/state/bible_provider.dart
 - `_FakeBible` --inherits--> `BibleNotifier`  [EXTRACTED]
   test/passage_deep_link_test.dart → lib/state/bible_provider.dart
 - `_FakeBible` --inherits--> `BibleNotifier`  [EXTRACTED]
   test/votd_pool_test.dart → lib/state/bible_provider.dart
-- `_FakeCommentary` --inherits--> `CommentaryNotifier`  [EXTRACTED]
-  test/commentary_hub_test.dart → lib/state/commentary_provider.dart
 
 ## Import Cycles
 - None detected.
@@ -995,7 +995,7 @@ Cohesion: 0.50
 Nodes (4): git, blessed_account, ref, url
 
 ## Knowledge Gaps
-- **14261 isolated node(s):** `YearProgress`, `_votdEpochDay`, `index`, `calendarDayNumber`, `votdDayNumber` (+14256 more)
+- **14261 isolated node(s):** `a11yHideNav`, `a11yMakePrimary`, `a11yNextWeek`, `a11yNotifications`, `a11yPreviousWeek` (+14256 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 14991 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **21 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -1004,15 +1004,15 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `_` connect `_` to `verse_link_text.dart`, `share_sheet.dart`, `textured_glass_container.dart`, `package:flutter_riverpod/flutter_riverpod.dart`, `preferencesProvider`, `List`, `dart:convert`, `reading_plan_detail_v2_screen.dart`, `storage_screen.dart`, `share_sheet_test.dart`?**
   _High betweenness centrality (0.012) - this node is a cross-community bridge._
-- **What connects `YearProgress`, `_votdEpochDay`, `index` to the rest of the system?**
+- **What connects `a11yHideNav`, `a11yMakePrimary`, `a11yNextWeek` to the rest of the system?**
   _14261 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `app_localizations.dart` be split into smaller, more focused modules?**
   _Cohesion score 0.0016339869281045752 - nodes in this community are weakly interconnected._
-- **Why does `AppLocalizations` connect `AppLocalizations` to `app_localizations.dart`, `home_screen.dart`, `package:flutter/widgets.dart`?**
-  _High betweenness centrality (0.007) - this node is a cross-community bridge._
+- **Why does `preferencesProvider` connect `preferencesProvider` to `most_read_provider.dart`, `package:flutter_riverpod/flutter_riverpod.dart`, `preferences_service.dart`, `reading_plan_provider.dart`, `locale_provider.dart`, `read_screen.dart`, `theme_picker_sheet.dart`, `search_provider.dart`, `plan_flow.dart`, `account_menu.dart`, `bible_sync.dart`, `resolvedThemeProvider`, `home_provider.dart`, `_`, `devotional_provider.dart`, `theme_provider.dart`, `study_screen_v2.dart`, `widget_settings_provider.dart`, `auth_provider.dart`, `story_of_the_day_provider.dart`, `share_sheet.dart`, `streak_provider.dart`, `read_location_provider.dart`, `List`?**
+  _High betweenness centrality (0.009) - this node is a cross-community bridge._
 - **Should `app_localizations_en.dart` be split into smaller, more focused modules?**
   _Cohesion score 0.0016570008285004142 - nodes in this community are weakly interconnected._
 - **Why does `_` connect `_` to `most_read_provider.dart`, `verse_linker.dart`, `streak_provider.dart`, `ai_journal_service.dart`, `widget_settings_provider.dart`?**
-  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **Should `app_localizations_fr.dart` be split into smaller, more focused modules?**
   _Cohesion score 0.0016570008285004142 - nodes in this community are weakly interconnected._
