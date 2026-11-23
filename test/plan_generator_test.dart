@@ -165,6 +165,78 @@ void main() {
         'Genesis breaks: Pericope=${30 - chapterBreaks - verseBreaks}, Chapter=$chapterBreaks, Verse=$verseBreaks');
   });
 
+  test('overlapping pericopes and gaps tile the range exactly', () async {
+    // One word per verse, so a chunk's word count is its verse count.
+    final wc = WordCountService();
+    await wc.initFromJson(jsonEncode({
+      'Test': {
+        '1': {
+          'total': 20,
+          'verses': {for (var v = 1; v <= 20; v++) '$v': 1},
+        }
+      }
+    }));
+    PericopeEntry pericope(String id, int startVerse, int endVerse) =>
+        PericopeEntry(
+          id: id,
+          book: 'Test',
+          startChapter: 1,
+          startVerse: startVerse,
+          endChapter: 1,
+          endVerse: endVerse,
+          title: id,
+          confidence: 'high',
+        );
+    // p1/p2 overlap at 1:3-1:5; 1:9-1:12 and 1:17-1:20 are uncovered gaps.
+    final gen = PlanGenerator(
+      wordCountService: wc,
+      allPericopes: [
+        pericope('p1', 1, 5),
+        pericope('p2', 3, 8),
+        pericope('p3', 13, 16),
+      ],
+    );
+
+    final plan = gen.generatePlan(
+      id: 'synthetic',
+      title: 'Synthetic',
+      tracks: [
+        [
+          PlanRange(
+              book: 'Test',
+              startChapter: 1,
+              startVerse: 1,
+              endChapter: 1,
+              endVerse: 20)
+        ]
+      ],
+      days: 5,
+    );
+
+    // Portions tile 1:1-1:20 once: no verse dropped (gaps) or counted twice
+    // (overlaps), and every portion's word count matches its verse span.
+    final portions = [for (final day in plan.schedule) ...day.portions];
+    var expectedStart = 1;
+    for (final p in portions) {
+      expect(p.startVerse, expectedStart);
+      expect(p.wordCount, p.endVerse - p.startVerse + 1);
+      expectedStart = p.endVerse + 1;
+    }
+    expect(expectedStart, 21);
+    expect(plan.schedule.fold<int>(0, (n, d) => n + d.totalWords), 20);
+
+    // Chunk edges come only from pericope starts/ends (after 2, 5, 8, 12, 16)
+    // and the range end; with 5 days and no chunk larger than the split
+    // threshold, every day break must land on one of those edges.
+    final dayEnds = [
+      for (final day in plan.schedule) day.portions.last.endVerse
+    ];
+    for (final end in dayEnds) {
+      expect([2, 5, 8, 12, 16, 20], contains(end),
+          reason: 'day breaks must be pericope boundaries, got $dayEnds');
+    }
+  });
+
   test('Multi-track: Genesis + Hebrews in 30 days', () {
     final plan = generator.generatePlan(
       id: 'genheb30',
@@ -435,6 +507,7 @@ void main() {
       }
     }
 
+    final generationTimer = Stopwatch()..start();
     final plan = generator.generatePlan(
       id: 'bible3',
       title: 'Whole Bible in 3 Days',
@@ -442,6 +515,9 @@ void main() {
       days: 3,
       cadence: 7,
     );
+    generationTimer.stop();
+    debugPrint(
+        'Whole Bible 3-day plan generation: ${generationTimer.elapsedMicroseconds} µs');
 
     expect(plan.days, 3);
     int totalBibleWords = 0;
@@ -450,6 +526,19 @@ void main() {
       totalBibleWords += day.totalWords;
       expect(day.totalWords, greaterThan(200000)); // ~263k
     }
+    final expectedWords = ranges.fold<int>(
+      0,
+      (total, range) =>
+          total +
+          wordCountService.wordsInRange(
+            range.book,
+            range.startChapter,
+            range.startVerse,
+            range.endChapter,
+            range.endVerse,
+          ),
+    );
+    expect(totalBibleWords, expectedWords);
     debugPrint('Whole Bible total words in 3-day plan: $totalBibleWords');
   });
 

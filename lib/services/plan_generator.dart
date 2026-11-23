@@ -10,13 +10,8 @@ class _Chunk {
   final int endV;
   final int words;
 
-  /// Identifies if this chunk ends on a pericope boundary naturally.
-  final bool endsOnPericope;
-  final bool endsOnChapter;
-
   _Chunk(
-      this.book, this.startCh, this.startV, this.endCh, this.endV, this.words,
-      {this.endsOnPericope = false, this.endsOnChapter = false});
+      this.book, this.startCh, this.startV, this.endCh, this.endV, this.words);
 }
 
 const int kSlowReaderWpm = 130;
@@ -253,54 +248,40 @@ class PlanGenerator {
     }
     if (chs.isEmpty) return [];
 
-    // Cover key per verse: sorted ids of intersecting pericopes ('-' = gap).
-    String keyFor(int i) {
-      final r = _ref(chs[i], vs[i]);
-      final ids = <int>[];
-      for (var k = 0; k < bookPericopes.length; k++) {
-        final p = bookPericopes[k];
-        if (r >= _ref(p.startChapter, p.startVerse) &&
-            r <= _ref(p.endChapter, p.endVerse)) {
-          ids.add(k);
-        }
-      }
-      return ids.isEmpty ? '-' : ids.join(',');
-    }
-
-    bool pericopeEndsAt(int i) {
-      final r = _ref(chs[i], vs[i]);
-      for (final p in bookPericopes) {
-        if (r == _ref(p.endChapter, p.endVerse)) return true;
-      }
-      return false;
-    }
+    // A verse's covering pericopes change only where one starts or ends, so
+    // runs of equal coverage break exactly at those refs. Sweeping them keeps
+    // this linear in verses instead of verses × pericopes, and needs no
+    // active-set bookkeeping: every boundary is a real coverage change
+    // (a starting pericope was not covering the previous verse, an ending
+    // one will not cover the next), so overlaps and gaps both stay exact.
+    final starts = {
+      for (final p in bookPericopes) _ref(p.startChapter, p.startVerse)
+    };
+    final ends = {
+      for (final p in bookPericopes) _ref(p.endChapter, p.endVerse)
+    };
 
     final chunks = <_Chunk>[];
     var runStart = 0;
-    var runKey = keyFor(0);
     void emitRun(int end) {
-      final words = wordCountService.wordsInRange(
-          range.book, chs[runStart], vs[runStart], chs[end], vs[end]);
       chunks.add(_Chunk(
         range.book,
         chs[runStart],
         vs[runStart],
         chs[end],
         vs[end],
-        words,
-        endsOnPericope: pericopeEndsAt(end),
-        endsOnChapter:
-            vs[end] == wordCountService.maxVerseInChapter(range.book, chs[end]),
+        wordCountService.wordsInRange(
+            range.book, chs[runStart], vs[runStart], chs[end], vs[end]),
       ));
     }
 
     for (var i = 1; i < chs.length; i++) {
-      final k = keyFor(i);
-      if (k != runKey) {
-        emitRun(i - 1);
-        runStart = i;
-        runKey = k;
+      if (!ends.contains(_ref(chs[i - 1], vs[i - 1])) &&
+          !starts.contains(_ref(chs[i], vs[i]))) {
+        continue;
       }
+      emitRun(i - 1);
+      runStart = i;
     }
     emitRun(chs.length - 1);
     return chunks;
@@ -318,13 +299,7 @@ class PlanGenerator {
             ? c.endV
             : wordCountService.maxVerseInChapter(c.book, ch);
         final int words = wordCountService.wordsInRange(c.book, ch, sV, ch, eV);
-
-        final bool endsOnPericope = (ch == c.endCh) ? c.endsOnPericope : false;
-        final bool endsOnChapter =
-            eV == wordCountService.maxVerseInChapter(c.book, ch);
-
-        chapterChunks.add(_Chunk(c.book, ch, sV, ch, eV, words,
-            endsOnPericope: endsOnPericope, endsOnChapter: endsOnChapter));
+        chapterChunks.add(_Chunk(c.book, ch, sV, ch, eV, words));
       }
       return chapterChunks.expand((cc) => _splitChunk(cc, maxWords)).toList();
     }
@@ -335,11 +310,7 @@ class PlanGenerator {
       for (int v = c.startV; v <= c.endV; v++) {
         final int words =
             wordCountService.wordsInRange(c.book, c.startCh, v, c.startCh, v);
-        final bool endsOnPericope = (v == c.endV) ? c.endsOnPericope : false;
-        final bool endsOnChapter =
-            (v == wordCountService.maxVerseInChapter(c.book, c.startCh));
-        verseChunks.add(_Chunk(c.book, c.startCh, v, c.startCh, v, words,
-            endsOnPericope: endsOnPericope, endsOnChapter: endsOnChapter));
+        verseChunks.add(_Chunk(c.book, c.startCh, v, c.startCh, v, words));
       }
       return verseChunks;
     }
