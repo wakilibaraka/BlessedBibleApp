@@ -4,6 +4,8 @@ All notable changes to The Blessed Bible. Newest first.
 
 ## [Unreleased]
 
+## [0.0.7] - 2026-11-23
+
 ### Reader
 - **Read in context opens the chapter reader:** "Read in context" on the Verse of the Day, a commentary pull-quote, or a verse preview now opens the plan-style chapter reader at the named chapter with that verse accented and scrolled into view, instead of only switching to the Read tab.
 
