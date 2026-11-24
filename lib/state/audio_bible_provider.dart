@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -432,10 +433,21 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
     final file = await cache.fileFor(id);
     try {
       final player = _audio;
+      // The media item is what the lock screen and notification show.
+      final mediaItem = MediaItem(
+        id: id,
+        title: '$book $chapter',
+        album: 'World English Bible',
+        artist: 'Read by David Williams',
+      );
       if (await file.exists()) {
-        await player.setFilePath(file.path);
+        await player.setAudioSource(
+          AudioSource.file(file.path, tag: mediaItem),
+        );
       } else {
-        await player.setUrl(url);
+        await player.setAudioSource(
+          AudioSource.uri(Uri.parse(url), tag: mediaItem),
+        );
       }
       if (autoplay) await player.play();
       state = state.copyWith(downloaded: await file.exists());
