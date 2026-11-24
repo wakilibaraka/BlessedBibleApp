@@ -12,16 +12,17 @@ A fast, offline-first, distraction-free Bible study app crafted with Flutter. Bu
 
 ## ⬇️ Download & Installation
 
-Get the latest release APKs directly from [GitHub Releases](https://github.com/wakilibaraka/BlessedBibleApp/releases/latest).
+Get the latest release APK from [GitHub Releases](https://github.com/wakilibaraka/BlessedBibleApp/releases/latest).
 
 | Package | Recommended For | Description |
 | :--- | :--- | :--- |
-| **`BlessedBible-*-arm64-v8a.apk`** | **Most Modern Phones & Tablets** *(Recommended)* | Optimized 64-bit ARM build with the smallest download size (~127 MB) and fastest startup. |
-| **`BlessedBible-*-universal.apk`** | **Any Android Device** | Complete bundle containing all CPU architectures (~172 MB). Choose this if you're unsure of your processor type. |
-| **`BlessedBible-*-armeabi-v7a.apk`** | **Older 32-bit Phones** | Optimized build for older 32-bit ARM Android devices (~125 MB). |
-| **`BlessedBible-*-x86_64.apk`** | **Emulators & Chromebooks** | Optimized for Intel/AMD-based Android emulators and Chromebook devices (~128 MB). |
+| **`BlessedBible-v1.0.7-arm64-v8a.apk`** | **Modern 64-bit Android Phones & Tablets** *(Recommended)* | 64-bit ARM build — `versionName` 1.0.7, `versionCode` 2014, `minSdk` 24, ~150 MB. |
 
-> **How to install:** Download the APK matching your device, tap the downloaded file on your Android device, and allow installation from your browser or file manager when prompted.
+`checksums.txt` sits beside the APK on the release page and carries its SHA256 (`f80667ed…cb22`). The APK is signed with the project's test upload key, so it installs by sideload but is not a Play Store upload.
+
+> **How to install:** Download the APK, tap the downloaded file on your Android device, and allow installation from your browser or file manager when prompted.
+>
+> **Other architectures:** v1.0.7 ships arm64 only. 32-bit ARM, x86_64 and universal builds can still be produced locally with `flutter build apk --release --split-per-abi`; see Developer Setup below.
 
 ---
 
@@ -128,9 +129,14 @@ flutter test
 # Run app on connected device or emulator
 flutter run
 
-# Build a release APK for modern 64-bit phones (arm64 only, ~5 MB of packs)
-flutter build apk --release --target-platform android-arm64
+# Build the release APKs, one per CPU architecture
+flutter build apk --release --split-per-abi
+# → build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+#   is published as BlessedBible-v1.0.7-arm64-v8a.apk
 ```
+
+> `--target-platform android-arm64` alone still bundles the other architectures' plugin
+> libraries, so build with `--split-per-abi` and ship the `arm64-v8a` split.
 
 ### Content Build Scripts
 Database conversion and data processing tools reside in [`tool/`](tool/README.md).
