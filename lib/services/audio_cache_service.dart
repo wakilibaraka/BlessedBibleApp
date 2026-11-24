@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:path_provider/path_provider.dart';
+
 /// On-disk storage for chapters the listener chose to keep.
 ///
 /// The default is streaming, so this directory can legitimately stay empty.
@@ -13,6 +15,20 @@ class AudioCacheService {
 
   final Directory root;
   final int maxBytes;
+
+  /// The cache the app actually uses: `<support>/audio_bible`.
+  ///
+  /// Defined once so the player and Settings → Storage always measure and
+  /// clear the same directory.
+  static Future<AudioCacheService> openDefault({
+    int maxBytes = defaultMaxBytes,
+  }) async {
+    final support = await getApplicationSupportDirectory();
+    return AudioCacheService(
+      Directory('${support.path}${Platform.pathSeparator}audio_bible'),
+      maxBytes: maxBytes,
+    );
+  }
 
   Future<Directory> ensureRoot() async {
     if (!await root.exists()) await root.create(recursive: true);

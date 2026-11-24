@@ -7460,6 +7460,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sync the audio from here'**
   String get audioAnchorFromHere;
+
+  /// No description provided for @audioContinueListening.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue listening'**
+  String get audioContinueListening;
+
+  /// No description provided for @audioPausedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Paused at {time}'**
+  String audioPausedAt(Object time);
+
+  /// No description provided for @spaceAudioDownloads.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio downloads'**
+  String get spaceAudioDownloads;
+
+  /// No description provided for @spaceAudioExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'Chapters saved for offline listening. You can download them again at any time.'**
+  String get spaceAudioExplain;
+
+  /// No description provided for @spaceClearAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear audio downloads'**
+  String get spaceClearAudio;
+
+  /// No description provided for @spaceClearAudioTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear audio downloads?'**
+  String get spaceClearAudioTitle;
+
+  /// No description provided for @spaceClearAudioBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved chapters will be removed from this device. You can download them again at any time.'**
+  String get spaceClearAudioBody;
 }
 
 class _AppLocalizationsDelegate

@@ -4325,4 +4325,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get audioAnchorFromHere => 'Sync the audio from here';
+
+  @override
+  String get audioContinueListening => 'Continue listening';
+
+  @override
+  String audioPausedAt(Object time) {
+    return 'Paused at $time';
+  }
+
+  @override
+  String get spaceAudioDownloads => 'Audio downloads';
+
+  @override
+  String get spaceAudioExplain =>
+      'Chapters saved for offline listening. You can download them again at any time.';
+
+  @override
+  String get spaceClearAudio => 'Clear audio downloads';
+
+  @override
+  String get spaceClearAudioTitle => 'Clear audio downloads?';
+
+  @override
+  String get spaceClearAudioBody =>
+      'Saved chapters will be removed from this device. You can download them again at any time.';
 }

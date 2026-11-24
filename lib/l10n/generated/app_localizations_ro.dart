@@ -4389,4 +4389,29 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get audioAnchorFromHere => 'Sincronizează audio de aici';
+
+  @override
+  String get audioContinueListening => 'Continuă ascultarea';
+
+  @override
+  String audioPausedAt(Object time) {
+    return 'Pauză la $time';
+  }
+
+  @override
+  String get spaceAudioDownloads => 'Descărcări audio';
+
+  @override
+  String get spaceAudioExplain =>
+      'Capitole salvate pentru ascultare offline. Le poți descărca din nou oricând.';
+
+  @override
+  String get spaceClearAudio => 'Șterge descărcările audio';
+
+  @override
+  String get spaceClearAudioTitle => 'Ștergi descărcările audio?';
+
+  @override
+  String get spaceClearAudioBody =>
+      'Capitolele salvate vor fi eliminate de pe acest dispozitiv. Le poți descărca din nou oricând.';
 }

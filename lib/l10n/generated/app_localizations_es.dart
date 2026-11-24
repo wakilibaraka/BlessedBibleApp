@@ -4356,4 +4356,29 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get audioAnchorFromHere => 'Sincronizar el audio desde aquí';
+
+  @override
+  String get audioContinueListening => 'Seguir escuchando';
+
+  @override
+  String audioPausedAt(Object time) {
+    return 'Pausado en $time';
+  }
+
+  @override
+  String get spaceAudioDownloads => 'Descargas de audio';
+
+  @override
+  String get spaceAudioExplain =>
+      'Capítulos guardados para escuchar sin conexión. Puedes volver a descargarlos cuando quieras.';
+
+  @override
+  String get spaceClearAudio => 'Borrar descargas de audio';
+
+  @override
+  String get spaceClearAudioTitle => '¿Borrar las descargas de audio?';
+
+  @override
+  String get spaceClearAudioBody =>
+      'Los capítulos guardados se eliminarán de este dispositivo. Puedes descargarlos de nuevo cuando quieras.';
 }

@@ -1224,5 +1224,12 @@
   "audioAdvanceChapter": "Continuă redarea",
   "audioAdvanceBook": "Oprește la finalul cărții",
   "audioAdvanceOff": "Oprește la finalul capitolului",
-  "audioAnchorFromHere": "Sincronizează audio de aici"
+  "audioAnchorFromHere": "Sincronizează audio de aici",
+  "audioContinueListening": "Continuă ascultarea",
+  "audioPausedAt": "Pauză la {time}",
+  "spaceAudioDownloads": "Descărcări audio",
+  "spaceAudioExplain": "Capitole salvate pentru ascultare offline. Le poți descărca din nou oricând.",
+  "spaceClearAudio": "Șterge descărcările audio",
+  "spaceClearAudioTitle": "Ștergi descărcările audio?",
+  "spaceClearAudioBody": "Capitolele salvate vor fi eliminate de pe acest dispozitiv. Le poți descărca din nou oricând."
 }

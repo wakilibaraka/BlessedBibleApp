@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/audio_bible_service.dart';
@@ -14,6 +13,7 @@ import '../services/audio_verse_timing.dart';
 import '../services/bible_database_service.dart';
 import '../services/translation_pack_store.dart';
 import 'bible_provider.dart';
+import 'last_played_audio_provider.dart';
 
 const Object _unset = Object();
 
@@ -180,6 +180,10 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
   /// ready (used by "play from this verse").
   int? _pendingStartVerse;
 
+  /// Last position written to the resume point, so the position stream does
+  /// not rewrite preferences several times a second.
+  Duration _lastRecordedPosition = Duration.zero;
+
   @override
   AudioBibleState build() {
     _loadPreferences();
@@ -252,6 +256,14 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
         position: position,
         currentVerse: verse ?? state.currentVerse,
       );
+      // Keep a resumable point current without writing preferences on every
+      // tick; ten seconds is finer than anyone resumes to.
+      if (state.isCurrentChapter &&
+          (position - _lastRecordedPosition).abs() >=
+              const Duration(seconds: 10)) {
+        _lastRecordedPosition = position;
+        _recordLastPlayed(state.book!, state.chapter!, position);
+      }
     });
     _durationSub = player.durationStream.listen((duration) {
       if (duration == null) return;
@@ -268,12 +280,19 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
   Future<AudioCacheService> _ensureCache() async {
     final existing = _cache;
     if (existing != null) return existing;
-    final support = await getApplicationSupportDirectory();
-    final cache = AudioCacheService(
-      Directory('${support.path}${Platform.pathSeparator}audio_bible'),
-    );
+    // One definition of where chapters live, shared with Settings → Storage.
+    final cache = await AudioCacheService.openDefault();
     _cache = cache;
     return cache;
+  }
+
+  /// Remembers the chapter and position for Home's Continue listening card.
+  void _recordLastPlayed(String book, int chapter, Duration position) {
+    unawaited(ref.read(lastPlayedAudioProvider.notifier).record(
+          book: book,
+          chapter: chapter,
+          position: position,
+        ));
   }
 
   Future<void> _refreshCacheInfo() async {
@@ -392,6 +411,7 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
     int chapter, {
     bool autoplay = true,
     int? startAtVerse,
+    Duration? startAt,
   }) async {
     _pendingStartVerse = startAtVerse;
     final url = AudioBibleService.urlFor(book, chapter);
@@ -449,6 +469,11 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
           AudioSource.uri(Uri.parse(url), tag: mediaItem),
         );
       }
+      // Resuming from Home lands where the listener left off.
+      if (startAt != null && startAt > Duration.zero) {
+        await player.seek(startAt);
+        _lastRecordedPosition = startAt;
+      }
       if (autoplay) await player.play();
       state = state.copyWith(downloaded: await file.exists());
     } catch (_) {
@@ -459,6 +484,7 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
       );
     }
     await _refreshCacheInfo();
+    _recordLastPlayed(book, chapter, startAt ?? Duration.zero);
     // Read-along needs the text; it is fetched alongside playback so a slow
     // database never delays the sound.
     unawaited(_loadTimeline(book, chapter));
@@ -469,6 +495,10 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
     if (!state.isCurrentChapter) return;
     if (state.playing) {
       await player.pause();
+      // Pausing is a natural resume point; write it immediately.
+      if (state.isCurrentChapter) {
+        _recordLastPlayed(state.book!, state.chapter!, state.position);
+      }
     } else {
       await player.play();
     }

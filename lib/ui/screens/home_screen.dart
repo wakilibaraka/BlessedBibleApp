@@ -20,6 +20,7 @@ import '../widgets/passage_reader_link.dart';
 import '../sheets/appearance_settings_sheet.dart';
 import '../widgets/shared_top_header.dart';
 import '../widgets/glass_container.dart';
+import '../widgets/continue_listening_card.dart';
 import '../widgets/bouncy_entrance.dart';
 import '../widgets/commentary_view.dart';
 import '../../state/commentary_provider.dart';
@@ -437,6 +438,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
 
           const SizedBox(height: 16),
+
+          // ── Continue listening (audio) ───────────
+          const ContinueListeningCard(),
 
           // ── Word of the Day Section ──────────────
           const WordOfTheDaySection(),

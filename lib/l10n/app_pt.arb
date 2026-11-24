@@ -1224,5 +1224,12 @@
   "audioAdvanceChapter": "Continuar a reproduzir",
   "audioAdvanceBook": "Parar no fim do livro",
   "audioAdvanceOff": "Parar no fim do capítulo",
-  "audioAnchorFromHere": "Sincronizar o áudio a partir daqui"
+  "audioAnchorFromHere": "Sincronizar o áudio a partir daqui",
+  "audioContinueListening": "Continuar a ouvir",
+  "audioPausedAt": "Em pausa em {time}",
+  "spaceAudioDownloads": "Downloads de áudio",
+  "spaceAudioExplain": "Capítulos guardados para ouvir offline. Pode voltar a transferi-los a qualquer momento.",
+  "spaceClearAudio": "Limpar downloads de áudio",
+  "spaceClearAudioTitle": "Limpar os downloads de áudio?",
+  "spaceClearAudioBody": "Os capítulos guardados serão removidos deste dispositivo. Pode transferi-los novamente quando quiser."
 }

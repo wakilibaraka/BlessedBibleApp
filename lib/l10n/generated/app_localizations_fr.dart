@@ -4388,4 +4388,29 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get audioAnchorFromHere => 'Synchroniser l\'audio à partir d\'ici';
+
+  @override
+  String get audioContinueListening => 'Continuer l\'écoute';
+
+  @override
+  String audioPausedAt(Object time) {
+    return 'En pause à $time';
+  }
+
+  @override
+  String get spaceAudioDownloads => 'Téléchargements audio';
+
+  @override
+  String get spaceAudioExplain =>
+      'Chapitres enregistrés pour l\'écoute hors ligne. Vous pouvez les retélécharger à tout moment.';
+
+  @override
+  String get spaceClearAudio => 'Supprimer les téléchargements audio';
+
+  @override
+  String get spaceClearAudioTitle => 'Supprimer les téléchargements audio ?';
+
+  @override
+  String get spaceClearAudioBody =>
+      'Les chapitres enregistrés seront retirés de cet appareil. Vous pourrez les télécharger à nouveau.';
 }
