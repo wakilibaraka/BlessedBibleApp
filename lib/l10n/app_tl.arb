@@ -1224,5 +1224,12 @@
   "audioAdvanceChapter": "Magpatuloy",
   "audioAdvanceBook": "Huminto sa dulo ng aklat",
   "audioAdvanceOff": "Huminto sa dulo ng kabanata",
-  "audioAnchorFromHere": "I-sync ang audio mula rito"
+  "audioAnchorFromHere": "I-sync ang audio mula rito",
+  "audioContinueListening": "Magpatuloy makinig",
+  "audioPausedAt": "Naka-pause sa {time}",
+  "spaceAudioDownloads": "Mga audio download",
+  "spaceAudioExplain": "Mga kabanatang naka-save para sa offline na pakikinig. Maaari mong i-download muli anumang oras.",
+  "spaceClearAudio": "I-clear ang mga audio download",
+  "spaceClearAudioTitle": "I-clear ang mga audio download?",
+  "spaceClearAudioBody": "Tatanggalin sa device na ito ang mga naka-save na kabanata. Maaari mong i-download muli anumang oras."
 }

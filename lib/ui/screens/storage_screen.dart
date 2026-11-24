@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../services/audio_cache_service.dart';
 import '../../services/bible_database_service.dart';
 import '../../services/firebase_setup.dart';
 import '../../services/translation_downloader.dart';
@@ -29,10 +30,11 @@ class StorageScreen extends ConsumerStatefulWidget {
 }
 
 class _StorageScreenState extends ConsumerState<StorageScreen> {
-  /// cache bytes, downloads bytes, per-pack sizes.
+  /// cache bytes, downloads bytes, audio bytes, per-pack sizes.
   int _cacheBytes = 0;
   int _contentBytes = 0;
   int _downloadBytes = 0;
+  int _audioBytes = 0;
   bool _busy = false;
   List<_PackRow> _packs = const [];
   bool _loaded = false;
@@ -47,6 +49,7 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
     final cache = await _cacheBytesUsed();
     final content = await bibleDbService.contentBytesUsed();
     final packs = await _readPacks();
+    final audio = await _audioCacheBytes();
     final downloads =
         packs.fold<int>(0, (sum, p) => sum + (p.downloaded ? p.sizeBytes : 0));
     if (!mounted) return;
@@ -55,8 +58,20 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
       _contentBytes = content;
       _packs = packs;
       _downloadBytes = downloads;
+      _audioBytes = audio;
       _loaded = true;
     });
+  }
+
+  /// Chapters kept for offline listening, measured through the same service
+  /// the player uses so the number matches what is actually on disk.
+  Future<int> _audioCacheBytes() async {
+    try {
+      final cache = await AudioCacheService.openDefault();
+      return await cache.totalBytes();
+    } catch (_) {
+      return 0;
+    }
   }
 
   /// Cache = temp dir (generated share cards, thumbnails) + any
@@ -152,6 +167,23 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
         }
       }
       return freed;
+    }, success: success);
+  }
+
+  Future<void> _clearAudio() async {
+    final confirmed = await _confirm(
+      title: context.l10n.spaceClearAudioTitle,
+      body: context.l10n.spaceClearAudioBody,
+      confirmLabel: context.l10n.spaceClearAudio,
+      destructive: true,
+    );
+    if (!confirmed || !mounted) return;
+    final success = context.l10n.spaceAudioDownloads;
+    await _run(() async {
+      final cache = await AudioCacheService.openDefault();
+      final before = await cache.totalBytes();
+      await cache.clear();
+      return before;
     }, success: success);
   }
 
@@ -287,6 +319,9 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
                         _StatRow(
                             label: context.l10n.spaceCache,
                             value: _mb(_cacheBytes)),
+                        _StatRow(
+                            label: context.l10n.spaceAudioDownloads,
+                            value: _mb(_audioBytes)),
                       ],
                     ),
                   ),
@@ -312,6 +347,40 @@ class _StorageScreenState extends ConsumerState<StorageScreen> {
                             onPressed: _busy ? null : _clearCache,
                             icon: const Icon(Icons.cleaning_services_rounded),
                             label: Text(context.l10n.spaceClearCache),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  // ── Audio downloads ─────────────────────────
+                  V2Card(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        V2Eyebrow(context.l10n.spaceAudioDownloads),
+                        const SizedBox(height: 6),
+                        Text(
+                          context.l10n.spaceAudioExplain,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.7),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _mb(_audioBytes),
+                          style: theme.textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w800),
+                        ),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed:
+                                _busy || _audioBytes <= 0 ? null : _clearAudio,
+                            icon: const Icon(Icons.delete_outline_rounded),
+                            label: Text(context.l10n.spaceClearAudio),
                           ),
                         ),
                       ],

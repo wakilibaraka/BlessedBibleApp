@@ -4370,4 +4370,29 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get audioAnchorFromHere => 'I-sync ang audio mula rito';
+
+  @override
+  String get audioContinueListening => 'Magpatuloy makinig';
+
+  @override
+  String audioPausedAt(Object time) {
+    return 'Naka-pause sa $time';
+  }
+
+  @override
+  String get spaceAudioDownloads => 'Mga audio download';
+
+  @override
+  String get spaceAudioExplain =>
+      'Mga kabanatang naka-save para sa offline na pakikinig. Maaari mong i-download muli anumang oras.';
+
+  @override
+  String get spaceClearAudio => 'I-clear ang mga audio download';
+
+  @override
+  String get spaceClearAudioTitle => 'I-clear ang mga audio download?';
+
+  @override
+  String get spaceClearAudioBody =>
+      'Tatanggalin sa device na ito ang mga naka-save na kabanata. Maaari mong i-download muli anumang oras.';
 }

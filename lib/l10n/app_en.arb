@@ -2388,5 +2388,19 @@
   "audioAdvanceChapter": "Keep playing",
   "audioAdvanceBook": "Stop at the end of the book",
   "audioAdvanceOff": "Stop at the end of the chapter",
-  "audioAnchorFromHere": "Sync the audio from here"
+  "audioAnchorFromHere": "Sync the audio from here",
+  "audioContinueListening": "Continue listening",
+  "audioPausedAt": "Paused at {time}",
+  "spaceAudioDownloads": "Audio downloads",
+  "spaceAudioExplain": "Chapters saved for offline listening. You can download them again at any time.",
+  "spaceClearAudio": "Clear audio downloads",
+  "spaceClearAudioTitle": "Clear audio downloads?",
+  "spaceClearAudioBody": "Saved chapters will be removed from this device. You can download them again at any time.",
+  "audioContinueListening": "Continue listening",
+  "audioPausedAt": "Paused at {time}",
+  "spaceAudioDownloads": "Audio downloads",
+  "spaceAudioExplain": "Chapters saved for offline listening. You can download them again at any time.",
+  "spaceClearAudio": "Clear audio downloads",
+  "spaceClearAudioTitle": "Clear audio downloads?",
+  "spaceClearAudioBody": "Saved chapters will be removed from this device. You can download them again at any time."
 }

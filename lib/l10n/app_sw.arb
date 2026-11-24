@@ -1224,5 +1224,12 @@
   "audioAdvanceChapter": "Endelea kucheza",
   "audioAdvanceBook": "Simama mwisho wa kitabu",
   "audioAdvanceOff": "Simama mwisho wa sura",
-  "audioAnchorFromHere": "Sawazisha sauti kuanzia hapa"
+  "audioAnchorFromHere": "Sawazisha sauti kuanzia hapa",
+  "audioContinueListening": "Endelea kusikiliza",
+  "audioPausedAt": "Imesimama saa {time}",
+  "spaceAudioDownloads": "Vipakuliwa vya sauti",
+  "spaceAudioExplain": "Sura zilizohifadhiwa kwa kusikiliza bila mtandao. Unaweza kuzipakua tena wakati wowote.",
+  "spaceClearAudio": "Futa vipakuliwa vya sauti",
+  "spaceClearAudioTitle": "Ungependa kufuta vipakuliwa vya sauti?",
+  "spaceClearAudioBody": "Sura zilizohifadhiwa zitaondolewa kwenye kifaa hiki. Unaweza kuzipakua tena wakati wowote."
 }

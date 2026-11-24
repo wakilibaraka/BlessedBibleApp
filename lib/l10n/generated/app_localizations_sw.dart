@@ -4342,4 +4342,29 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get audioAnchorFromHere => 'Sawazisha sauti kuanzia hapa';
+
+  @override
+  String get audioContinueListening => 'Endelea kusikiliza';
+
+  @override
+  String audioPausedAt(Object time) {
+    return 'Imesimama saa $time';
+  }
+
+  @override
+  String get spaceAudioDownloads => 'Vipakuliwa vya sauti';
+
+  @override
+  String get spaceAudioExplain =>
+      'Sura zilizohifadhiwa kwa kusikiliza bila mtandao. Unaweza kuzipakua tena wakati wowote.';
+
+  @override
+  String get spaceClearAudio => 'Futa vipakuliwa vya sauti';
+
+  @override
+  String get spaceClearAudioTitle => 'Ungependa kufuta vipakuliwa vya sauti?';
+
+  @override
+  String get spaceClearAudioBody =>
+      'Sura zilizohifadhiwa zitaondolewa kwenye kifaa hiki. Unaweza kuzipakua tena wakati wowote.';
 }
