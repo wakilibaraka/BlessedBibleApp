@@ -4,6 +4,17 @@ All notable changes to The Blessed Bible. Newest first.
 
 ## [Unreleased]
 
+## [1.0.7] - 2026-11-24
+
+### Audio Bible
+- **Read along:** the chapter text follows the narrated verse, steps aside when you scroll, and offers "Back to the playing verse". Verse timing is estimated from the text, and tapping the verse you hear corrects the chapter.
+- **Offline read-along from install:** the World English Bible text ships with the app (~5 MB), so a fresh install follows the narration without downloading a translation.
+- **Verse-aware scrubber:** one tick per verse, with the current verse named above the bar.
+- **Built for listening:** continuous play, a 15/30/45/60-minute sleep timer, 10-second skips, 0.75×–2× speed, and a mini player plus media notification that keep playing with the screen off.
+- **Resume from Home:** a **Continue listening** card opens the last chapter at the position it was left.
+- **Downloads in Settings → Storage:** the chapter-audio cache's size and clear action now sit beside the app's other storage rows, not only in the player sheet.
+- **Corrections persist:** verse-sync anchors are saved per chapter (`book`, `chapter`, `verse`, `position_ms`, `saved_at`) in `audio_sync_anchors`, capped at 200 chapters with the oldest dropped first, and applied before a chapter's first timeline is built, so a listener only corrects a chapter once.
+
 ## [0.0.7] - 2026-11-23
 
 ### Reader
