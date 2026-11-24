@@ -7,6 +7,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/audio_anchor_store.dart';
 import '../services/audio_bible_service.dart';
 import '../services/audio_cache_service.dart';
 import '../services/audio_verse_timing.dart';
@@ -174,6 +175,10 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
   /// per chapter so scrubbing back to it keeps the correction.
   final Map<String, VerseAnchor> _anchors = {};
 
+  /// Persists those corrections, so a chapter only has to be corrected once.
+  static const AudioAnchorStore _anchorStore = AudioAnchorStore();
+  Future<void>? _anchorsLoading;
+
   bool _bookDownloading = false;
 
   /// A verse to jump to once the timeline for a freshly opened chapter is
@@ -187,6 +192,7 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
   @override
   AudioBibleState build() {
     _loadPreferences();
+    unawaited(_ensureAnchorsLoaded());
     ref.onDispose(() {
       _playerSub?.cancel();
       _positionSub?.cancel();
@@ -341,6 +347,29 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
     return const [];
   }
 
+  /// Loads saved corrections once; every chapter opened afterwards gets its
+  /// correction applied by [_applyTimeline] without another disk read.
+  Future<void> _ensureAnchorsLoaded() {
+    return _anchorsLoading ??= _loadAnchors();
+  }
+
+  Future<void> _loadAnchors() async {
+    try {
+      final saved = await _anchorStore.load();
+      _anchors.addAll(saved);
+    } catch (_) {
+      // Read-along still works without corrections; it is just an estimate.
+    }
+  }
+
+  Future<void> _persistAnchor(AudioSyncAnchor anchor) async {
+    try {
+      await _anchorStore.save(anchor);
+    } catch (_) {
+      // A correction that cannot be written still applies to this session.
+    }
+  }
+
   Future<void> _loadTimeline(String book, int chapter) async {
     if (_timelineLoading) return;
     _timelineLoading = true;
@@ -348,6 +377,10 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
       final id = AudioBibleService.chapterId(book, chapter);
       final verses = await _versesForTiming(book, chapter);
       if (verses.isEmpty) return;
+      if (state.book != book || state.chapter != chapter) return;
+      // A saved correction has to be in place before the first timeline is
+      // built, otherwise the chapter opens uncorrected and then jumps.
+      await _ensureAnchorsLoaded();
       if (state.book != book || state.chapter != chapter) return;
       _timelineChapterId = id;
       _timelineVerses = verses;
@@ -533,7 +566,15 @@ class AudioBibleNotifier extends Notifier<AudioBibleState> {
     final chapter = state.chapter;
     if (book == null || chapter == null) return;
     final id = AudioBibleService.chapterId(book, chapter);
-    _anchors[id] = VerseAnchor(verse: verse, at: state.position);
+    final anchor = VerseAnchor(verse: verse, at: state.position);
+    _anchors[id] = anchor;
+    unawaited(_persistAnchor(AudioSyncAnchor(
+      book: book,
+      chapter: chapter,
+      verse: verse,
+      position: anchor.at,
+      savedAt: DateTime.now(),
+    )));
     _timelineDuration = null;
     _applyTimeline();
   }
