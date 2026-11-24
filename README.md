@@ -68,9 +68,12 @@ Get the latest release APKs directly from [GitHub Releases](https://github.com/w
 - **Honest Progress**: Day completion survives re-partitioning (style changes, pace changes, imports) because progress is keyed by passage content, not by day number.
 
 ### 🎧 Listen to Any Chapter
-- **Tap the headphones in the reader**: streams the public-domain World English Bible narration for the chapter you are on (about 0.2–1 MB each). No audio ships in the app, so the download stays small.
-- **Offline only when you ask**: download a single chapter to listen without a connection. Downloads are capped at 200 MB and the oldest are dropped first; clear them from the player at any time.
-- **Built for listening**: continuous play auto-advances to the next chapter, with 10-second skips and 0.75×–2× speed.
+- **Tap the headphones in the reader**: streams the public-domain World English Bible narration for the chapter you are on (about 0.2–1 MB each), with a media notification and lock-screen controls. No narration files ship in the app, so the download stays small.
+- **WEB on device from install**: the World English Bible text ships with the app (about 5 MB), so read-along works offline on a fresh install without downloading a translation.
+- **Read along**: the text follows the narrated verse, steps aside the moment you scroll, and offers "Back to the playing verse". Verse timing is estimated from the text — tap the verse you hear to correct a chapter, and the correction is saved so you only fix a chapter once.
+- **Verse-aware scrubber**: one tick per verse; tap to jump to a verse or drag to scrub, with the current verse named above the bar.
+- **Built for listening**: continuous play (next chapter, or stop at the end of the book), a 15/30/45/60-minute sleep timer, 10-second skips, and 0.75×–2× speed.
+- **Offline and resumable**: download a single chapter or a whole book (capped at 200 MB, oldest dropped first), clear downloads from the player or from **Settings → Storage**, and resume the last chapter from the **Continue listening** card on Home.
 
 ### 🎨 Dynamic Themes & Custom Typography
 - **14 Hand-Crafted Visual Themes**: Light, Dark, Sepia, OLED black, Earth, Paperlike, and Claymorphic styles with live recoloring.
@@ -96,7 +99,7 @@ Get the latest release APKs directly from [GitHub Releases](https://github.com/w
 - **Local Storage**: Bundled SQLite database (`sqflite`), Git LFS data packs, and `shared_preferences`
 - **Cloud & Sync**: Firebase Auth, Cloud Firestore (with strict security rules), Firebase App Check, and Crashlytics
 - **Design Tokens**: Centralized token architecture (`AppPalette`, `TypeScale`, `Radii`, `Elevation`) ensuring consistent styling without raw magic values
-- **CI/CD Pipeline**: GitHub Actions running automated formatting, static analysis (`--fatal-infos`), 420+ unit/widget tests, golden snapshots, Firestore rules tests, and Android debug plus R8/keystore release builds
+- **CI/CD Pipeline**: GitHub Actions running automated formatting, static analysis (`--fatal-infos`), 440+ unit/widget tests, golden snapshots, Firestore rules tests, and Android debug plus R8/keystore release builds
 
 ---
 
@@ -124,6 +127,9 @@ flutter test
 
 # Run app on connected device or emulator
 flutter run
+
+# Build a release APK for modern 64-bit phones (arm64 only, ~5 MB of packs)
+flutter build apk --release --target-platform android-arm64
 ```
 
 ### Content Build Scripts
