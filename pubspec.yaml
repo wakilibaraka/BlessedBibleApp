@@ -48,6 +48,9 @@ dependencies:
       url: https://github.com/wakilibaraka/blessed-account
       ref: b6e43ac708d5853227f033710a836ffd1b2bec36
   just_audio: ^0.10.6
+  # Lock-screen / notification controls and background playback for the
+  # chapter audio. Requires the audio_service activity on Android.
+  just_audio_background: ^0.0.1-beta.17
 
 dev_dependencies:
   flutter_test:

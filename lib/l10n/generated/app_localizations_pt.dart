@@ -4299,4 +4299,68 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get audioListen => 'Ouvir';
+
+  @override
+  String get audioPlay => 'Reproduzir';
+
+  @override
+  String get audioPause => 'Pausar';
+
+  @override
+  String audioNowPlaying(Object verse) {
+    return 'Versículo $verse';
+  }
+
+  @override
+  String get audioFollow => 'Rolar com o áudio';
+
+  @override
+  String get audioFollowPaused => 'Rolagem pausada';
+
+  @override
+  String get audioBackToVerse => 'Voltar ao versículo em reprodução';
+
+  @override
+  String get audioSleepTimer => 'Temporizador';
+
+  @override
+  String get audioSleepOff => 'Temporizador desligado';
+
+  @override
+  String audioSleepRemaining(Object time) {
+    return 'Faltam $time';
+  }
+
+  @override
+  String get audioDownloadBook => 'Baixar este livro';
+
+  @override
+  String audioBookDownloading(Object done, Object total) {
+    return '$done de $total capítulos';
+  }
+
+  @override
+  String get audioListenInWeb => 'Ler em paralelo em WEB';
+
+  @override
+  String get audioSyncApprox =>
+      'A sincronização é estimada. Toque num versículo para corrigir.';
+
+  @override
+  String get audioPlayFromVerse => 'Reproduzir a partir deste versículo';
+
+  @override
+  String get audioAdvanceTitle => 'Ao terminar um capítulo';
+
+  @override
+  String get audioAdvanceChapter => 'Continuar a reproduzir';
+
+  @override
+  String get audioAdvanceBook => 'Parar no fim do livro';
+
+  @override
+  String get audioAdvanceOff => 'Parar no fim do capítulo';
+
+  @override
+  String get audioAnchorFromHere => 'Sincronizar o áudio a partir daqui';
 }

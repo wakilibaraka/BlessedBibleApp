@@ -85,6 +85,7 @@ class TranslationPackStore {
 
   /// Packs shipped inside the APK (restorable offline).
   static const List<String> bundledPackIds = [
+    'web',
     'swh_ulb',
     'ita_dio',
     'fra_lsg',
@@ -94,10 +95,24 @@ class TranslationPackStore {
     'spa_r09',
   ];
 
+  /// The translation the chapter narration is read from. It ships with the
+  /// app so read-along works offline on a fresh install, with no download.
+  static const String audioTranslationId = 'web';
+
   /// Static catalog metadata for bundled packs so translation lists can be
   /// populated immediately without extracting all 35.4 MB of pack files
   /// on first launch.
   static const Map<String, PackMeta> bundledPackMeta = {
+    'web': PackMeta(
+      id: 'web',
+      languageCode: 'en',
+      languageName: 'English',
+      translationName: 'World English Bible',
+      abbreviation: 'WEB',
+      license: 'Public Domain',
+      isComplete: true,
+      source: 'bundled',
+    ),
     'fra_lsg': PackMeta(
       id: 'fra_lsg',
       languageCode: 'fr',

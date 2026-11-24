@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:blessed_account/blessed_account.dart';
 import 'firebase_options.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,6 +33,13 @@ import 'state/locale_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Keeps the chapter audio alive in the background with lock-screen and
+  // notification controls. Must run before any player is created.
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.baraka.bibleapp.audio',
+    androidNotificationChannelName: 'Bible audio',
+    androidNotificationOngoing: true,
+  );
   late final SharedPreferences rawPrefs;
   await Future.wait([
     Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),

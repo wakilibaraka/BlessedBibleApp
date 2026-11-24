@@ -4278,4 +4278,68 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get audioListen => 'Sikiliza';
+
+  @override
+  String get audioPlay => 'Cheza';
+
+  @override
+  String get audioPause => 'Sitisha';
+
+  @override
+  String audioNowPlaying(Object verse) {
+    return 'Mstari $verse';
+  }
+
+  @override
+  String get audioFollow => 'Sogeza na sauti';
+
+  @override
+  String get audioFollowPaused => 'Usogezaji umesitishwa';
+
+  @override
+  String get audioBackToVerse => 'Rudi kwenye mstari unaosomwa';
+
+  @override
+  String get audioSleepTimer => 'Kipima muda';
+
+  @override
+  String get audioSleepOff => 'Kipima muda kimezimwa';
+
+  @override
+  String audioSleepRemaining(Object time) {
+    return 'Zimesalia $time';
+  }
+
+  @override
+  String get audioDownloadBook => 'Pakua kitabu hiki';
+
+  @override
+  String audioBookDownloading(Object done, Object total) {
+    return '$done kati ya $total sura';
+  }
+
+  @override
+  String get audioListenInWeb => 'Soma sambamba kwa WEB';
+
+  @override
+  String get audioSyncApprox =>
+      'Usawazishaji ni makadirio. Gusa mstari ili kuurekebisha.';
+
+  @override
+  String get audioPlayFromVerse => 'Cheza kutoka mstari huu';
+
+  @override
+  String get audioAdvanceTitle => 'Sura inapoisha';
+
+  @override
+  String get audioAdvanceChapter => 'Endelea kucheza';
+
+  @override
+  String get audioAdvanceBook => 'Simama mwisho wa kitabu';
+
+  @override
+  String get audioAdvanceOff => 'Simama mwisho wa sura';
+
+  @override
+  String get audioAnchorFromHere => 'Sawazisha sauti kuanzia hapa';
 }

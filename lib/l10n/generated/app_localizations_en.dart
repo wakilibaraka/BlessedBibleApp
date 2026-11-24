@@ -4261,4 +4261,68 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get audioListen => 'Listen';
+
+  @override
+  String get audioPlay => 'Play';
+
+  @override
+  String get audioPause => 'Pause';
+
+  @override
+  String audioNowPlaying(Object verse) {
+    return 'Verse $verse';
+  }
+
+  @override
+  String get audioFollow => 'Scroll with the audio';
+
+  @override
+  String get audioFollowPaused => 'Scroll paused';
+
+  @override
+  String get audioBackToVerse => 'Back to the playing verse';
+
+  @override
+  String get audioSleepTimer => 'Sleep timer';
+
+  @override
+  String get audioSleepOff => 'Sleep timer off';
+
+  @override
+  String audioSleepRemaining(Object time) {
+    return '$time left';
+  }
+
+  @override
+  String get audioDownloadBook => 'Download this book';
+
+  @override
+  String audioBookDownloading(Object done, Object total) {
+    return '$done of $total chapters';
+  }
+
+  @override
+  String get audioListenInWeb => 'Read along in WEB';
+
+  @override
+  String get audioSyncApprox =>
+      'Verse sync is estimated. Tap a verse to correct it.';
+
+  @override
+  String get audioPlayFromVerse => 'Play from this verse';
+
+  @override
+  String get audioAdvanceTitle => 'When a chapter ends';
+
+  @override
+  String get audioAdvanceChapter => 'Keep playing';
+
+  @override
+  String get audioAdvanceBook => 'Stop at the end of the book';
+
+  @override
+  String get audioAdvanceOff => 'Stop at the end of the chapter';
+
+  @override
+  String get audioAnchorFromHere => 'Sync the audio from here';
 }

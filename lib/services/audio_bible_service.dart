@@ -23,6 +23,12 @@ class AudioBookSource {
   final int chapters;
 }
 
+/// What happens when a chapter finishes playing.
+/// - [chapter]: keep going into the next chapter, across books.
+/// - [book]: continue within the current book, then stop.
+/// - [off]: stop at the end of every chapter.
+enum AudioAdvanceMode { chapter, book, off }
+
 /// A resolved chapter reference, used for next/previous navigation.
 class AudioChapterRef {
   const AudioChapterRef(this.bookName, this.chapter);
@@ -198,10 +204,18 @@ class AudioBibleService {
     required int? chapter,
     required String? consumedFor,
     required bool navigating,
+    AudioAdvanceMode mode = AudioAdvanceMode.chapter,
   }) {
+    if (mode == AudioAdvanceMode.off) return null;
     if (navigating || book == null || chapter == null) return null;
     if (consumedFor == chapterId(book, chapter)) return null;
-    return next(book, chapter);
+    final target = next(book, chapter);
+    if (target == null) return null;
+    if (mode == AudioAdvanceMode.book) {
+      final source = sourceFor(book);
+      if (source == null || target.bookName != source.bookName) return null;
+    }
+    return target;
   }
 
   /// Cycles 0.75x -> 1x -> 1.25x -> 1.5x -> 2x -> 0.75x, snapping whatever
