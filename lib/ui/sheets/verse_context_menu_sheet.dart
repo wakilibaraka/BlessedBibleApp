@@ -11,6 +11,8 @@ import 'package:flutter/cupertino.dart';
 import '../screens/commentary_hub_screen.dart';
 import '../../state/commentary_provider.dart';
 import '../widgets/cross_references_sheet.dart';
+import '../../services/audio_bible_service.dart';
+import '../../state/audio_bible_provider.dart';
 
 class VerseContextMenuSheet extends ConsumerStatefulWidget {
   final int verseNumber;
@@ -72,6 +74,28 @@ class _VerseContextMenuSheetState extends ConsumerState<VerseContextMenuSheet> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    // Listen from this verse: the narration opens here and the
+                    // player sheet can be reopened from the mini player.
+                    if (AudioBibleService.urlFor(
+                            widget.bookName, widget.chapterNum) !=
+                        null) ...[
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton.icon(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            ref.read(audioBibleProvider.notifier).playFromVerse(
+                                  widget.bookName,
+                                  widget.chapterNum,
+                                  widget.verseNumber,
+                                );
+                          },
+                          icon: const Icon(Icons.play_arrow_rounded, size: 18),
+                          label: Text(context.l10n.audioPlayFromVerse),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                    ],
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [

@@ -45,6 +45,8 @@ import '../../state/hints_provider.dart';
 import '../../models/share_content.dart';
 import '../../services/share_service.dart';
 import '../widgets/audio_bible_sheet.dart';
+import '../widgets/audio_listen_icon.dart';
+import '../../state/audio_bible_provider.dart';
 import '../widgets/share_sheet.dart';
 import '../widgets/radial_action_menu.dart';
 import '../widgets/cross_references_sheet.dart';
@@ -300,6 +302,15 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
   }
 
   int? _navigatedVerseIndex;
+
+  /// True once the listener drags the text away from the narration; auto
+  /// follow stops until they tap "back to the playing verse".
+  bool _audioFollowPaused = false;
+
+  /// The chapter the paused follow belongs to, so moving to another chapter
+  /// starts following again.
+  String? _followedAudioChapterId;
+
   Timer? _scrollDebounceTimer;
   VoidCallback? _pendingScrollSave;
   Timer? _visitTimer;
@@ -585,6 +596,111 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
         fc.chapter.number == loc.chapter);
   }
 
+  /// The reader page showing the chapter that is playing, or -1.
+  int _audioPageIndex() {
+    final audio = ref.read(audioBibleProvider);
+    final book = audio.book;
+    final chapter = audio.chapter;
+    if (book == null || chapter == null) return -1;
+    final flatChapters = ref.read(flatChaptersProvider);
+    return flatChapters.indexWhere((fc) =>
+        fc.book.name.toLowerCase() == book.toLowerCase() &&
+        fc.chapter.number == chapter);
+  }
+
+  /// Scrolls the reader to the verse being narrated. Only called when the
+  /// narrated verse changes, and never while the listener is dragging.
+  void _followAudioVerse(int verse) {
+    if (_audioFollowPaused || _isScrolling.value) return;
+    final audio = ref.read(audioBibleProvider);
+    if (!audio.followAudio || !audio.isCurrentChapter) return;
+    final index = _audioPageIndex();
+    if (index < 0) return;
+    if (_currentPageIndex != index) {
+      _animateToPage(index);
+      // The new page's list has no scroll controller until it builds; the
+      // next verse change will scroll it.
+      return;
+    }
+    final controller = _itemScrollControllers[index];
+    if (controller == null || !controller.isAttached) return;
+    final duration = Motion.of(context, const Duration(milliseconds: 450));
+    if (duration == Duration.zero) {
+      controller.jumpTo(index: verse - 1, alignment: 0.25);
+    } else {
+      controller.scrollTo(
+        index: verse - 1,
+        duration: duration,
+        curve: Curves.easeInOutCubic,
+        alignment: 0.25,
+      );
+    }
+  }
+
+  void _backToPlayingVerse() {
+    setState(() => _audioFollowPaused = false);
+    final verse = ref.read(audioBibleProvider).currentVerse;
+    if (verse != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _followAudioVerse(verse);
+      });
+    }
+  }
+
+  /// A drag means the listener took over, so auto follow steps aside until
+  /// they ask for it back. Programmatic scrolls have no drag details and are
+  /// ignored here.
+  void _noteManualScroll(ScrollNotification notification) {
+    if (notification is! ScrollStartNotification) return;
+    if (notification.dragDetails == null) return;
+    final audio = ref.read(audioBibleProvider);
+    if (!audio.playing || _audioFollowPaused) return;
+    setState(() => _audioFollowPaused = true);
+  }
+
+  Widget _buildBackToVersePill(BuildContext context, ThemeData theme) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(Radii.pill),
+        onTap: _backToPlayingVerse,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(Radii.pill),
+            border: Border.all(
+              color: AppColors.goldAccent.withValues(alpha: 0.45),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: context.palette.shadow,
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const AudioListenIcon(
+                playing: true,
+                color: AppColors.goldAccent,
+                size: 16,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                context.l10n.audioBackToVerse,
+                style: theme.textTheme.labelMedium
+                    ?.copyWith(fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _scrollToVerse(int verse, ReadLocationState loc) {
     void tryScroll(int retries) {
       if (!mounted) return;
@@ -823,11 +939,14 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
               ),
               child: Padding(
                 padding: const EdgeInsets.all(2),
-                child: Icon(
-                  Icons.headphones_rounded,
-                  size: 17,
-                  color: tokens.readingInk.withValues(alpha: 0.8),
-                  semanticLabel: context.l10n.audioListen,
+                child: Semantics(
+                  label: context.l10n.audioListen,
+                  child: AudioListenIcon(
+                    playing:
+                        ref.watch(audioBibleProvider.select((s) => s.playing)),
+                    color: tokens.readingInk.withValues(alpha: 0.8),
+                    size: 17,
+                  ),
                 ),
               ),
             ),
@@ -1026,6 +1145,33 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           .addPostFrameCallback((_) => _applyLocationRequest(next));
     });
 
+    // Read-along: the narration moves a verse at a time, so the text follows
+    // it unless the listener scrolled away.
+    ref.listen<({String? book, int? chapter})>(
+      audioBibleProvider.select((s) => (book: s.book, chapter: s.chapter)),
+      (previous, next) {
+        final id = next.book == null ? null : '${next.book}:${next.chapter}';
+        if (id == _followedAudioChapterId) return;
+        _followedAudioChapterId = id;
+        if (!_audioFollowPaused) return;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && _audioFollowPaused) {
+            setState(() => _audioFollowPaused = false);
+          }
+        });
+      },
+    );
+
+    ref.listen<int?>(
+      audioBibleProvider.select((s) => s.currentVerse),
+      (previous, next) {
+        if (next == null || next == previous) return;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _followAudioVerse(next);
+        });
+      },
+    );
+
     String currentBookName = loc.bookName;
     int currentChapter = loc.chapter;
 
@@ -1043,6 +1189,9 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
           ? appThemeMode.backgroundColor
           : tokens.readingPaper;
     }
+
+    final isAudioPlaying =
+        ref.watch(audioBibleProvider.select((s) => s.playing));
 
     return Scaffold(
       backgroundColor: getThemeBackgroundColor(),
@@ -1272,6 +1421,7 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                                             child: NotificationListener<
                                                 ScrollNotification>(
                                               onNotification: (notification) {
+                                                _noteManualScroll(notification);
                                                 if (notification
                                                         is ScrollStartNotification ||
                                                     notification
@@ -1933,6 +2083,17 @@ class _ReadScreenState extends ConsumerState<ReadScreen>
                     );
                   }),
                 ),
+
+                // ── Back to the narrated verse ────────────────────────
+                if (_audioFollowPaused && isAudioPlaying)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: kBottomDockHeight + kBottomDockInset + 24,
+                    child: Center(
+                      child: _buildBackToVersePill(context, theme),
+                    ),
+                  ),
 
                 // ── Hints UI ──────────────────────────────────────────────────
                 if (_currentHintMessage != null)

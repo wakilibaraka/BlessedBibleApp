@@ -4325,4 +4325,68 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get audioListen => 'Ascultă';
+
+  @override
+  String get audioPlay => 'Redă';
+
+  @override
+  String get audioPause => 'Pauză';
+
+  @override
+  String audioNowPlaying(Object verse) {
+    return 'Versul $verse';
+  }
+
+  @override
+  String get audioFollow => 'Derulează cu audio';
+
+  @override
+  String get audioFollowPaused => 'Derulare în pauză';
+
+  @override
+  String get audioBackToVerse => 'Înapoi la versetul redat';
+
+  @override
+  String get audioSleepTimer => 'Temporizator';
+
+  @override
+  String get audioSleepOff => 'Temporizator oprit';
+
+  @override
+  String audioSleepRemaining(Object time) {
+    return 'Mai sunt $time';
+  }
+
+  @override
+  String get audioDownloadBook => 'Descarcă această carte';
+
+  @override
+  String audioBookDownloading(Object done, Object total) {
+    return '$done din $total capitole';
+  }
+
+  @override
+  String get audioListenInWeb => 'Citește în paralel în WEB';
+
+  @override
+  String get audioSyncApprox =>
+      'Sincronizarea este estimată. Atinge un verset pentru a o corecta.';
+
+  @override
+  String get audioPlayFromVerse => 'Redă de la acest verset';
+
+  @override
+  String get audioAdvanceTitle => 'La finalul unui capitol';
+
+  @override
+  String get audioAdvanceChapter => 'Continuă redarea';
+
+  @override
+  String get audioAdvanceBook => 'Oprește la finalul cărții';
+
+  @override
+  String get audioAdvanceOff => 'Oprește la finalul capitolului';
+
+  @override
+  String get audioAnchorFromHere => 'Sincronizează audio de aici';
 }

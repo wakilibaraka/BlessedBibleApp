@@ -7346,6 +7346,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Listen'**
   String get audioListen;
+
+  /// No description provided for @audioPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get audioPlay;
+
+  /// No description provided for @audioPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get audioPause;
+
+  /// No description provided for @audioNowPlaying.
+  ///
+  /// In en, this message translates to:
+  /// **'Verse {verse}'**
+  String audioNowPlaying(Object verse);
+
+  /// No description provided for @audioFollow.
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll with the audio'**
+  String get audioFollow;
+
+  /// No description provided for @audioFollowPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll paused'**
+  String get audioFollowPaused;
+
+  /// No description provided for @audioBackToVerse.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to the playing verse'**
+  String get audioBackToVerse;
+
+  /// No description provided for @audioSleepTimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep timer'**
+  String get audioSleepTimer;
+
+  /// No description provided for @audioSleepOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep timer off'**
+  String get audioSleepOff;
+
+  /// No description provided for @audioSleepRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{time} left'**
+  String audioSleepRemaining(Object time);
+
+  /// No description provided for @audioDownloadBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Download this book'**
+  String get audioDownloadBook;
+
+  /// No description provided for @audioBookDownloading.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} chapters'**
+  String audioBookDownloading(Object done, Object total);
+
+  /// No description provided for @audioListenInWeb.
+  ///
+  /// In en, this message translates to:
+  /// **'Read along in WEB'**
+  String get audioListenInWeb;
+
+  /// No description provided for @audioSyncApprox.
+  ///
+  /// In en, this message translates to:
+  /// **'Verse sync is estimated. Tap a verse to correct it.'**
+  String get audioSyncApprox;
+
+  /// No description provided for @audioPlayFromVerse.
+  ///
+  /// In en, this message translates to:
+  /// **'Play from this verse'**
+  String get audioPlayFromVerse;
+
+  /// No description provided for @audioAdvanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'When a chapter ends'**
+  String get audioAdvanceTitle;
+
+  /// No description provided for @audioAdvanceChapter.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep playing'**
+  String get audioAdvanceChapter;
+
+  /// No description provided for @audioAdvanceBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop at the end of the book'**
+  String get audioAdvanceBook;
+
+  /// No description provided for @audioAdvanceOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop at the end of the chapter'**
+  String get audioAdvanceOff;
+
+  /// No description provided for @audioAnchorFromHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync the audio from here'**
+  String get audioAnchorFromHere;
 }
 
 class _AppLocalizationsDelegate

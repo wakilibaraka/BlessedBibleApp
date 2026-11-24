@@ -20,6 +20,7 @@ import 'study_screen_v2.dart';
 import 'settings_screen.dart';
 import '../sheets/search_settings_sheet.dart';
 import '../widgets/animated_background.dart';
+import '../widgets/mini_audio_player.dart';
 import '../widgets/bouncy_entrance.dart';
 import '../widgets/crossed_swords_icon.dart';
 import '../widgets/verse_action_sheet.dart';
@@ -206,6 +207,15 @@ class MainNavScreen extends ConsumerWidget {
           extendBody: true,
           body: Stack(
             children: [
+              // Narration stays reachable above the dock after the player
+              // sheet is dismissed.
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom:
+                    kBottomDockInset * 2 + kBottomDockHeight + kBottomDockGap,
+                child: const MiniAudioPlayer(),
+              ),
               _StaggeredTabStack(
                 index: currentIndex,
                 children: screens.asMap().entries.map((entry) {

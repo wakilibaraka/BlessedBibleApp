@@ -4306,4 +4306,68 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get audioListen => 'Makinig';
+
+  @override
+  String get audioPlay => 'I-play';
+
+  @override
+  String get audioPause => 'I-pause';
+
+  @override
+  String audioNowPlaying(Object verse) {
+    return 'Talata $verse';
+  }
+
+  @override
+  String get audioFollow => 'Mag-scroll kasama ng audio';
+
+  @override
+  String get audioFollowPaused => 'Naka-pause ang pag-scroll';
+
+  @override
+  String get audioBackToVerse => 'Bumalik sa tumutugtog na talata';
+
+  @override
+  String get audioSleepTimer => 'Sleep timer';
+
+  @override
+  String get audioSleepOff => 'Naka-off ang sleep timer';
+
+  @override
+  String audioSleepRemaining(Object time) {
+    return '$time ang natitira';
+  }
+
+  @override
+  String get audioDownloadBook => 'I-download ang aklat na ito';
+
+  @override
+  String audioBookDownloading(Object done, Object total) {
+    return '$done sa $total kabanata';
+  }
+
+  @override
+  String get audioListenInWeb => 'Magbasa kasabay sa WEB';
+
+  @override
+  String get audioSyncApprox =>
+      'Tantya lang ang pag-sync. I-tap ang talata para itama.';
+
+  @override
+  String get audioPlayFromVerse => 'I-play mula sa talatang ito';
+
+  @override
+  String get audioAdvanceTitle => 'Kapag natapos ang kabanata';
+
+  @override
+  String get audioAdvanceChapter => 'Magpatuloy';
+
+  @override
+  String get audioAdvanceBook => 'Huminto sa dulo ng aklat';
+
+  @override
+  String get audioAdvanceOff => 'Huminto sa dulo ng kabanata';
+
+  @override
+  String get audioAnchorFromHere => 'I-sync ang audio mula rito';
 }
